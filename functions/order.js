@@ -11,6 +11,13 @@ export async function onRequest(context) {
     return new Response(null, { headers: corsHeaders });
   }
 
+  if (!env.ORDERS) {
+    return new Response(JSON.stringify({ success: false, error: 'Storage not configured' }), {
+      status: 503,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
   if (request.method === 'POST') {
     let body;
     try {
