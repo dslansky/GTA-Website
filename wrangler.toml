@@ -1,0 +1,12 @@
+name = "gtawebsite"
+main = "worker.js"
+compatibility_date = "2026-05-14"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "."
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "ORDERS"
+id = "e2e1463276b04a8f81fae35623ce9316"
