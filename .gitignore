@@ -1,0 +1,17 @@
+.claude/
+*.HEIC
+*.heic
+img/*.MP4
+img/*.mp4
+img/[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]-*.JPG
+img/[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]-*.jpg
+img/IMG_2308.jpg
+img/IMG_3426.jpg
+img/IMG_4656.JPG
+img/IMG_4695.jpg
+img/IMG_4878.jpg
+img/IMG_9097.jpg
+img/IMG_9098.jpg
+img/IMG_9099.jpg
+img/IMG_9100.jpg
+img/IMG_9601.jpg

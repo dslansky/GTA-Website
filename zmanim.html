@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zmanim — Greentree Acres</title>
+  <meta name="description" content="Daily halachic times for Greentree Acres in Ferndale, NY (zip 12734), plus the GTA Summer Zmanim 2026 schedule PDF." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .zmanim-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    .zmanim-date-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-secondary);
+    }
+    #zmanim-date {
+      padding: 8px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.875rem;
+      background: var(--color-surface);
+      color: var(--color-dark);
+      cursor: pointer;
+    }
+    #zmanim-date:focus {
+      outline: 2px solid var(--color-green);
+      outline-offset: 2px;
+    }
+
+    #zmanim-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      min-height: 28px;
+    }
+    .zmanim-hebrew {
+      font-size: 0.9rem;
+      color: var(--color-secondary);
+      font-style: italic;
+    }
+    .zmanim-parsha {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--color-green);
+      background: var(--color-green-muted);
+      padding: 3px 11px;
+      border-radius: 100px;
+    }
+
+    #zmanim-status {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: var(--color-secondary);
+    }
+
+    #zmanim-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 24px;
+    }
+    @media (max-width: 600px) {
+      #zmanim-grid { grid-template-columns: 1fr; }
+    }
+    .zmanim-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 16px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .zmanim-label {
+      font-size: 0.85rem;
+      color: var(--color-secondary);
+    }
+    .zmanim-time {
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-green);
+      white-space: nowrap;
+      margin-left: 12px;
+    }
+
+    .pdf-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 28px 0;
+    }
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--color-green);
+      color: white;
+      border-radius: 100px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: opacity var(--transition);
+    }
+    .btn-download:hover { opacity: 0.85; color: white; }
+    .btn-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-dark);
+      border-radius: 100px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .btn-open:hover { border-color: var(--color-green); color: var(--color-green); }
+    .pdf-embed-wrap {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .pdf-embed-wrap iframe {
+      display: block;
+      width: 100%;
+      height: min(80vh, 900px);
+      border: none;
+    }
+    .pdf-embed-fallback {
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--color-secondary);
+      background: var(--color-surface);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       NAV
+  ══════════════════════════════════════ -->
+  <nav id="nav">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img src="img/logo.png" alt="Greentree Acres" class="nav-logo-img" />
+        <span class="nav-logo-text">Greentree Acres</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html#history">Our Story</a></li>
+        <li><a href="index.html#amenities">Amenities</a></li>
+        <li><a href="index.html#gallery">Gallery</a></li>
+        <li><a href="index.html#videos">Videos</a></li>
+        <li><a href="ferndale.html">Ferndale History</a></li>
+        <li><a href="zmanim.html">Zmanim</a></li>
+        <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
+      </ul>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PAGE HEADER
+  ══════════════════════════════════════ -->
+  <section class="page-header">
+    <div class="container page-header-content">
+      <p class="eyebrow">Ferndale, NY · 12734</p>
+      <h1>Zmanim</h1>
+      <p>Daily halachic times for Greentree Acres, plus our summer schedule PDF.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       LIVE ZMANIM
+  ══════════════════════════════════════ -->
+  <section class="section" id="live-zmanim">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Daily Times</p>
+        <h2>Today's Zmanim</h2>
+        <p>Halachic times for Ferndale, NY. Select any date to look up times.</p>
+      </div>
+
+      <div class="zmanim-controls reveal reveal-delay-1">
+        <label class="zmanim-date-label" for="zmanim-date">Date</label>
+        <input type="date" id="zmanim-date" />
+      </div>
+
+      <div id="zmanim-meta"></div>
+      <p id="zmanim-status"></p>
+      <div id="zmanim-grid"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       COLONY ZMANIM PDF
+  ══════════════════════════════════════ -->
+  <section class="section--sm" id="colony-schedule" style="background: var(--color-surface); border-top: 1px solid var(--color-border);">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Colony Schedule</p>
+        <h2>GTA Summer Zmanim 2026</h2>
+        <p>Printable zmanim schedule for the colony. Download or view below.</p>
+      </div>
+
+      <div class="pdf-actions reveal reveal-delay-1">
+        <a href="pdf/GTA%20Summer%20Zmanim%202026.pdf" download class="btn-download">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </a>
+        <a href="pdf/GTA%20Summer%20Zmanim%202026.pdf" target="_blank" rel="noopener noreferrer" class="btn-open">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open in new tab
+        </a>
+      </div>
+
+      <div class="pdf-embed-wrap reveal reveal-delay-2">
+        <iframe
+          src="pdf/GTA%20Summer%20Zmanim%202026.pdf"
+          title="GTA Summer Zmanim 2026"
+          loading="lazy"
+        ></iframe>
+        <p class="pdf-embed-fallback">If the PDF appears blank, use <strong>Open in new tab</strong> above.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="img/logo.png" alt="Greentree Acres" class="footer-logo" />
+        <p>&copy; 2026 Greentree Acres. All rights reserved.</p>
+      </div>
+      <p>
+        Historical context courtesy of the
+        <a href="https://borschtbelthistoricalmarkerproject.org/ferndale" target="_blank" rel="noopener noreferrer">
+          Borscht Belt Historical Marker Project
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    (function () {
+      var ROWS = [
+        { label: 'Alot HaShachar',           keys: ['alotHaShachar'] },
+        { label: 'Misheyakir',                keys: ['misheyakir', 'misheyakirMachmir'] },
+        { label: 'Sunrise',                   keys: ['sunrise', 'dawn'] },
+        { label: 'Sof Zman Kriat Shma (GRA)', keys: ['sofZmanShma', 'sofZmanShmaBaalHatanya'] },
+        { label: 'Sof Zman Kriat Shma (MGA)', keys: ['sofZmanShmaMGA', 'sofZmanShmaMGA19Point8', 'sofZmanShmaMGA16Point1'] },
+        { label: 'Sof Zman Tefila (GRA)',     keys: ['sofZmanTfilla', 'sofZmanTfilaBaalHatanya'] },
+        { label: 'Sof Zman Tefila (MGA)',     keys: ['sofZmanTfillaMGA', 'sofZmanTfillaMGA19Point8', 'sofZmanTfillaMGA16Point1'] },
+        { label: 'Chatzot',                   keys: ['chatzot'] },
+        { label: 'Mincha Gedola',             keys: ['minchaGedola', 'minchaGedolaBaalHatanya', 'minchaGedolaMGA'] },
+        { label: 'Mincha Ketana',             keys: ['minchaKetana', 'minchaKetanaBaalHatanya', 'minchaKetanaMGA'] },
+        { label: 'Plag HaMincha',             keys: ['plagHaMincha', 'plagHaminchaBaalHatanya'] },
+        { label: 'Shkiah',                    keys: ['shkia', 'sunset', 'dusk'] },
+        { label: 'Tzeit HaKochavim',          keys: ['tzeit', 'tzeit85deg', 'tzeit72min', 'tzaisBaalHatanya', 'tzeit50min', 'tzeit42min'] },
+      ];
+
+      function todayNY() {
+        return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+      }
+
+      function formatTime(iso) {
+        if (!iso || typeof iso !== 'string' || !iso.includes('T')) return null;
+        var d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        return d.toLocaleTimeString('en-US', {
+          hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/New_York'
+        });
+      }
+
+      function firstTime(times, keys) {
+        for (var i = 0; i < keys.length; i++) {
+          var v = times[keys[i]];
+          var raw = v && typeof v === 'object' && 'value' in v ? v.value : v;
+          var t = formatTime(raw);
+          if (t) return t;
+        }
+        return null;
+      }
+
+      function esc(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
+
+      function load(date) {
+        var grid   = document.getElementById('zmanim-grid');
+        var meta   = document.getElementById('zmanim-meta');
+        var status = document.getElementById('zmanim-status');
+        var parts  = date.split('-');
+        var y = parts[0], m = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+
+        status.textContent = 'Loading…';
+        grid.innerHTML = '';
+        meta.innerHTML = '';
+
+        Promise.all([
+          fetch('https://www.hebcal.com/zmanim?cfg=json&geo=zip&zip=12734&tzid=America%2FNew_York&date=' + date),
+          fetch('https://www.hebcal.com/converter?cfg=json&gy=' + y + '&gm=' + m + '&gd=' + d + '&g2h=1')
+        ]).then(function(responses) {
+          return Promise.all(responses.map(function(r) { return r.json(); }));
+        }).then(function(data) {
+          var zm   = data[0];
+          var conv = data[1];
+          status.textContent = '';
+
+          var metaHtml = '';
+          if (conv.hebrew) metaHtml += '<span class="zmanim-hebrew">' + esc(conv.hebrew) + '</span>';
+          var parsha = Array.isArray(conv.events) && conv.events.find(function(e) { return /parashat/i.test(e); });
+          if (parsha) metaHtml += '<span class="zmanim-parsha">' + esc(parsha) + '</span>';
+          meta.innerHTML = metaHtml;
+
+          var times = zm.times || {};
+          grid.innerHTML = ROWS.map(function(row) {
+            var t = firstTime(times, row.keys);
+            return '<div class="zmanim-row"><span class="zmanim-label">' + esc(row.label) +
+                   '</span><span class="zmanim-time">' + (t ? esc(t) : '—') + '</span></div>';
+          }).join('');
+        }).catch(function() {
+          status.textContent = 'Could not load zmanim. Please check your connection and try again.';
+        });
+      }
+
+      var input = document.getElementById('zmanim-date');
+      input.value = todayNY();
+      load(input.value);
+      input.addEventListener('change', function() { if (input.value) load(input.value); });
+    })();
+  </script>
+</body>
+</html>
