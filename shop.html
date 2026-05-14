@@ -12,6 +12,7 @@
 
   <link rel="stylesheet" href="css/styles.css" />
   <style>
+    /* ── Grid ── */
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -21,6 +22,7 @@
     @media (max-width: 900px) { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 560px) { .shop-grid { grid-template-columns: 1fr; } }
 
+    /* ── Card ── */
     .shop-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
@@ -85,6 +87,64 @@
       margin-bottom: 16px;
     }
 
+    /* ── Size + Qty ── */
+    .shop-card-options {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .size-select {
+      flex: 1;
+      padding: 7px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.8rem;
+      background: var(--color-bg, #f9f9f7);
+      color: var(--color-dark);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .size-select:focus { outline: 2px solid var(--color-green); outline-offset: 2px; }
+    .size-select.error { border-color: #e53e3e; }
+
+    .qty-stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .qty-btn {
+      width: 30px;
+      height: 32px;
+      background: var(--color-surface);
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      color: var(--color-dark);
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-btn:hover { background: var(--color-green-muted); }
+    .qty-val {
+      min-width: 28px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      border-left: 1px solid var(--color-border);
+      border-right: 1px solid var(--color-border);
+      padding: 0 4px;
+      line-height: 32px;
+    }
+
+    /* ── Card Footer ── */
     .shop-card-footer {
       display: flex;
       align-items: center;
@@ -106,15 +166,20 @@
       padding: 9px 18px;
       background: var(--color-green);
       color: white;
+      border: none;
       border-radius: 100px;
       font-size: 0.8rem;
       font-weight: 600;
+      font-family: var(--font);
       letter-spacing: 0.01em;
+      cursor: pointer;
       transition: opacity var(--transition);
       white-space: nowrap;
     }
-    .btn-order:hover { opacity: 0.85; color: white; }
+    .btn-order:hover { opacity: 0.85; }
+    .btn-order:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    /* ── Info note ── */
     .shop-note {
       margin-top: 48px;
       padding: 24px 28px;
@@ -128,6 +193,226 @@
     .shop-note svg { flex-shrink: 0; color: var(--color-green); margin-top: 2px; }
     .shop-note p { color: var(--color-dark); font-size: 0.9rem; line-height: 1.65; margin: 0; }
     .shop-note strong { color: var(--color-green); }
+
+    /* ── Floating cart button ── */
+    #cart-float-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 900;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--color-green);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    #cart-float-btn:hover { opacity: 0.9; transform: scale(1.05); }
+
+    #cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #e53e3e;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 100px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      font-family: var(--font);
+    }
+    #cart-badge.visible { display: flex; }
+
+    /* ── Cart overlay ── */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 950;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── Cart drawer ── */
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(420px, 100vw);
+      background: white;
+      z-index: 960;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+    }
+    .cart-drawer.open { transform: translateX(0); }
+
+    .cart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .cart-header h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin: 0;
+    }
+    #cart-close {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--color-secondary);
+      line-height: 1;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #cart-close:hover { color: var(--color-dark); }
+
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 24px;
+    }
+
+    .cart-empty {
+      text-align: center;
+      color: var(--color-secondary);
+      font-size: 0.9rem;
+      margin-top: 40px;
+    }
+
+    .cart-item-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .cart-item-row:last-child { border-bottom: none; }
+
+    .cart-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+    }
+    .cart-item-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-dark);
+    }
+    .cart-item-size {
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+    }
+
+    .cart-item-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .cart-item-qty {
+      font-size: 0.8rem;
+      color: var(--color-secondary);
+    }
+    .cart-item-price {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      min-width: 36px;
+      text-align: right;
+    }
+    .cart-remove {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      color: var(--color-secondary);
+      padding: 2px 4px;
+      line-height: 1;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .cart-remove:hover { color: #e53e3e; background: #fff0f0; }
+
+    .cart-footer {
+      padding: 20px 24px 28px;
+      border-top: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+
+    .cart-total {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      margin-bottom: 18px;
+    }
+    .cart-total strong {
+      color: var(--color-green);
+      font-size: 1.1rem;
+    }
+
+    .cart-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .cart-form input {
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.875rem;
+      color: var(--color-dark);
+      background: var(--color-bg, #f9f9f7);
+      transition: border-color 0.15s;
+    }
+    .cart-form input:focus {
+      outline: 2px solid var(--color-green);
+      outline-offset: 2px;
+    }
+
+    #cart-submit {
+      width: 100%;
+      justify-content: center;
+      padding: 12px;
+      font-size: 0.9rem;
+    }
+
+    .cart-msg {
+      font-size: 0.82rem;
+      margin: 0;
+      min-height: 20px;
+      text-align: center;
+    }
+    .cart-msg.success { color: var(--color-green); }
+    .cart-msg.error { color: #e53e3e; }
   </style>
 </head>
 <body>
@@ -178,13 +463,13 @@
 
       <div class="shop-note reveal">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        <p>All items are <strong>custom-branded with the GTA Lobos logo</strong>. To place an order, click <strong>Order Now</strong> on any item — it'll open a message to the office. Orders are fulfilled seasonally.</p>
+        <p>All items are <strong>custom-branded with the GTA Lobos logo</strong>. Select size and quantity, add to cart, then submit your order. Orders are fulfilled seasonally.</p>
       </div>
 
       <div class="shop-grid">
 
         <!-- New Era Cap -->
-        <div class="shop-card reveal">
+        <div class="shop-card reveal" data-name="New Era 39THIRTY Cap" data-price="28">
           <img class="shop-card-img" src="img/shop/cap.png" alt="GTA Lobos New Era Cap" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -193,15 +478,22 @@
             </div>
             <p class="shop-card-name">New Era 39THIRTY Cap</p>
             <p class="shop-card-desc">Classic structured cap in navy with embroidered GTA Lobos logo. Flex-fit, one size fits most.</p>
+            <div class="shop-card-options">
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
             <div class="shop-card-footer">
               <span class="shop-card-price">$28</span>
-              <a class="btn-order" href="index.html#contact">Order Now</a>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
         </div>
 
         <!-- Stanley Tumbler -->
-        <div class="shop-card reveal reveal-delay-1">
+        <div class="shop-card reveal reveal-delay-1" data-name="Stanley Quencher 40oz Tumbler" data-price="35">
           <img class="shop-card-img" src="img/shop/stanley.png" alt="GTA Lobos Stanley Tumbler" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -210,15 +502,22 @@
             </div>
             <p class="shop-card-name">Stanley Quencher 40oz Tumbler</p>
             <p class="shop-card-desc">The iconic Stanley Quencher in matte black with GTA Lobos laser engraving. Keeps drinks cold all day at the pool.</p>
+            <div class="shop-card-options">
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
             <div class="shop-card-footer">
               <span class="shop-card-price">$35</span>
-              <a class="btn-order" href="index.html#contact">Order Now</a>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
         </div>
 
         <!-- Yeti Tumbler -->
-        <div class="shop-card reveal reveal-delay-2">
+        <div class="shop-card reveal reveal-delay-2" data-name="Yeti Rambler 20oz Tumbler" data-price="28">
           <img class="shop-card-img" src="img/shop/yeti.png" alt="GTA Lobos Yeti Rambler" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -227,15 +526,22 @@
             </div>
             <p class="shop-card-name">Yeti Rambler 20oz Tumbler</p>
             <p class="shop-card-desc">Yeti's legendary insulated tumbler in black with GTA Lobos engraving. Double-wall vacuum insulation, dishwasher safe.</p>
+            <div class="shop-card-options">
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
             <div class="shop-card-footer">
               <span class="shop-card-price">$28</span>
-              <a class="btn-order" href="index.html#contact">Order Now</a>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
         </div>
 
         <!-- Pint Glass -->
-        <div class="shop-card reveal">
+        <div class="shop-card reveal" data-name="GTA Lobos Pint Glass" data-price="12">
           <img class="shop-card-img" src="img/shop/pint-glass.png" alt="GTA Lobos Pint Glass" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -244,15 +550,22 @@
             </div>
             <p class="shop-card-name">GTA Lobos Pint Glass</p>
             <p class="shop-card-desc">16oz classic pint glass with the GTA Lobos logo printed on the side. Perfect for Shabbos kiddush or a cold drink by the pool.</p>
+            <div class="shop-card-options">
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
             <div class="shop-card-footer">
               <span class="shop-card-price">$12</span>
-              <a class="btn-order" href="index.html#contact">Order Now</a>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
         </div>
 
         <!-- Sherpa Zip Hoodie -->
-        <div class="shop-card reveal reveal-delay-2">
+        <div class="shop-card reveal reveal-delay-2" data-name="Sherpa Fleece Zip Hoodie" data-price="38">
           <img class="shop-card-img" src="img/shop/zip-hoodie.png" alt="GTA Lobos Sherpa Zip Hoodie" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -261,15 +574,31 @@
             </div>
             <p class="shop-card-name">Sherpa Fleece Zip Hoodie</p>
             <p class="shop-card-desc">Ultra-cozy sherpa-lined zip hoodie with GTA Lobos chest embroidery. Perfect for cool Catskills nights. Sizes S–3XL.</p>
+            <div class="shop-card-options">
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+                <option>3XL</option>
+              </select>
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
             <div class="shop-card-footer">
               <span class="shop-card-price">$38</span>
-              <a class="btn-order" href="index.html#contact">Order Now</a>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
         </div>
 
         <!-- UA Hoodie -->
-        <div class="shop-card reveal">
+        <div class="shop-card reveal" data-name="Under Armour Rival Hoodie" data-price="42">
           <img class="shop-card-img" src="img/shop/hoodie.png" alt="GTA Lobos Under Armour Hoodie" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -278,15 +607,30 @@
             </div>
             <p class="shop-card-name">Under Armour Rival Hoodie</p>
             <p class="shop-card-desc">UA's classic Rival fleece pullover in black with embroidered GTA Lobos logo. Moisture-wicking, brushed interior. Sizes S–2XL.</p>
+            <div class="shop-card-options">
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+              </select>
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
             <div class="shop-card-footer">
               <span class="shop-card-price">$42</span>
-              <a class="btn-order" href="index.html#contact">Order Now</a>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
         </div>
 
         <!-- UA Joggers -->
-        <div class="shop-card reveal reveal-delay-1">
+        <div class="shop-card reveal reveal-delay-1" data-name="Under Armour Rival Joggers" data-price="35">
           <img class="shop-card-img" src="img/shop/joggers.png" alt="GTA Lobos Under Armour Joggers" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -295,9 +639,24 @@
             </div>
             <p class="shop-card-name">Under Armour Rival Joggers</p>
             <p class="shop-card-desc">UA Rival fleece joggers in black with GTA Lobos leg embroidery. Tapered fit, elastic waistband with drawstring. Sizes S–2XL.</p>
+            <div class="shop-card-options">
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+              </select>
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
             <div class="shop-card-footer">
               <span class="shop-card-price">$35</span>
-              <a class="btn-order" href="index.html#contact">Order Now</a>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
         </div>
@@ -324,6 +683,250 @@
     </div>
   </footer>
 
+  <!-- ══════════════════════════════════════
+       FLOATING CART BUTTON
+  ══════════════════════════════════════ -->
+  <button id="cart-float-btn" aria-label="View cart">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span id="cart-badge"></span>
+  </button>
+
+  <!-- ══════════════════════════════════════
+       CART OVERLAY + DRAWER
+  ══════════════════════════════════════ -->
+  <div id="cart-overlay" class="cart-overlay"></div>
+
+  <div id="cart-drawer" class="cart-drawer" role="dialog" aria-label="Shopping cart">
+    <div class="cart-header">
+      <h3>Your Order</h3>
+      <button id="cart-close" aria-label="Close cart">&#x2715;</button>
+    </div>
+
+    <div id="cart-items" class="cart-items">
+      <p class="cart-empty">No items yet. Add something above!</p>
+    </div>
+
+    <div class="cart-footer">
+      <div class="cart-total">Total: <strong id="cart-total-price">$0</strong></div>
+
+      <div class="cart-form">
+        <input type="text" id="cart-name" placeholder="Your name" autocomplete="name" />
+        <input type="email" id="cart-email" placeholder="Your email" autocomplete="email" />
+      </div>
+
+      <button id="cart-submit" class="btn-order" type="button">Place Order</button>
+      <p id="cart-msg" class="cart-msg"></p>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
+  <script>
+    (function () {
+      var cart = [];
+
+      function esc(s) {
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
+
+      function updateBadge() {
+        var total = cart.reduce(function (s, i) { return s + i.qty; }, 0);
+        var badge = document.getElementById('cart-badge');
+        badge.textContent = total || '';
+        if (total > 0) badge.classList.add('visible');
+        else badge.classList.remove('visible');
+      }
+
+      function renderCart() {
+        var el = document.getElementById('cart-items');
+        var totalEl = document.getElementById('cart-total-price');
+
+        if (!cart.length) {
+          el.innerHTML = '<p class="cart-empty">No items yet. Add something above!</p>';
+          totalEl.textContent = '$0';
+          return;
+        }
+
+        el.innerHTML = cart.map(function (item, i) {
+          return '<div class="cart-item-row">' +
+            '<div class="cart-item-info">' +
+              '<span class="cart-item-name">' + esc(item.name) + '</span>' +
+              (item.size ? '<span class="cart-item-size">Size: ' + esc(item.size) + '</span>' : '') +
+            '</div>' +
+            '<div class="cart-item-right">' +
+              '<span class="cart-item-qty">×' + item.qty + '</span>' +
+              '<span class="cart-item-price">$' + (item.price * item.qty) + '</span>' +
+              '<button class="cart-remove" type="button" data-idx="' + i + '" aria-label="Remove">&#x2715;</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        var total = cart.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+        totalEl.textContent = '$' + total;
+      }
+
+      function openCart() {
+        renderCart();
+        document.getElementById('cart-drawer').classList.add('open');
+        document.getElementById('cart-overlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeCart() {
+        document.getElementById('cart-drawer').classList.remove('open');
+        document.getElementById('cart-overlay').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      // Wire up each card
+      document.querySelectorAll('.shop-card').forEach(function (card) {
+        var addBtn     = card.querySelector('.btn-add-cart');
+        var sizeSelect = card.querySelector('.size-select');
+        var qtyValEl   = card.querySelector('.qty-val');
+
+        // Qty steppers
+        card.querySelectorAll('.qty-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var cur  = parseInt(qtyValEl.textContent, 10);
+            var dir  = parseInt(btn.getAttribute('data-dir'), 10);
+            var next = Math.max(1, Math.min(20, cur + dir));
+            qtyValEl.textContent = next;
+          });
+        });
+
+        addBtn.addEventListener('click', function () {
+          var name  = card.getAttribute('data-name');
+          var price = parseInt(card.getAttribute('data-price'), 10);
+          var size  = sizeSelect ? sizeSelect.value : '';
+          var qty   = parseInt(qtyValEl.textContent, 10);
+
+          // Require size when selector exists
+          if (sizeSelect && !size) {
+            sizeSelect.classList.add('error');
+            sizeSelect.focus();
+            setTimeout(function () { sizeSelect.classList.remove('error'); }, 2000);
+            return;
+          }
+
+          // Merge with existing cart entry if same name + size
+          var existing = null;
+          for (var i = 0; i < cart.length; i++) {
+            if (cart[i].name === name && cart[i].size === size) {
+              existing = cart[i];
+              break;
+            }
+          }
+          if (existing) {
+            existing.qty += qty;
+          } else {
+            cart.push({ name: name, price: price, size: size, qty: qty });
+          }
+
+          updateBadge();
+
+          // Flash confirmation
+          var orig = addBtn.textContent;
+          addBtn.textContent = 'Added!';
+          addBtn.disabled = true;
+          setTimeout(function () {
+            addBtn.textContent = orig;
+            addBtn.disabled = false;
+          }, 1200);
+
+          // Reset controls
+          qtyValEl.textContent = '1';
+          if (sizeSelect) sizeSelect.value = '';
+        });
+      });
+
+      // Remove item from cart
+      document.getElementById('cart-items').addEventListener('click', function (e) {
+        if (e.target.classList.contains('cart-remove')) {
+          var idx = parseInt(e.target.getAttribute('data-idx'), 10);
+          cart.splice(idx, 1);
+          updateBadge();
+          renderCart();
+        }
+      });
+
+      // Open / close
+      document.getElementById('cart-float-btn').addEventListener('click', openCart);
+      document.getElementById('cart-close').addEventListener('click', closeCart);
+      document.getElementById('cart-overlay').addEventListener('click', closeCart);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeCart();
+      });
+
+      // Submit order
+      document.getElementById('cart-submit').addEventListener('click', function () {
+        var msgEl  = document.getElementById('cart-msg');
+        var submitBtn = document.getElementById('cart-submit');
+        msgEl.textContent = '';
+        msgEl.className = 'cart-msg';
+
+        if (!cart.length) {
+          msgEl.textContent = 'Cart is empty.';
+          msgEl.classList.add('error');
+          return;
+        }
+
+        var name  = document.getElementById('cart-name').value.trim();
+        var email = document.getElementById('cart-email').value.trim();
+
+        if (!name || !email) {
+          msgEl.textContent = 'Name and email are required.';
+          msgEl.classList.add('error');
+          return;
+        }
+
+        var lines = cart.map(function (i) {
+          return i.qty + 'x ' + i.name +
+            (i.size ? ' — Size: ' + i.size : '') +
+            ' — $' + (i.price * i.qty);
+        });
+        var total = cart.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+        lines.push('', 'ORDER TOTAL: $' + total);
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+
+        fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: '69aabe46-d8a2-4e24-95c5-71f98aa46221',
+            subject: 'GTA Shop Order — ' + name,
+            name: name,
+            email: email,
+            message: lines.join('\n')
+          })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success) {
+            cart = [];
+            updateBadge();
+            renderCart();
+            document.getElementById('cart-name').value = '';
+            document.getElementById('cart-email').value = '';
+            msgEl.textContent = 'Order sent! We\'ll be in touch soon.';
+            msgEl.classList.add('success');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Place Order';
+          } else {
+            throw new Error('submit failed');
+          }
+        })
+        .catch(function () {
+          msgEl.textContent = 'Something went wrong. Email us at gtabungalows@gmail.com.';
+          msgEl.classList.add('error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Place Order';
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
