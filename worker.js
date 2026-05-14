@@ -17,6 +17,8 @@ const CORS = {
 };
 
 async function handleOrder(request, env) {
+  const url = new URL(request.url);
+
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: CORS });
   }
