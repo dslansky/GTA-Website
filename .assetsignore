@@ -1,0 +1,12 @@
+.git
+.wrangler
+.claude
+*.HEIC
+*.MP4
+img/IMG_*.jpg
+img/IMG_*.JPG
+img/*.HEIC
+img/*.MP4
+img/[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]-*.JPG
+img/[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]-*.MP4
+img/[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]-*.JPG
