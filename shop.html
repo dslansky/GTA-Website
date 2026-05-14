@@ -881,26 +881,21 @@
           return;
         }
 
-        var lines = cart.map(function (i) {
-          return i.qty + 'x ' + i.name +
-            (i.size ? ' — Size: ' + i.size : '') +
-            ' — $' + (i.price * i.qty);
-        });
         var total = cart.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
-        lines.push('', 'ORDER TOTAL: $' + total);
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending…';
 
-        fetch('https://api.web3forms.com/submit', {
+        fetch('/order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            access_key: '69aabe46-d8a2-4e24-95c5-71f98aa46221',
-            subject: 'GTA Shop Order — ' + name,
             name: name,
             email: email,
-            message: lines.join('\n')
+            items: cart.map(function (i) {
+              return { name: i.name, size: i.size, qty: i.qty, price: i.price };
+            }),
+            total: total
           })
         })
         .then(function (r) { return r.json(); })
