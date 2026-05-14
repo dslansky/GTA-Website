@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GTA Shop — Greentree Acres</title>
+  <meta name="description" content="Official Greentree Acres Lobos swag — caps, hoodies, tumblers, and more. All items branded with the GTA Lobos logo." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin-top: 48px;
+    }
+    @media (max-width: 900px) { .shop-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .shop-grid { grid-template-columns: 1fr; } }
+
+    .shop-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow var(--transition), transform var(--transition);
+    }
+    .shop-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-3px);
+    }
+
+    .shop-card-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      background: #fff;
+      padding: 28px;
+    }
+
+    .shop-card-body {
+      padding: 20px 22px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .shop-card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .shop-card-badge img {
+      height: 18px;
+      width: auto;
+      opacity: 0.75;
+    }
+    .shop-card-badge span {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-green);
+    }
+
+    .shop-card-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .shop-card-desc {
+      font-size: 0.85rem;
+      color: var(--color-secondary);
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    .shop-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .shop-card-price {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .btn-order {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      background: var(--color-green);
+      color: white;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      transition: opacity var(--transition);
+      white-space: nowrap;
+    }
+    .btn-order:hover { opacity: 0.85; color: white; }
+
+    .shop-note {
+      margin-top: 48px;
+      padding: 24px 28px;
+      background: var(--color-green-muted);
+      border: 1px solid rgba(58, 125, 50, 0.15);
+      border-radius: var(--radius);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .shop-note svg { flex-shrink: 0; color: var(--color-green); margin-top: 2px; }
+    .shop-note p { color: var(--color-dark); font-size: 0.9rem; line-height: 1.65; margin: 0; }
+    .shop-note strong { color: var(--color-green); }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       NAV
+  ══════════════════════════════════════ -->
+  <nav id="nav">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img src="img/logo.png" alt="Greentree Acres" class="nav-logo-img" />
+        <span class="nav-logo-text">Greentree Acres</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html#history">Our Story</a></li>
+        <li><a href="index.html#amenities">Amenities</a></li>
+        <li><a href="index.html#gallery">Gallery</a></li>
+        <li><a href="index.html#videos">Videos</a></li>
+        <li><a href="ferndale.html">Ferndale History</a></li>
+        <li><a href="zmanim.html">Zmanim</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
+      </ul>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PAGE HEADER
+  ══════════════════════════════════════ -->
+  <section class="page-header">
+    <div class="container page-header-content">
+      <p class="eyebrow">Greentree Acres · Official Gear</p>
+      <h1>GTA Lobos Shop</h1>
+      <p>Premium gear for the colony — all items branded with the GTA Lobos logo. Priced at cost for colony members.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SHOP GRID
+  ══════════════════════════════════════ -->
+  <section class="section" id="shop">
+    <div class="container">
+
+      <div class="shop-note reveal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <p>All items are <strong>custom-branded with the GTA Lobos logo</strong>. To place an order, click <strong>Order Now</strong> on any item — it'll open a message to the office. Orders are fulfilled seasonally.</p>
+      </div>
+
+      <div class="shop-grid">
+
+        <!-- New Era Cap -->
+        <div class="shop-card reveal">
+          <img class="shop-card-img" src="img/shop/cap.png" alt="GTA Lobos New Era Cap" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">New Era 39THIRTY Cap</p>
+            <p class="shop-card-desc">Classic structured cap in navy with embroidered GTA Lobos logo. Flex-fit, one size fits most.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$28</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stanley Tumbler -->
+        <div class="shop-card reveal reveal-delay-1">
+          <img class="shop-card-img" src="img/shop/stanley.png" alt="GTA Lobos Stanley Tumbler" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">Stanley Quencher 40oz Tumbler</p>
+            <p class="shop-card-desc">The iconic Stanley Quencher in matte black with GTA Lobos laser engraving. Keeps drinks cold all day at the pool.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$35</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Yeti Tumbler -->
+        <div class="shop-card reveal reveal-delay-2">
+          <img class="shop-card-img" src="img/shop/yeti.png" alt="GTA Lobos Yeti Rambler" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">Yeti Rambler 20oz Tumbler</p>
+            <p class="shop-card-desc">Yeti's legendary insulated tumbler in black with GTA Lobos engraving. Double-wall vacuum insulation, dishwasher safe.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$28</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pint Glass -->
+        <div class="shop-card reveal">
+          <img class="shop-card-img" src="img/shop/pint-glass.png" alt="GTA Lobos Pint Glass" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">GTA Lobos Pint Glass</p>
+            <p class="shop-card-desc">16oz classic pint glass with the GTA Lobos logo printed on the side. Perfect for Shabbos kiddush or a cold drink by the pool.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$12</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alo Leggings -->
+        <div class="shop-card reveal reveal-delay-1">
+          <img class="shop-card-img" src="img/shop/leggings.png" alt="GTA Lobos Alo Leggings" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">Alo High-Waist Leggings</p>
+            <p class="shop-card-desc">Alo's premium high-waist leggings in black with GTA Lobos stripe detail. Sizes XS–XL available.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$48</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sherpa Zip Hoodie -->
+        <div class="shop-card reveal reveal-delay-2">
+          <img class="shop-card-img" src="img/shop/zip-hoodie.png" alt="GTA Lobos Sherpa Zip Hoodie" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">Sherpa Fleece Zip Hoodie</p>
+            <p class="shop-card-desc">Ultra-cozy sherpa-lined zip hoodie with GTA Lobos chest embroidery. Perfect for cool Catskills nights. Sizes S–3XL.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$38</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- UA Hoodie -->
+        <div class="shop-card reveal">
+          <img class="shop-card-img" src="img/shop/hoodie.png" alt="GTA Lobos Under Armour Hoodie" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">Under Armour Rival Hoodie</p>
+            <p class="shop-card-desc">UA's classic Rival fleece pullover in black with embroidered GTA Lobos logo. Moisture-wicking, brushed interior. Sizes S–2XL.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$42</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- UA Joggers -->
+        <div class="shop-card reveal reveal-delay-1">
+          <img class="shop-card-img" src="img/shop/joggers.png" alt="GTA Lobos Under Armour Joggers" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Lobos</span>
+            </div>
+            <p class="shop-card-name">Under Armour Rival Joggers</p>
+            <p class="shop-card-desc">UA Rival fleece joggers in black with GTA Lobos leg embroidery. Tapered fit, elastic waistband with drawstring. Sizes S–2XL.</p>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$35</span>
+              <a class="btn-order" href="index.html#contact">Order Now</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="img/logo.png" alt="Greentree Acres" class="footer-logo" />
+        <p>&copy; 2026 Greentree Acres. All rights reserved.</p>
+      </div>
+      <p>
+        Historical context courtesy of the
+        <a href="https://borschtbelthistoricalmarkerproject.org/ferndale" target="_blank" rel="noopener noreferrer">
+          Borscht Belt Historical Marker Project
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
