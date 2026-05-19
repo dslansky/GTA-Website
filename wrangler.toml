@@ -10,3 +10,7 @@ binding = "ASSETS"
 [[kv_namespaces]]
 binding = "ORDERS"
 id = "e2e1463276b04a8f81fae35623ce9316"
+
+[[r2_buckets]]
+binding = "MEMORIES"
+bucket_name = "gta-memories"
