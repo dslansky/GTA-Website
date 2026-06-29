@@ -31,6 +31,9 @@ export default {
     if (url.pathname === '/admin/gazette') {
       return handleAdminGazette(request, env, url);
     }
+    if (url.pathname === '/admin/push/verify') {
+      return handleAdminPushVerify(request, env, url);
+    }
     if (url.pathname === '/gazette-data') {
       return handleGazetteData(env);
     }
@@ -259,8 +262,30 @@ async function handleAdmin(request, env, url) {
 
   const subList = await env.ORDERS.list({ prefix: 'push_sub_' });
   const subCount = subList.keys.length;
+  const metaRaw = await env.ORDERS.get('push_meta');
+  const meta = metaRaw ? JSON.parse(metaRaw) : {};
+
+  function ago(iso) {
+    if (!iso) return null;
+    const ms = Date.now() - Date.parse(iso);
+    if (isNaN(ms) || ms < 0) return null;
+    const min = Math.floor(ms / 60000);
+    if (min < 1) return 'just now';
+    if (min < 60) return min + ' min ago';
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return hr + ' hr ago';
+    const d = Math.floor(hr / 24);
+    if (d < 7) return d + ' day' + (d === 1 ? '' : 's') + ' ago';
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' });
+  }
+
+  const lastVerifiedAgo = ago(meta.lastVerified);
+  const liveLabel = lastVerifiedAgo
+    ? `${meta.liveCount || 0} live subscriber${meta.liveCount === 1 ? '' : 's'} (verified ${lastVerifiedAgo}, ${subCount} stored)`
+    : `${subCount} stored subscriber${subCount === 1 ? '' : 's'} — count refreshes automatically after next scheduled notification`;
 
   await seedDefaultsIfEmpty(env);
+  await seedPoolChangeoversIfMissing(env);
   const schedules = await listSchedules(env);
   const editId = url.searchParams.get('edit') || '';
   const editing = editId ? schedules.find(s => s.id === editId) : null;
@@ -408,7 +433,7 @@ async function handleAdmin(request, env, url) {
 
   <h2>Send Notification Now</h2>
   <div class="panel">
-    <p class="count" style="margin-bottom:14px;">${subCount} ${subCount === 1 ? 'subscriber' : 'subscribers'} will receive this</p>
+    <p class="count" style="margin-bottom:14px;">${liveLabel}</p>
     <form method="POST" action="/admin/notify?key=${key}" onsubmit="return confirm('Send to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
       <label for="ntitle">Title</label>
       <input id="ntitle" name="title" type="text" required maxlength="80" placeholder="e.g. Pool closed today" />
@@ -792,6 +817,21 @@ function endpointToKey(endpoint) {
   return 'push_sub_' + s.slice(-60);
 }
 
+async function handleAdminPushVerify(request, env, url) {
+  const key = url.searchParams.get('key');
+  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+  const result = await sendPushToAll(env, {
+    title: '✅ Notifications working',
+    body: 'You are subscribed to GTA updates.',
+    url: '/local.html',
+  });
+  return new Response(
+    `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="3;url=/admin?key=${key}"><style>body{font-family:-apple-system,sans-serif;max-width:520px;margin:48px auto;padding:24px;text-align:center;background:#f5f5f7}h1{color:#3a7d32}p{color:#6e6e73}strong{color:#1d1d1f}</style></head><body><h1>Verified</h1><p><strong>${result.sent} live</strong> subscriber${result.sent === 1 ? '' : 's'} pinged.</p><p>Removed <strong>${result.failed} dead</strong> subscription${result.failed === 1 ? '' : 's'}.</p><p>Accurate count: <strong>${result.sent}</strong></p><p><a href="/admin?key=${key}">Back to admin</a></p></body></html>`,
+    { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+  );
+}
+
 async function handleSubscribe(request, env) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: CORS });
@@ -849,6 +889,10 @@ async function sendPushToAll(env, msg) {
     } catch {
       failed++;
     }
+  }));
+  await env.ORDERS.put('push_meta', JSON.stringify({
+    lastVerified: new Date().toISOString(),
+    liveCount: sent,
   }));
   return { sent, failed, total: subs.length };
 }
@@ -1077,6 +1121,44 @@ async function seedDefaultsIfEmpty(env) {
   ));
 }
 
+// Pool changeover heads-up: ~15 min before each gender switch / close.
+// Cron is */15 so scheduled time at :15 or :45 fires that exact tick.
+const POOL_CHANGEOVERS = [
+  // Sunday (10-12:30 L, 12:30-3 M, 3-5 L, 5-6:30 M)
+  ['sun_1215', ['SUN'], '12:15', 'Pool switches in 15 min', "Men's swim starts at 12:30pm"],
+  ['sun_1445', ['SUN'], '14:45', 'Pool switches in 15 min', "Ladies' swim starts at 3:00pm"],
+  ['sun_1645', ['SUN'], '16:45', 'Pool switches in 15 min', "Men's swim starts at 5:00pm"],
+  ['sun_1815', ['SUN'], '18:15', 'Pool closing soon',       'Pool closes at 6:30pm'],
+  // Mon-Thu (10-12:30 L, 12:30-1:30 M, 1:30-5:15 L, 5:15-6:15 M)
+  ['wd_1215',  ['MON','TUE','WED','THU'], '12:15', 'Pool switches in 15 min', "Men's swim starts at 12:30pm"],
+  ['wd_1315',  ['MON','TUE','WED','THU'], '13:15', 'Pool switches in 15 min', "Ladies' swim starts at 1:30pm"],
+  ['wd_1700',  ['MON','TUE','WED','THU'], '17:00', 'Pool switches in 15 min', "Men's swim starts at 5:15pm"],
+  ['wd_1800',  ['MON','TUE','WED','THU'], '18:00', 'Pool closing soon',       'Pool closes at 6:15pm'],
+  // Friday (10-12 L, 12-1:30 M, 1:30-4 L, 4-6 M)
+  ['fri_1145', ['FRI'], '11:45', 'Pool switches in 15 min', "Men's swim starts at 12:00pm"],
+  ['fri_1315', ['FRI'], '13:15', 'Pool switches in 15 min', "Ladies' swim starts at 1:30pm"],
+  ['fri_1545', ['FRI'], '15:45', 'Pool switches in 15 min', "Men's swim starts at 4:00pm"],
+  ['fri_1745', ['FRI'], '17:45', 'Pool closing for Shabbos', 'Pool closes at 6:00pm for Shabbos'],
+];
+
+async function seedPoolChangeoversIfMissing(env) {
+  await Promise.all(POOL_CHANGEOVERS.map(async ([slug, days, time, title, body]) => {
+    const id = 'sched_pool_' + slug;
+    const existing = await env.ORDERS.get(id);
+    if (existing) return;
+    const sched = {
+      id, title, body,
+      url: '/local.html',
+      schedule: { type: 'weekly', days, time },
+      dynamic: null,
+      enabled: true,
+      lastFired: null,
+      created: new Date().toISOString(),
+    };
+    await env.ORDERS.put(id, JSON.stringify(sched));
+  }));
+}
+
 function scheduleMatches(sched, now) {
   const s = sched.schedule || {};
   if (s.type === 'weekly') {
@@ -1112,6 +1194,7 @@ function nyLocalIsoToUTC(iso) {
 
 async function runScheduledTick(env) {
   await seedDefaultsIfEmpty(env);
+  await seedPoolChangeoversIfMissing(env);
   const now = nyNow();
   const scheds = await listSchedules(env);
 
