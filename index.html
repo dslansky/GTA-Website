@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Greentree Acres — Ferndale, NY</title>
   <meta name="description" content="Greentree Acres bungalow colony in Ferndale, NY. A Catskills summer tradition for over 40 years — heated pool, entertainment, community, and timeless memories." />
 
@@ -40,12 +40,12 @@
         <li><a href="ferndale.html">Ferndale History</a></li>
         <li><a href="zmanim.html">Zmanim</a></li>
         <li><a href="local.html">Local Info</a></li>
+        <li><a href="gazette.html">Gazette</a></li>
         <li><a href="vues.html">Country Vues</a></li>
         <li><a class="nav-cta" href="#contact">Get in Touch</a></li>
       </ul>
 
       <span id="nav-weather"></span>
-      <span id="nav-pool"></span>
 
       <button class="nav-toggle" id="navToggle" aria-label="Open menu">
         <span></span><span></span><span></span>
@@ -71,6 +71,27 @@
     </div>
 
     <div class="hero-scroll">Scroll</div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       GAZETTE BANNER
+  ══════════════════════════════════════ -->
+  <section id="gazette-banner" style="display:none;">
+    <div class="container">
+      <a href="gazette.html" class="gz-banner-card">
+        <div class="gz-banner-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2z"/><path d="M16 4v5h5M8 13h8M8 17h6M8 9h2"/></svg>
+        </div>
+        <div class="gz-banner-text">
+          <p class="eyebrow">This Week's Gazette</p>
+          <h2 id="gz-banner-title">GTA Gazette</h2>
+          <p id="gz-banner-date" style="font-size: 0.88rem; color: var(--color-secondary); margin-top: 4px;"></p>
+        </div>
+        <div class="gz-banner-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+    </div>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -393,6 +414,18 @@
   </footer>
 
 
+  <script>
+    fetch('/gazette-data').then(r => r.json()).then(d => {
+      const latest = (d.issues || [])[0];
+      if (!latest) return;
+      document.getElementById('gz-banner-title').textContent = latest.title || 'GTA Gazette';
+      if (latest.issueDate) {
+        const date = new Date(latest.issueDate + 'T12:00:00');
+        document.getElementById('gz-banner-date').textContent = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      }
+      document.getElementById('gazette-banner').style.display = '';
+    }).catch(() => {});
+  </script>
   <script src="js/main.js"></script>
   <script src="js/weather.js" defer></script>
   <script src="js/pool.js" defer></script>

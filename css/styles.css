@@ -120,6 +120,8 @@ p { color: var(--color-secondary); line-height: 1.75; }
   letter-spacing: -0.01em;
   color: white;
   transition: color var(--transition);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .nav-logo-img {
@@ -135,6 +137,11 @@ p { color: var(--color-secondary); line-height: 1.75; }
 .nav-logo-text {
   font-size: 1rem;
   font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 1280px) {
+  .nav-logo-text { display: none; }
 }
 
 #nav.scrolled .nav-logo { color: var(--color-dark); }
@@ -156,8 +163,8 @@ p { color: var(--color-secondary); line-height: 1.75; }
 }
 
 @media (max-width: 1180px) {
-  .nav-links { gap: 1.1rem; }
-  .nav-links a { font-size: 0.83rem; }
+  .nav-links { gap: 0.9rem; }
+  .nav-links a { font-size: 0.82rem; }
 }
 
 .nav-links a:hover { color: white; }
@@ -205,12 +212,15 @@ p { color: var(--color-secondary); line-height: 1.75; }
    HERO
    ========================================= */
 #hero {
-  min-height: 100vh;
+  min-height: 85vh;
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
   background: #1a2e18;
+}
+@media (max-width: 700px) {
+  #hero { min-height: 70vh; }
 }
 
 .hero-overlay {
@@ -241,8 +251,15 @@ p { color: var(--color-secondary); line-height: 1.75; }
 .hero-content {
   position: relative;
   z-index: 2;
-  padding-top: var(--nav-height);
+  padding-top: calc(var(--nav-height) + 42px + env(safe-area-inset-top));
+  padding-bottom: 80px;
   max-width: 760px;
+}
+@media (max-width: 700px) {
+  .hero-content {
+    padding-top: calc(var(--nav-height) + 38px + env(safe-area-inset-top));
+    padding-bottom: 60px;
+  }
 }
 
 .hero-content .eyebrow { color: rgba(255,255,255,0.7); }
@@ -1652,8 +1669,9 @@ footer {
 #nav.scrolled .nav-weather-link:hover { background: var(--color-green-muted); color: var(--color-green); }
 .nav-weather-icon { font-size: 1rem; line-height: 1; }
 .nav-weather-temp { font-size: 0.82rem; }
-@media (max-width: 900px) {
-  #nav-weather { order: -1; margin-left: 0; margin-right: 12px; }
+@media (max-width: 1024px) {
+  #nav-weather { margin-left: auto; margin-right: 12px; }
+  .nav-toggle { margin-left: 0; }
 }
 
 /* ── Weather widget (Local Info) ── */
@@ -1752,6 +1770,10 @@ footer {
 .nav-pool-text { font-size: 0.8rem; }
 @media (max-width: 900px) {
   #nav-pool { order: -1; margin-left: 0; margin-right: 8px; }
+}
+@media (max-width: 1100px) {
+  .nav-pool-text { display: none; }
+  .nav-pool-link { padding: 5px 8px; }
 }
 
 /* ── Pool modal ── */
@@ -2015,3 +2037,141 @@ footer {
   transition: border-color var(--transition), color var(--transition);
 }
 .notify-toggle:hover { border-color: var(--color-green); color: var(--color-green); }
+
+/* ── Gazette homepage banner ── */
+#gazette-banner {
+  padding: 40px 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.gz-banner-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 26px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+  color: inherit;
+}
+.gz-banner-card:hover {
+  border-color: var(--color-green);
+  box-shadow: 0 8px 28px rgba(58, 125, 50, 0.15);
+  transform: translateY(-2px);
+  color: inherit;
+}
+.gz-banner-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  background: var(--color-green-muted);
+  color: var(--color-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.gz-banner-text { flex: 1; min-width: 0; }
+.gz-banner-text .eyebrow { margin-bottom: 4px; font-size: 0.7rem; }
+.gz-banner-text h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0;
+  line-height: 1.3;
+}
+.gz-banner-arrow {
+  color: var(--color-green);
+  flex-shrink: 0;
+  transition: transform var(--transition);
+}
+.gz-banner-card:hover .gz-banner-arrow { transform: translateX(4px); }
+@media (max-width: 600px) {
+  .gz-banner-card { gap: 14px; padding: 18px 20px; }
+  .gz-banner-icon { width: 48px; height: 48px; }
+  .gz-banner-icon svg { width: 30px; height: 30px; }
+  .gz-banner-text h2 { font-size: 1.05rem; }
+}
+
+/* ── Pool status banner (sticky below nav) ── */
+#pool-status-banner {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  z-index: 90;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: none;
+  font-family: var(--font);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  transition: background var(--transition);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#pool-status-banner.pool-status-open    { background: linear-gradient(90deg, var(--color-green) 0%, var(--color-green-light) 100%); }
+#pool-status-banner.pool-status-closed  { background: linear-gradient(90deg, #c43a3a 0%, #d84a4a 100%); }
+#pool-status-banner:hover { filter: brightness(1.08); }
+.pool-banner-icon { font-size: 1.15rem; line-height: 1; }
+.pool-banner-text { display: inline-flex; gap: 4px; align-items: baseline; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pool-banner-text strong { font-weight: 700; }
+.pool-banner-detail { font-weight: 500; opacity: 0.92; }
+.pool-banner-arrow { font-size: 1.3rem; line-height: 1; opacity: 0.7; margin-left: 4px; }
+
+@media (max-width: 600px) {
+  #pool-status-banner { font-size: 0.85rem; height: 38px; padding: 0 14px; }
+  .pool-banner-detail { font-size: 0.82rem; }
+}
+
+/* ── iOS standalone PWA: safe-area insets ── */
+#nav {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  height: calc(var(--nav-height) + env(safe-area-inset-top));
+}
+#pool-status-banner {
+  top: calc(var(--nav-height) + env(safe-area-inset-top));
+  padding-left: calc(18px + env(safe-area-inset-left));
+  padding-right: calc(18px + env(safe-area-inset-right));
+}
+/* Page-header sections (non-hero pages): add padding for banner */
+body.has-pool-banner .page-header {
+  padding-top: calc(148px + 42px + env(safe-area-inset-top));
+}
+@media (max-width: 768px) {
+  body.has-pool-banner .page-header {
+    padding-top: calc(108px + 38px + env(safe-area-inset-top));
+  }
+}
+/* Hero extends behind nav + banner like before — no body padding */
+body.has-pool-banner .jump-nav {
+  top: calc(var(--nav-height) + env(safe-area-inset-top) + 42px);
+}
+@media (max-width: 600px) {
+  body.has-pool-banner .jump-nav {
+    top: calc(var(--nav-height) + env(safe-area-inset-top) + 38px);
+  }
+}
+
+/* Bottom-fixed elements respect home indicator */
+#push-prompt,
+#push-toast,
+#pwa-hint,
+#share-memory-btn {
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+footer {
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+}

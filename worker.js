@@ -28,6 +28,16 @@ export default {
     if (url.pathname === '/admin/schedule') {
       return handleAdminSchedule(request, env, url);
     }
+    if (url.pathname === '/admin/gazette') {
+      return handleAdminGazette(request, env, url);
+    }
+    if (url.pathname === '/gazette-data') {
+      return handleGazetteData(env);
+    }
+    const gazPdfMatch = url.pathname.match(/^\/gazette\/([^/]+)\/pdf$/);
+    if (gazPdfMatch) {
+      return handleGazettePdf(env, gazPdfMatch[1]);
+    }
     if (url.pathname === '/push/vapid-key') {
       return new Response(VAPID_PUBLIC_KEY, {
         headers: { ...CORS, 'Content-Type': 'text/plain' },
@@ -113,7 +123,7 @@ async function handleOrder(request, env, url) {
     }
 
     const list = await env.ORDERS.list();
-    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_') && !k.name.startsWith('sched_'));
+    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_') && !k.name.startsWith('sched_') && !k.name.startsWith('gazette_'));
     if (!orderKeys.length) {
       return csv('id,timestamp,name,email,items,total\n');
     }
@@ -254,6 +264,8 @@ async function handleAdmin(request, env, url) {
   const schedules = await listSchedules(env);
   const editId = url.searchParams.get('edit') || '';
   const editing = editId ? schedules.find(s => s.id === editId) : null;
+
+  const gazettes = await listGazettes(env);
 
   const renderItem = (m) => {
     const thumb = m.hasPhoto
@@ -476,6 +488,44 @@ async function handleAdmin(request, env, url) {
     }
   </script>
 
+  <a id="gazette"></a>
+  <h2>GTA Gazette (${gazettes.length} issue${gazettes.length === 1 ? '' : 's'})</h2>
+  <div class="panel">
+    <form method="POST" action="/admin/gazette?key=${key}" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="upload" />
+      <label>Title (optional, auto-generated from parsha if blank)</label>
+      <input name="title" type="text" maxlength="120" placeholder="e.g. GTA Gazette — Welcome Back Edition" />
+      <label>Parsha</label>
+      <input name="parsha" type="text" maxlength="80" placeholder="e.g. Chukas – Balak" />
+      <label>Issue Date</label>
+      <input name="issueDate" type="date" required value="${new Date().toISOString().slice(0,10)}" />
+      <label>PDF File</label>
+      <input name="pdf" type="file" accept="application/pdf,.pdf" required />
+      <button type="submit">Upload Issue</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    ${gazettes.length ? gazettes.map(g => `
+      <div class="sched-row">
+        <div class="sched-row-main">
+          <div class="sched-row-top">
+            <strong>${esc(g.title || 'GTA Gazette')}</strong>
+          </div>
+          <div class="sched-row-meta">${esc(g.issueDate || '')}${g.parsha ? ' · ' + esc(g.parsha) : ''} · <span style="color:#999;">${esc(g.filename || '')}</span></div>
+        </div>
+        <div class="sched-row-actions">
+          <a href="/gazette/${esc(g.id)}/pdf" target="_blank" rel="noopener" class="btn-mini">View PDF</a>
+          <form method="POST" action="/admin/gazette?key=${key}" style="display:inline;" onsubmit="return confirm('Delete this issue?')">
+            <input type="hidden" name="action" value="delete" />
+            <input type="hidden" name="id" value="${esc(g.id)}" />
+            <button class="btn-mini btn-del">Delete</button>
+          </form>
+        </div>
+      </div>
+    `).join('') : '<p class="empty">No issues uploaded yet.</p>'}
+  </div>
+
   <h2>Memories — Pending (${pending.length})</h2>
   ${pending.length ? pending.map(renderItem).join('') : '<p class="empty">None pending.</p>'}
   <h2>Approved (${approved.length})</h2>
@@ -638,6 +688,100 @@ async function handleAdminSchedule(request, env, url) {
     status: 302,
     headers: { Location: '/admin?key=' + key + '#schedules' },
   });
+}
+
+// ── Gazette ─────────────────────────────────────────────────────────────────
+
+const MAX_GAZETTE_BYTES = 30 * 1024 * 1024;
+
+async function handleAdminGazette(request, env, url) {
+  const key = url.searchParams.get('key');
+  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const fd = await request.formData();
+  const action = fd.get('action') || 'upload';
+
+  if (action === 'delete') {
+    const id = fd.get('id');
+    if (id) {
+      await env.MEMORIES.delete('gazette/' + id + '.pdf');
+      await env.ORDERS.delete('gazette_' + id);
+    }
+    return new Response(null, { status: 302, headers: { Location: '/admin?key=' + key + '#gazette' } });
+  }
+
+  // upload
+  const title  = (fd.get('title')  || '').trim();
+  const parsha = (fd.get('parsha') || '').trim();
+  const issue  = (fd.get('issueDate') || '').trim(); // YYYY-MM-DD
+  const file   = fd.get('pdf');
+
+  if (!file || typeof file === 'string' || file.size === 0) {
+    return new Response('PDF file required', { status: 400 });
+  }
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+    return new Response('Must be a PDF', { status: 400 });
+  }
+  if (file.size > MAX_GAZETTE_BYTES) {
+    return new Response('PDF must be under 30MB', { status: 400 });
+  }
+  if (!issue) {
+    return new Response('Issue date required', { status: 400 });
+  }
+
+  const id = issue.replace(/-/g, '') + '_' + Math.random().toString(36).slice(2, 6);
+  const buf = await file.arrayBuffer();
+
+  await env.MEMORIES.put('gazette/' + id + '.pdf', buf, {
+    httpMetadata: { contentType: 'application/pdf', contentDisposition: 'inline; filename="' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_') + '"' },
+  });
+
+  await env.ORDERS.put('gazette_' + id, JSON.stringify({
+    id,
+    title: title || ('GTA Gazette' + (parsha ? ' — ' + parsha : '')),
+    parsha,
+    issueDate: issue,
+    filename: file.name,
+    uploadedAt: new Date().toISOString(),
+  }));
+
+  return new Response(null, {
+    status: 302,
+    headers: { Location: '/admin?key=' + key + '#gazette' },
+  });
+}
+
+async function handleGazettePdf(env, id) {
+  const obj = await env.MEMORIES.get('gazette/' + id + '.pdf');
+  if (!obj) return new Response('Not found', { status: 404 });
+  return new Response(obj.body, {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Cache-Control': 'public, max-age=86400',
+      'Content-Disposition': obj.httpMetadata?.contentDisposition || 'inline',
+    },
+  });
+}
+
+async function handleGazetteData(env) {
+  const list = await env.ORDERS.list({ prefix: 'gazette_' });
+  if (!list.keys.length) return json({ issues: [] });
+  const all = await Promise.all(
+    list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
+  );
+  all.sort((a, b) => (b.issueDate || '').localeCompare(a.issueDate || ''));
+  return json({ issues: all });
+}
+
+async function listGazettes(env) {
+  const list = await env.ORDERS.list({ prefix: 'gazette_' });
+  if (!list.keys.length) return [];
+  const all = await Promise.all(
+    list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
+  );
+  all.sort((a, b) => (b.issueDate || '').localeCompare(a.issueDate || ''));
+  return all;
 }
 
 // ── Push subscriptions ──────────────────────────────────────────────────────

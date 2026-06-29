@@ -108,6 +108,33 @@
     el.querySelector('[data-pool-open]').addEventListener('click', openModal);
   }
 
+  function ensureBanner() {
+    var existing = document.getElementById('pool-status-banner');
+    if (existing) return existing;
+    var el = document.createElement('button');
+    el.id = 'pool-status-banner';
+    el.type = 'button';
+    el.setAttribute('aria-label', 'Pool status — tap for full schedule');
+    el.addEventListener('click', openModal);
+    document.body.insertBefore(el, document.body.firstChild);
+    document.body.classList.add('has-pool-banner');
+    return el;
+  }
+
+  function renderBanner() {
+    if (document.body.hasAttribute('data-no-pool-banner')) return;
+    var s = currentStatus();
+    var el = ensureBanner();
+    el.className = 'pool-status-' + s.tone;
+    el.innerHTML =
+      '<span class="pool-banner-icon">' + s.icon + '</span>' +
+      '<span class="pool-banner-text">' +
+        '<strong>' + (s.open ? s.label + ' swimming' : s.label) + '</strong>' +
+        (s.detail ? '<span class="pool-banner-detail"> · ' + s.detail + '</span>' : '') +
+      '</span>' +
+      '<span class="pool-banner-arrow">›</span>';
+  }
+
   function buildScheduleHtml() {
     var keys = ['sun', 'mon-thu', 'fri', 'sat'];
     return keys.map(function (k) {
@@ -191,6 +218,12 @@
     if (modal) modal.classList.remove('open');
   }
 
-  renderNav();
-  setInterval(renderNav, 60000);
+  function renderAll() {
+    renderNav();
+    renderBanner();
+  }
+
+  if (document.body) renderAll();
+  else document.addEventListener('DOMContentLoaded', renderAll);
+  setInterval(renderAll, 60000);
 })();

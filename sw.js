@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v11-2026-06-29';
+const CACHE_VERSION = 'gta-v19-2026-06-29';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 
@@ -11,6 +11,7 @@ const SHELL_URLS = [
   '/zmanim.html',
   '/local.html',
   '/vues.html',
+  '/gazette.html',
   '/css/styles.css',
   '/js/main.js',
   '/js/weather.js',
@@ -54,7 +55,9 @@ function isPassthroughPath(url) {
          url.pathname.startsWith('/memory') ||
          url.pathname.startsWith('/gallery-data') ||
          url.pathname.startsWith('/admin') ||
-         url.pathname.startsWith('/push/');
+         url.pathname.startsWith('/push/') ||
+         url.pathname.startsWith('/gazette/') ||
+         url.pathname === '/gazette-data';
 }
 
 self.addEventListener('fetch', (event) => {
