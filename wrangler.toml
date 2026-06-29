@@ -14,3 +14,12 @@ id = "e2e1463276b04a8f81fae35623ce9316"
 [[r2_buckets]]
 binding = "MEMORIES"
 bucket_name = "gta-memories"
+
+[triggers]
+crons = [
+  "0 19 * * FRI",
+  "0 14 * * SUN",
+  "0 13 * * FRI",
+  "0 14 * * *",
+]
+

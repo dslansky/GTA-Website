@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v8-2026-06-29';
+const CACHE_VERSION = 'gta-v10-2026-06-29';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 
@@ -53,7 +53,8 @@ function isPassthroughPath(url) {
   return url.pathname.startsWith('/order') ||
          url.pathname.startsWith('/memory') ||
          url.pathname.startsWith('/gallery-data') ||
-         url.pathname.startsWith('/admin');
+         url.pathname.startsWith('/admin') ||
+         url.pathname.startsWith('/push/');
 }
 
 self.addEventListener('fetch', (event) => {
@@ -117,4 +118,41 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
+});
+
+// ── Push notifications ──────────────────────────────────────────────────────
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch {}
+  const title = data.title || 'Greentree Acres';
+  const options = {
+    body: data.body || '',
+    icon: '/img/icons/icon-192.png',
+    badge: '/img/icons/icon-192.png',
+    tag: data.tag || 'gta-notification',
+    data: { url: data.url || '/' },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const data = event.notification.data || {};
+  const targetUrl = new URL(data.url || '/', self.registration.scope).href;
+  event.waitUntil((async () => {
+    const wcs = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const exact = wcs.find((c) => c.url === targetUrl);
+    if (exact) return exact.focus();
+    const sameOrigin = wcs.find((c) => {
+      try { return new URL(c.url).origin === self.location.origin; } catch { return false; }
+    });
+    if (sameOrigin && 'navigate' in sameOrigin) {
+      try {
+        const navigated = await sameOrigin.navigate(targetUrl);
+        if (navigated) return navigated.focus();
+        return sameOrigin.focus();
+      } catch {}
+    }
+    return self.clients.openWindow(targetUrl);
+  })());
 });

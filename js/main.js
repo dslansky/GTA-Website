@@ -132,6 +132,156 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// ── Push notifications ──
+(function () {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+  const SUBSCRIBED_KEY = 'gta-push-subscribed';
+  const DISMISSED_KEY  = 'gta-push-dismissed';
+
+  function b64urlToUint8(s) {
+    s = (s + '==='.slice(s.length % 4 + 1)).replace(/-/g, '+').replace(/_/g, '/');
+    const bin = atob(s);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  async function subscribe() {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const keyRes = await fetch('/push/vapid-key');
+      const vapidPub = (await keyRes.text()).trim();
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: b64urlToUint8(vapidPub),
+      });
+      const res = await fetch('/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub.toJSON()),
+      });
+      if (!res.ok) throw new Error('subscribe failed');
+      localStorage.setItem(SUBSCRIBED_KEY, '1');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function unsubscribe() {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) {
+        await fetch('/push/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint: sub.endpoint }),
+        }).catch(() => {});
+        await sub.unsubscribe();
+      }
+      localStorage.removeItem(SUBSCRIBED_KEY);
+    } catch {}
+  }
+
+  // Expose for manual buttons
+  window.GTANotify = {
+    subscribe,
+    unsubscribe,
+    async status() {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      return {
+        permission: Notification.permission,
+        subscribed: !!sub,
+      };
+    }
+  };
+
+  // Auto-prompt on first run (after install on iOS; first visit on Android/desktop)
+  (async function maybePromptAuto() {
+    if (localStorage.getItem(SUBSCRIBED_KEY)) return;
+    if (localStorage.getItem(DISMISSED_KEY)) return;
+    if (Notification.permission === 'denied') return;
+
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isStandalone = window.navigator.standalone === true ||
+      window.matchMedia('(display-mode: standalone)').matches;
+    // iOS push only works when installed
+    if (isIOS && !isStandalone) return;
+
+    // Wait 4s so user sees site first
+    setTimeout(showPrompt, 4000);
+  })();
+
+  function showPrompt() {
+    if (localStorage.getItem(SUBSCRIBED_KEY) || localStorage.getItem(DISMISSED_KEY)) return;
+    const banner = document.createElement('div');
+    banner.id = 'push-prompt';
+    banner.innerHTML =
+      '<div class="push-prompt-inner">' +
+        '<div class="push-prompt-text">' +
+          '<strong>Get colony updates</strong>' +
+          '<span>Pool hours, weather, events, Shabbos zmanim.</span>' +
+        '</div>' +
+        '<div class="push-prompt-actions">' +
+          '<button type="button" class="push-prompt-btn push-prompt-yes">Enable</button>' +
+          '<button type="button" class="push-prompt-btn push-prompt-no">Not now</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(banner);
+
+    banner.querySelector('.push-prompt-no').addEventListener('click', () => {
+      localStorage.setItem(DISMISSED_KEY, '1');
+      banner.remove();
+    });
+    banner.querySelector('.push-prompt-yes').addEventListener('click', async () => {
+      const btn = banner.querySelector('.push-prompt-yes');
+      btn.disabled = true; btn.textContent = '…';
+      const ok = await subscribe();
+      banner.remove();
+      if (ok) {
+        const t = document.createElement('div');
+        t.id = 'push-toast';
+        t.textContent = '✓ Notifications enabled';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+      }
+    });
+  }
+
+  // Wire up any manual buttons on page
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-push-toggle]');
+    if (!btn) return;
+    e.preventDefault();
+    const status = await window.GTANotify.status();
+    if (status.subscribed) {
+      await unsubscribe();
+      btn.textContent = btn.dataset.labelOff || 'Enable notifications';
+    } else {
+      btn.disabled = true; btn.textContent = '…';
+      const ok = await subscribe();
+      btn.disabled = false;
+      btn.textContent = ok ? (btn.dataset.labelOn || '✓ Notifications enabled') : 'Enable notifications';
+    }
+  });
+
+  // Reflect current state on any manual buttons on page load
+  window.addEventListener('load', async () => {
+    const btns = document.querySelectorAll('[data-push-toggle]');
+    if (!btns.length) return;
+    const status = await window.GTANotify.status();
+    btns.forEach(b => {
+      b.textContent = status.subscribed
+        ? (b.dataset.labelOn || '✓ Notifications enabled — tap to disable')
+        : (b.dataset.labelOff || 'Enable notifications');
+    });
+  });
+})();
+
 // ── iOS Add-to-Home-Screen hint ──
 (function () {
   const ua = window.navigator.userAgent || '';

@@ -1932,3 +1932,86 @@ footer {
 .pool-emergency-btn:hover { color: white; opacity: 0.88; }
 .pool-emergency-911 { background: #c43a3a; }
 .pool-emergency-hatzalah { background: var(--color-green); }
+
+/* ── Push notification prompt + toast ── */
+#push-prompt {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  max-width: 460px;
+  margin: 0 auto;
+  background: var(--color-dark);
+  color: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 250;
+  animation: push-prompt-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.push-prompt-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+}
+.push-prompt-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.push-prompt-text strong { font-weight: 600; font-size: 0.92rem; }
+.push-prompt-text span { font-size: 0.78rem; opacity: 0.85; }
+.push-prompt-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.push-prompt-btn {
+  padding: 8px 14px;
+  border-radius: 100px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+}
+.push-prompt-yes { background: var(--color-green); color: white; }
+.push-prompt-yes:hover { opacity: 0.9; }
+.push-prompt-no { background: transparent; color: rgba(255,255,255,0.7); }
+.push-prompt-no:hover { color: white; }
+@keyframes push-prompt-in {
+  from { transform: translateY(120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+#push-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-green);
+  color: white;
+  padding: 12px 22px;
+  border-radius: 100px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 260;
+  box-shadow: var(--shadow-lg);
+  animation: push-prompt-in 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Manual notification toggle */
+.notify-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+.notify-toggle:hover { border-color: var(--color-green); color: var(--color-green); }
