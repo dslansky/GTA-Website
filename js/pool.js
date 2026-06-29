@@ -143,7 +143,8 @@
           '<div class="pool-safety">' +
             '<h4>Pool Safety</h4>' +
             '<ul>' +
-              '<li><strong>No lifeguard on duty.</strong> Swim at your own risk.</li>' +
+              '<li><strong>Ladies hours:</strong> Lifeguard on duty — <strong>Sarah Zelmanowitz, Bungalow 40</strong>.</li>' +
+              '<li><strong>Men hours:</strong> No lifeguard. <strong>Two adults must be present at all times</strong> — swim at your own risk.</li>' +
               '<li>Children must be supervised by a responsible adult at all times.</li>' +
               '<li>No diving. No running on the pool deck.</li>' +
               '<li>Do not swim alone or while impaired.</li>' +

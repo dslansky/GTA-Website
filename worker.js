@@ -25,6 +25,9 @@ export default {
     if (url.pathname === '/admin/notify') {
       return handleAdminNotify(request, env, url);
     }
+    if (url.pathname === '/admin/schedule') {
+      return handleAdminSchedule(request, env, url);
+    }
     if (url.pathname === '/push/vapid-key') {
       return new Response(VAPID_PUBLIC_KEY, {
         headers: { ...CORS, 'Content-Type': 'text/plain' },
@@ -38,7 +41,7 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runCron(event.cron, env));
+    ctx.waitUntil(runScheduledTick(env));
   },
 };
 
@@ -110,7 +113,7 @@ async function handleOrder(request, env, url) {
     }
 
     const list = await env.ORDERS.list();
-    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_'));
+    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_') && !k.name.startsWith('sched_'));
     if (!orderKeys.length) {
       return csv('id,timestamp,name,email,items,total\n');
     }
@@ -247,6 +250,11 @@ async function handleAdmin(request, env, url) {
   const subList = await env.ORDERS.list({ prefix: 'push_sub_' });
   const subCount = subList.keys.length;
 
+  await seedDefaultsIfEmpty(env);
+  const schedules = await listSchedules(env);
+  const editId = url.searchParams.get('edit') || '';
+  const editing = editId ? schedules.find(s => s.id === editId) : null;
+
   const renderItem = (m) => {
     const thumb = m.hasPhoto
       ? `<img src="/memory/${m.id}/photo" style="width:110px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" />`
@@ -272,6 +280,65 @@ async function handleAdmin(request, env, url) {
     </div>`;
   };
 
+  function describeSchedule(sched) {
+    const s = sched.schedule || {};
+    if (s.type === 'weekly') {
+      const days = (s.days || []).join(', ') || '(no days)';
+      return `Weekly · ${days} · ${s.time || '?'} ET`;
+    }
+    if (s.type === 'once') {
+      return `One-time · ${s.datetime || '?'} ET`;
+    }
+    return '(no schedule)';
+  }
+
+  const renderSched = (s) => {
+    const checked = s.enabled ? 'checked' : '';
+    const dynLabel = s.dynamic === 'zmanim' ? '<span class="dyn-tag">live Shabbos zmanim</span>' :
+                     s.dynamic === 'weather' ? '<span class="dyn-tag">live weather (sends only if alert)</span>' : '';
+    const lastFired = s.lastFired ? `Last sent: ${new Date(s.lastFired).toLocaleString('en-US', { timeZone: 'America/New_York' })} ET` : 'Never sent';
+    return `<div class="sched-row">
+      <div class="sched-row-main">
+        <div class="sched-row-top">
+          <strong>${esc(s.title)}</strong>
+          ${dynLabel}
+          ${s.enabled ? '<span class="badge-on">ON</span>' : '<span class="badge-off">OFF</span>'}
+        </div>
+        <div class="sched-row-meta">${esc(describeSchedule(s))} · <span style="color:#999;">${esc(lastFired)}</span></div>
+        <div class="sched-row-body">${esc(s.body)}</div>
+      </div>
+      <div class="sched-row-actions">
+        <a href="/admin?key=${key}&edit=${encodeURIComponent(s.id)}#sched-form" class="btn-mini">Edit</a>
+        <form method="POST" action="/admin/schedule?key=${key}" style="display:inline;">
+          <input type="hidden" name="action" value="toggle" />
+          <input type="hidden" name="id" value="${esc(s.id)}" />
+          <button class="btn-mini">${s.enabled ? 'Disable' : 'Enable'}</button>
+        </form>
+        <form method="POST" action="/admin/schedule?key=${key}" style="display:inline;" onsubmit="return confirm('Send this now to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
+          <input type="hidden" name="action" value="fire" />
+          <input type="hidden" name="id" value="${esc(s.id)}" />
+          <button class="btn-mini btn-fire">Fire now</button>
+        </form>
+        <form method="POST" action="/admin/schedule?key=${key}" style="display:inline;" onsubmit="return confirm('Delete schedule?')">
+          <input type="hidden" name="action" value="delete" />
+          <input type="hidden" name="id" value="${esc(s.id)}" />
+          <button class="btn-mini btn-del">Delete</button>
+        </form>
+      </div>
+    </div>`;
+  };
+
+  const formId    = editing ? editing.id : '';
+  const formTitle = editing ? editing.title : '';
+  const formBody  = editing ? editing.body : '';
+  const formUrl   = editing ? (editing.url || '/') : '/';
+  const formDyn   = editing ? (editing.dynamic || '') : '';
+  const formEnabled = editing ? editing.enabled : true;
+  const formType  = editing ? (editing.schedule?.type || 'weekly') : 'weekly';
+  const formTime  = editing ? (editing.schedule?.time || '09:00') : '09:00';
+  const formDays  = editing ? (editing.schedule?.days || []) : ['FRI'];
+  const formDT    = editing ? (editing.schedule?.datetime || '') : '';
+
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -285,7 +352,7 @@ async function handleAdmin(request, env, url) {
     h2 { color: #3a7d32; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin: 28px 0 12px; }
     .empty { color: #999; font-size: 0.875rem; padding: 16px 0; }
     .panel { background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-    .panel input, .panel textarea {
+    .panel input, .panel textarea, .panel select {
       width: 100%; padding: 10px 14px; border: 1px solid #d2d2d7; border-radius: 8px;
       font-family: inherit; font-size: 0.9rem; margin-bottom: 12px; box-sizing: border-box;
     }
@@ -296,13 +363,38 @@ async function handleAdmin(request, env, url) {
     .count { font-size: 0.8rem; color: #6e6e73; }
     .preset { display: inline-block; padding: 5px 12px; background: #f5f5f7; border: 1px solid #d2d2d7; border-radius: 100px; font-size: 0.78rem; cursor: pointer; margin: 2px; }
     .preset:hover { border-color: #3a7d32; color: #3a7d32; }
+    .sched-row { display: flex; gap: 16px; padding: 14px; border: 1px solid #d2d2d7; border-radius: 10px; background: #fff; margin-bottom: 10px; align-items: flex-start; flex-wrap: wrap; }
+    .sched-row-main { flex: 1; min-width: 240px; }
+    .sched-row-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .sched-row-meta { font-size: 0.78rem; color: #6e6e73; margin-bottom: 6px; }
+    .sched-row-body { font-size: 0.85rem; color: #444; line-height: 1.5; }
+    .sched-row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn-mini { padding: 6px 12px; background: #f5f5f7; border: 1px solid #d2d2d7; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: #1d1d1f; text-decoration: none; display: inline-block; }
+    .btn-mini:hover { border-color: #3a7d32; color: #3a7d32; }
+    .btn-del { color: #c43a3a; }
+    .btn-del:hover { border-color: #c43a3a; color: #c43a3a; }
+    .btn-fire { color: #b8590f; }
+    .btn-fire:hover { border-color: #b8590f; color: #b8590f; }
+    .badge-on { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 100px; background: #e8f2e6; color: #3a7d32; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-off { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 100px; background: #eee; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
+    .dyn-tag { font-size: 0.7rem; font-weight: 600; color: #8a3aa6; background: #f5ecf6; padding: 2px 8px; border-radius: 100px; }
+    .days-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .days-grid label { font-size: 0.78rem; font-weight: 600; color: #1d1d1f; text-transform: none; letter-spacing: 0; padding: 8px 12px; border: 1px solid #d2d2d7; border-radius: 100px; cursor: pointer; margin: 0; display: inline-flex; gap: 6px; align-items: center; }
+    .days-grid input { width: auto; margin: 0; }
+    .type-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+    .type-tabs label { padding: 8px 14px; border: 1px solid #d2d2d7; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; text-transform: none; letter-spacing: 0; margin: 0; color: #6e6e73; }
+    .type-tabs input:checked + span { color: #3a7d32; }
+    .type-tabs label:has(input:checked) { border-color: #3a7d32; background: #e8f2e6; }
+    .type-tabs input { width: auto; margin: 0 6px 0 0; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <h1>GTA Admin</h1>
   <p class="subtitle">Memory moderation + push notifications. Orders export: <a href="/order?key=${key}">/order?key=${key}</a></p>
 
-  <h2>Send Notification</h2>
+  <h2>Send Notification Now</h2>
   <div class="panel">
     <p class="count" style="margin-bottom:14px;">${subCount} ${subCount === 1 ? 'subscriber' : 'subscribers'} will receive this</p>
     <form method="POST" action="/admin/notify?key=${key}" onsubmit="return confirm('Send to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
@@ -316,6 +408,66 @@ async function handleAdmin(request, env, url) {
     </form>
     <p style="margin-top:14px;font-size:0.78rem;color:#6e6e73;">Presets: <span class="preset" onclick="setNotif('Pool closed today','Pool closed today due to weather. Stay tuned for updates.','/local.html')">Pool closed (weather)</span> <span class="preset" onclick="setNotif('Pool re-opening','Pool is now open. Have fun!','/local.html')">Pool re-open</span> <span class="preset" onclick="setNotif('Event tonight','Join us at 8pm in the casino.','/')">Event tonight</span></p>
   </div>
+
+  <a id="schedules"></a>
+  <h2>Scheduled Notifications (${schedules.length})</h2>
+  <div class="panel">
+    ${schedules.length ? schedules.map(renderSched).join('') : '<p class="empty">No schedules yet.</p>'}
+  </div>
+
+  <a id="sched-form"></a>
+  <h2>${editing ? 'Edit Schedule' : 'Add New Schedule'}</h2>
+  <div class="panel">
+    <form method="POST" action="/admin/schedule?key=${key}">
+      <input type="hidden" name="action" value="save" />
+      <input type="hidden" name="id" value="${esc(formId)}" />
+
+      <label>Title</label>
+      <input name="title" type="text" required maxlength="80" value="${esc(formTitle)}" placeholder="e.g. Pool closes at 6pm" />
+
+      <label>Message</label>
+      <textarea name="body" required maxlength="240" placeholder="Body of notification">${esc(formBody)}</textarea>
+
+      <label>Link (where tap opens)</label>
+      <input name="url" type="text" value="${esc(formUrl)}" placeholder="/local.html" />
+
+      <label>Dynamic content (optional)</label>
+      <select name="dynamic">
+        <option value="" ${formDyn === '' ? 'selected' : ''}>None (use message above as-is)</option>
+        <option value="zmanim" ${formDyn === 'zmanim' ? 'selected' : ''}>Live Shabbos zmanim (replaces body with candle lighting + havdalah)</option>
+        <option value="weather" ${formDyn === 'weather' ? 'selected' : ''}>Live weather alert (only sends if storm/heavy rain forecast today)</option>
+      </select>
+
+      <label>Schedule Type</label>
+      <div class="type-tabs">
+        <label><input type="radio" name="type" value="weekly" ${formType === 'weekly' ? 'checked' : ''} onchange="document.getElementById('weekly-fields').style.display=this.checked?'block':'none';document.getElementById('once-fields').style.display='none'" /><span>Recurring (Weekly)</span></label>
+        <label><input type="radio" name="type" value="once" ${formType === 'once' ? 'checked' : ''} onchange="document.getElementById('once-fields').style.display=this.checked?'block':'none';document.getElementById('weekly-fields').style.display='none'" /><span>One-Time</span></label>
+      </div>
+
+      <div id="weekly-fields" style="display:${formType === 'weekly' ? 'block' : 'none'}">
+        <label>Days</label>
+        <div class="days-grid">
+          ${DAY_NAMES.map(d => `<label><input type="checkbox" name="day_${d}" ${formDays.includes(d) ? 'checked' : ''} /> ${d}</label>`).join('')}
+        </div>
+        <label>Time (Eastern)</label>
+        <input name="time" type="time" value="${esc(formTime)}" />
+      </div>
+
+      <div id="once-fields" style="display:${formType === 'once' ? 'block' : 'none'}">
+        <label>Date &amp; Time (Eastern)</label>
+        <input name="datetime" type="datetime-local" value="${esc(formDT)}" />
+      </div>
+
+      <label><input type="checkbox" name="enabled" ${formEnabled ? 'checked' : ''} style="width:auto;margin-right:6px;" /> Enabled</label>
+
+      <div style="margin-top:14px;display:flex;gap:8px;">
+        <button type="submit">${editing ? 'Save Changes' : 'Add Schedule'}</button>
+        ${editing ? `<a href="/admin?key=${key}#schedules" class="btn-mini" style="padding:10px 18px;">Cancel</a>` : ''}
+      </div>
+      <p style="margin-top:10px;font-size:0.75rem;color:#999;">Note: cron tick runs every 15 min. Schedule fires within 15 min of selected time.</p>
+    </form>
+  </div>
+
   <script>
     function setNotif(t, b, u) {
       document.getElementById('ntitle').value = t;
@@ -392,6 +544,100 @@ async function handleAdminNotify(request, env, url) {
     `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="2;url=/admin?key=${key}"><style>body{font-family:-apple-system,sans-serif;max-width:520px;margin:48px auto;padding:24px;text-align:center;background:#f5f5f7}h1{color:#3a7d32}p{color:#6e6e73}</style></head><body><h1>Sent</h1><p>Delivered ${result.sent} / ${result.total}. ${result.failed ? result.failed + ' failed.' : ''}</p><p><a href="/admin?key=${key}">Back to admin</a></p></body></html>`,
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   );
+}
+
+async function handleAdminSchedule(request, env, url) {
+  const key = url.searchParams.get('key');
+  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const fd = await request.formData();
+  const action = fd.get('action');
+
+  if (action === 'delete') {
+    const id = fd.get('id');
+    if (id) await env.ORDERS.delete(id);
+  } else if (action === 'toggle') {
+    const id = fd.get('id');
+    if (id) {
+      const raw = await env.ORDERS.get(id);
+      if (raw) {
+        const s = JSON.parse(raw);
+        s.enabled = !s.enabled;
+        await env.ORDERS.put(id, JSON.stringify(s));
+      }
+    }
+  } else if (action === 'fire') {
+    const id = fd.get('id');
+    if (id) {
+      const raw = await env.ORDERS.get(id);
+      if (raw) {
+        const s = JSON.parse(raw);
+        let title = s.title, body = s.body, link = s.url || '/';
+        if (s.dynamic === 'zmanim') {
+          const z = await fetchShabbosZmanim();
+          if (z) body = `Candle lighting ${z.candles}${z.havdalah ? ', Havdalah ' + z.havdalah : ''}.`;
+        } else if (s.dynamic === 'weather') {
+          const w = await fetchWeatherAlert();
+          if (w.alert) {
+            body = w.alert;
+            if (w.title) title = w.title;
+          } else {
+            body = '(No alert right now — test fire) ' + body;
+          }
+        }
+        await sendPushToAll(env, { title, body, url: link });
+        s.lastFired = new Date().toISOString();
+        await env.ORDERS.put(id, JSON.stringify(s));
+      }
+    }
+  } else if (action === 'save') {
+    const id = fd.get('id') || ('sched_' + Date.now() + Math.random().toString(36).slice(2, 6));
+    const type = fd.get('type') || 'weekly';
+    const sched = {
+      id,
+      title: (fd.get('title') || '').trim(),
+      body:  (fd.get('body')  || '').trim(),
+      url:   (fd.get('url')   || '/').trim(),
+      schedule: {},
+      dynamic: (fd.get('dynamic') || '').trim() || null,
+      enabled: fd.get('enabled') === 'on',
+      lastFired: null,
+      created: new Date().toISOString(),
+    };
+
+    // Preserve created/lastFired on edit
+    const existing = await env.ORDERS.get(id);
+    if (existing) {
+      const prev = JSON.parse(existing);
+      sched.created = prev.created || sched.created;
+      sched.lastFired = prev.lastFired || null;
+    }
+
+    if (type === 'weekly') {
+      const days = [];
+      DAY_NAMES.forEach(d => { if (fd.get('day_' + d) === 'on') days.push(d); });
+      sched.schedule = {
+        type: 'weekly',
+        days,
+        time: (fd.get('time') || '09:00'),
+      };
+    } else if (type === 'once') {
+      sched.schedule = {
+        type: 'once',
+        datetime: (fd.get('datetime') || ''),
+      };
+    }
+
+    if (!sched.title || !sched.body) return new Response('Bad request: title + body required', { status: 400 });
+
+    await env.ORDERS.put(id, JSON.stringify(sched));
+  }
+
+  return new Response(null, {
+    status: 302,
+    headers: { Location: '/admin?key=' + key + '#schedules' },
+  });
 }
 
 // ── Push subscriptions ──────────────────────────────────────────────────────
@@ -599,51 +845,166 @@ async function sendOne(subscription, msg, env) {
   });
 }
 
-// ── Scheduled jobs ──────────────────────────────────────────────────────────
+// ── Scheduled jobs (KV-driven) ──────────────────────────────────────────────
 
-async function runCron(cronStr, env) {
-  // All times in UTC. Ferndale is EDT (UTC-4) in summer.
-  if (cronStr === '0 19 * * FRI') {
-    // Friday 3pm ET — Pool closing for Shabbos
-    await sendPushToAll(env, {
-      title: 'Pool closes at 6pm',
-      body: 'Pool closing today for Shabbos at 6pm. Enjoy the rest of your swim!',
-      url: '/local.html',
-    });
-    return;
+const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+function nyNow() {
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: 'numeric', minute: '2-digit', hour12: false,
+  });
+  const parts = fmt.formatToParts(new Date());
+  const obj = {};
+  parts.forEach(p => obj[p.type] = p.value);
+  const dayMap = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return {
+    weekday: dayMap[obj.weekday],
+    weekdayName: DAY_NAMES[dayMap[obj.weekday]],
+    hour: parseInt(obj.hour, 10) === 24 ? 0 : parseInt(obj.hour, 10),
+    minute: parseInt(obj.minute, 10),
+    iso: `${obj.year}-${obj.month}-${obj.day}T${String(obj.hour).padStart(2,'0')}:${obj.minute}`,
+  };
+}
+
+const DEFAULT_SCHEDULES = [
+  {
+    id: 'sched_default_pool_close',
+    title: 'Pool closes at 6pm',
+    body: 'Pool closing today for Shabbos at 6pm. Enjoy the rest of your swim!',
+    url: '/local.html',
+    schedule: { type: 'weekly', days: ['FRI'], time: '15:00' },
+    dynamic: null,
+    enabled: true,
+    lastFired: null,
+    created: new Date().toISOString(),
+  },
+  {
+    id: 'sched_default_pool_open',
+    title: 'Pool opens at 10am',
+    body: 'Pool opens at 10am today. See you there!',
+    url: '/local.html',
+    schedule: { type: 'weekly', days: ['SUN'], time: '10:00' },
+    dynamic: null,
+    enabled: true,
+    lastFired: null,
+    created: new Date().toISOString(),
+  },
+  {
+    id: 'sched_default_shabbos_zmanim',
+    title: 'Shabbos Zmanim',
+    body: 'Candle lighting today. See zmanim for details.',
+    url: '/zmanim.html',
+    schedule: { type: 'weekly', days: ['FRI'], time: '09:00' },
+    dynamic: 'zmanim',
+    enabled: true,
+    lastFired: null,
+    created: new Date().toISOString(),
+  },
+  {
+    id: 'sched_default_weather',
+    title: '⚠️ Weather Alert',
+    body: 'Severe weather expected today.',
+    url: '/local.html',
+    schedule: { type: 'weekly', days: ['SUN','MON','TUE','WED','THU','FRI','SAT'], time: '10:00' },
+    dynamic: 'weather',
+    enabled: true,
+    lastFired: null,
+    created: new Date().toISOString(),
+  },
+];
+
+async function listSchedules(env) {
+  const list = await env.ORDERS.list({ prefix: 'sched_' });
+  if (!list.keys.length) return [];
+  const all = await Promise.all(
+    list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
+  );
+  all.sort((a, b) => (a.created || '').localeCompare(b.created || ''));
+  return all;
+}
+
+async function seedDefaultsIfEmpty(env) {
+  const list = await env.ORDERS.list({ prefix: 'sched_', limit: 1 });
+  if (list.keys.length) return;
+  await Promise.all(DEFAULT_SCHEDULES.map(s =>
+    env.ORDERS.put(s.id, JSON.stringify(s))
+  ));
+}
+
+function scheduleMatches(sched, now) {
+  const s = sched.schedule || {};
+  if (s.type === 'weekly') {
+    const days = (s.days || []);
+    if (!days.includes(now.weekdayName)) return false;
+    const [h, m] = (s.time || '00:00').split(':').map(n => parseInt(n, 10));
+    // Match if scheduled time is within current 15-min cron window: [hh:mm, hh:mm+15)
+    if (now.hour !== h) return false;
+    if (now.minute < m || now.minute >= m + 15) return false;
+    return true;
   }
-  if (cronStr === '0 14 * * SUN') {
-    // Sunday 10am ET — Pool opens at 10am
-    await sendPushToAll(env, {
-      title: 'Pool opens at 10am',
-      body: 'Pool opens at 10am today. See you there!',
-      url: '/local.html',
-    });
-    return;
+  if (s.type === 'once') {
+    if (!s.datetime) return false;
+    // datetime is ET local "YYYY-MM-DDTHH:MM"
+    const schedIso = s.datetime;
+    const nowIso = now.iso;
+    if (schedIso > nowIso) return false;
+    // Within 15 min after scheduled
+    const schedTs = nyLocalIsoToUTC(schedIso);
+    const nowTs = nyLocalIsoToUTC(nowIso);
+    if (nowTs - schedTs > 15 * 60 * 1000) return false;
+    return true;
   }
-  if (cronStr === '0 13 * * FRI') {
-    // Friday 9am ET — Shabbos zmanim
-    const z = await fetchShabbosZmanim();
-    if (z) {
-      await sendPushToAll(env, {
-        title: 'Shabbos Zmanim',
-        body: `Candle lighting ${z.candles}${z.havdalah ? ', Havdalah ' + z.havdalah : ''}.`,
-        url: '/zmanim.html',
-      });
+  return false;
+}
+
+function nyLocalIsoToUTC(iso) {
+  // iso = "YYYY-MM-DDTHH:MM" in ET; convert to UTC ms
+  // Approximate: treat as UTC then subtract -240 min (EDT). Good enough for window check.
+  const d = new Date(iso + ':00Z');
+  return d.getTime() + 4 * 60 * 60 * 1000;
+}
+
+async function runScheduledTick(env) {
+  await seedDefaultsIfEmpty(env);
+  const now = nyNow();
+  const scheds = await listSchedules(env);
+
+  for (const sched of scheds) {
+    if (!sched.enabled) continue;
+    if (!scheduleMatches(sched, now)) continue;
+    // Debounce: skip if fired in last 25 min
+    if (sched.lastFired) {
+      const lastMs = Date.parse(sched.lastFired);
+      if (!isNaN(lastMs) && Date.now() - lastMs < 25 * 60 * 1000) continue;
     }
-    return;
-  }
-  if (cronStr === '0 14 * * *') {
-    // Daily 10am ET — weather alert if thunderstorm forecast today
-    const w = await fetchWeatherAlert();
-    if (w.alert) {
-      await sendPushToAll(env, {
-        title: '⚠️ Weather Alert',
-        body: w.alert,
-        url: '/local.html',
-      });
+
+    let title = sched.title;
+    let body  = sched.body;
+    let url   = sched.url || '/';
+
+    if (sched.dynamic === 'zmanim') {
+      const z = await fetchShabbosZmanim();
+      if (z) {
+        body = `Candle lighting ${z.candles}${z.havdalah ? ', Havdalah ' + z.havdalah : ''}.`;
+      }
+    } else if (sched.dynamic === 'weather') {
+      const w = await fetchWeatherAlert();
+      if (!w.alert) continue; // skip if no alert
+      body = w.alert;
+      if (w.title) title = w.title;
     }
-    return;
+
+    await sendPushToAll(env, { title, body, url });
+
+    // Mark fired + delete one-time entries after firing
+    if (sched.schedule.type === 'once') {
+      await env.ORDERS.delete(sched.id);
+    } else {
+      sched.lastFired = new Date().toISOString();
+      await env.ORDERS.put(sched.id, JSON.stringify(sched));
+    }
   }
 }
 
@@ -671,23 +1032,123 @@ async function fetchShabbosZmanim() {
   }
 }
 
-async function fetchWeatherAlert() {
+// ── Weather alerts (NWS official + Open-Meteo forecast extremes) ────────────
+
+const NWS_USER_AGENT = 'GreentreeAcresWebsite (dslansky@gmail.com)';
+const SEVERITY_RANK  = { 'Extreme': 4, 'Severe': 3, 'Moderate': 2, 'Minor': 1, 'Unknown': 0 };
+
+function eventIcon(event) {
+  const e = (event || '').toLowerCase();
+  if (e.includes('tornado')) return '🌪️';
+  if (e.includes('hurricane') || e.includes('tropical')) return '🌀';
+  if (e.includes('flash flood')) return '🌊';
+  if (e.includes('flood')) return '💧';
+  if (e.includes('thunderstorm') || e.includes('severe')) return '⚡';
+  if (e.includes('wind')) return '💨';
+  if (e.includes('heat')) return '🔥';
+  if (e.includes('winter') || e.includes('snow') || e.includes('blizzard') || e.includes('ice')) return '❄️';
+  if (e.includes('fog')) return '🌫️';
+  if (e.includes('air quality') || e.includes('smoke')) return '😷';
+  return '⚠️';
+}
+
+async function fetchNWSAlerts() {
   try {
-    const url = 'https://api.open-meteo.com/v1/forecast?latitude=41.7406&longitude=-74.7474&daily=weather_code,precipitation_probability_max&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=1';
-    const res = await fetch(url);
-    if (!res.ok) return { alert: null };
+    const res = await fetch('https://api.weather.gov/alerts/active?point=41.7406,-74.7474', {
+      headers: { 'User-Agent': NWS_USER_AGENT, 'Accept': 'application/geo+json' },
+    });
+    if (!res.ok) return [];
     const data = await res.json();
-    const code = data.daily?.weather_code?.[0];
-    const pop  = data.daily?.precipitation_probability_max?.[0] || 0;
-    // Thunderstorm codes: 95, 96, 99
-    if (code === 95 || code === 96 || code === 99) {
-      return { alert: `Thunderstorms expected today (${pop}% chance). Pool may close early — watch the sky.` };
-    }
-    if (pop >= 70) {
-      return { alert: `Heavy rain likely today (${pop}% chance). Pool may close early.` };
-    }
-    return { alert: null };
+    const features = data.features || [];
+    const alerts = features
+      .map(f => f.properties || {})
+      .filter(p =>
+        p.status === 'Actual' &&
+        (SEVERITY_RANK[p.severity] || 0) >= SEVERITY_RANK['Moderate'] &&
+        p.messageType !== 'Cancel'
+      )
+      .sort((a, b) => (SEVERITY_RANK[b.severity] || 0) - (SEVERITY_RANK[a.severity] || 0));
+    return alerts;
   } catch {
-    return { alert: null };
+    return [];
   }
+}
+
+async function fetchForecastExtremes() {
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=41.7406&longitude=-74.7474' +
+      '&daily=weather_code,precipitation_probability_max,wind_gusts_10m_max,temperature_2m_max,uv_index_max' +
+      '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=1';
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const code  = data.daily?.weather_code?.[0];
+    const pop   = data.daily?.precipitation_probability_max?.[0] || 0;
+    const gusts = data.daily?.wind_gusts_10m_max?.[0] || 0;
+    const high  = data.daily?.temperature_2m_max?.[0] || 0;
+    const uv    = data.daily?.uv_index_max?.[0] || 0;
+
+    const out = [];
+    if (code === 95 || code === 96 || code === 99) {
+      out.push(`⚡ Thunderstorms expected today (${pop}% chance). Pool may close early — watch the sky.`);
+    } else if (pop >= 80) {
+      out.push(`🌧️ Heavy rain likely today (${pop}% chance). Pool may close early.`);
+    }
+    if (gusts >= 35) {
+      out.push(`💨 High wind gusts up to ${Math.round(gusts)} mph today. Secure loose items.`);
+    }
+    if (high >= 95) {
+      out.push(`🔥 Extreme heat today (high ${Math.round(high)}°F). Hydrate, limit sun exposure.`);
+    } else if (high >= 90 && uv >= 8) {
+      out.push(`☀️ Hot + high UV today (${Math.round(high)}°F, UV ${Math.round(uv)}). Sunscreen + hydrate.`);
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+function formatNWSAlert(a) {
+  const icon = eventIcon(a.event);
+  const event = a.event || 'Weather Alert';
+  const headline = (a.headline || '').replace(/^[A-Z][a-z]+\s\d{1,2}\s+at\s+\d{1,2}:\d{2}[AP]M\s+\w+\sby\s+NWS\s+\w+\s+/i, '');
+  // Try to grab a useful instruction snippet
+  let instruction = (a.instruction || a.description || '').split('\n')[0];
+  if (instruction.length > 140) instruction = instruction.slice(0, 137) + '…';
+  return { icon, event, headline, instruction, severity: a.severity };
+}
+
+async function fetchWeatherAlert() {
+  const [nwsAlerts, forecastExtremes] = await Promise.all([
+    fetchNWSAlerts(),
+    fetchForecastExtremes(),
+  ]);
+
+  if (nwsAlerts.length) {
+    const top = formatNWSAlert(nwsAlerts[0]);
+    const additionalCount = nwsAlerts.length - 1;
+    const moreNote = additionalCount > 0 ? ` (+${additionalCount} more active alert${additionalCount === 1 ? '' : 's'})` : '';
+    const titleLine = `${top.icon} ${top.event}${moreNote}`;
+    const bodyParts = [];
+    if (top.instruction) bodyParts.push(top.instruction);
+    else if (top.headline) bodyParts.push(top.headline);
+    // Attach a forecast extreme too if useful and different domain
+    const relevantExtreme = forecastExtremes.find(f =>
+      !f.toLowerCase().includes(top.event.toLowerCase().split(' ')[0])
+    );
+    if (relevantExtreme) bodyParts.push(relevantExtreme);
+    return {
+      title: titleLine,
+      alert: bodyParts.join(' · ') || 'Check local weather alerts now.',
+    };
+  }
+
+  if (forecastExtremes.length) {
+    return {
+      title: '⚠️ Weather Heads-Up',
+      alert: forecastExtremes.join(' · '),
+    };
+  }
+
+  return { alert: null };
 }
