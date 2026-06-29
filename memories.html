@@ -11,6 +11,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#3a7d32" />
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/img/icons/favicon-32.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Greentree" />
+
   <style>
     /* ── Era filter ── */
     .era-filters {
@@ -314,12 +323,16 @@
       <ul class="nav-links">
         <li><a href="index.html#history">Our Story</a></li>
         <li><a href="index.html#amenities">Amenities</a></li>
+        <li><a href="memories.html">Memories</a></li>
         <li><a href="ferndale.html">Ferndale History</a></li>
         <li><a href="zmanim.html">Zmanim</a></li>
-        <li><a href="shop.html">Shop</a></li>
-        <li><a href="memories.html">Memories</a></li>
+        <li><a href="local.html">Local Info</a></li>
+        <li><a href="vues.html">Country Vues</a></li>
         <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
       </ul>
+
+      <span id="nav-weather"></span>
+      <span id="nav-pool"></span>
 
       <button class="nav-toggle" id="navToggle" aria-label="Open menu">
         <span></span><span></span><span></span>
@@ -687,6 +700,8 @@
   </div>
 
   <script src="js/main.js"></script>
+  <script src="js/weather.js" defer></script>
+  <script src="js/pool.js" defer></script>
   <script>
     (function () {
       var memories = [];

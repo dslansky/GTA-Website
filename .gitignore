@@ -1,4 +1,7 @@
 .claude/
+.DS_Store
+.wrangler/
+*.zip
 *.HEIC
 *.heic
 img/*.MP4

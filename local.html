@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local Info — Greentree Acres</title>
+  <meta name="description" content="Local emergency services, kosher business directory, and shul directory for the Sullivan County / Catskills area." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#3a7d32" />
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/img/icons/favicon-32.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Greentree" />
+
+  <style>
+    /* ── Section jump nav ── */
+    .jump-nav {
+      position: sticky;
+      top: var(--nav-height);
+      z-index: 50;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      padding: 10px 0;
+    }
+    .jump-nav-inner {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0 20px;
+    }
+    .jump-nav-inner::-webkit-scrollbar { display: none; }
+    .jump-link {
+      flex-shrink: 0;
+      padding: 9px 18px;
+      border-radius: 100px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      white-space: nowrap;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+    .jump-link:hover { border-color: var(--color-green); color: var(--color-green); }
+    .jump-link.active {
+      background: var(--color-green);
+      border-color: var(--color-green);
+      color: white;
+    }
+
+    /* offset sticky anchor scroll so headings clear nav + jump-nav */
+    #weather, #emergency, #directory {
+      scroll-margin-top: calc(var(--nav-height) + 60px);
+    }
+
+    /* ── Emergency section ── */
+    .emergency-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    @media (max-width: 700px) {
+      .emergency-grid { grid-template-columns: 1fr; }
+    }
+    .emergency-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .emergency-card .em-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-green);
+    }
+    .emergency-card h3 {
+      font-size: 1.2rem;
+      margin: 0;
+      color: var(--color-dark);
+    }
+    .emergency-card p {
+      font-size: 0.9rem;
+      color: var(--color-secondary);
+      margin: 0;
+      line-height: 1.55;
+    }
+    .em-call {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: var(--color-green);
+      color: white;
+      border-radius: 100px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      transition: opacity var(--transition);
+      margin-top: 4px;
+    }
+    .em-call:hover { opacity: 0.88; color: white; }
+    .em-call.em-emergency { background: #c43a3a; }
+    .em-call.em-emergency:hover { background: #a83030; }
+    .em-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--color-secondary);
+      margin-top: 2px;
+    }
+    .em-secondary a { color: var(--color-green); font-weight: 600; }
+    .em-secondary a:hover { text-decoration: underline; }
+    .em-link {
+      font-size: 0.82rem;
+      color: var(--color-secondary);
+    }
+    .em-link a { color: var(--color-green); }
+    .em-link a:hover { text-decoration: underline; }
+
+    /* ── Directory controls ── */
+    .dir-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .dir-search {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.95rem;
+      background: var(--color-surface);
+    }
+    .dir-search:focus {
+      outline: 2px solid var(--color-green);
+      outline-offset: 1px;
+    }
+    .dir-selects {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dir-selects select {
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      background: var(--color-surface);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1.5L6 6.5L11 1.5' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+    .dir-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .dir-chip {
+      padding: 7px 14px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 100px;
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--color-secondary);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+    .dir-chip:hover { color: var(--color-dark); }
+    .dir-chip.active {
+      background: var(--color-green);
+      color: white;
+      border-color: var(--color-green);
+    }
+    .dir-meta {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--color-secondary);
+    }
+
+    /* ── Directory cards ── */
+    .dir-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    @media (max-width: 600px) {
+      .dir-grid { grid-template-columns: 1fr; }
+    }
+    .dir-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .dir-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .dir-card h4 {
+      font-size: 0.98rem;
+      margin: 0;
+      line-height: 1.3;
+      color: var(--color-dark);
+    }
+    .dir-cat {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-green);
+    }
+    .dir-status {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .dir-status.year-round { background: var(--color-green-muted); color: var(--color-green); }
+    .dir-status.seasonal { background: #fff3e0; color: #b8590f; }
+    .dir-status.verify { background: #eceff1; color: #546e7a; }
+    .dir-address {
+      font-size: 0.82rem;
+      color: var(--color-secondary);
+      line-height: 1.5;
+    }
+    .dir-address a { color: var(--color-secondary); text-decoration: underline; text-decoration-color: var(--color-border); }
+    .dir-address a:hover { color: var(--color-green); text-decoration-color: var(--color-green); }
+    .dir-contacts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .dir-phone, .dir-web {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg);
+      color: var(--color-dark);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .dir-phone:hover, .dir-web:hover { border-color: var(--color-green); color: var(--color-green); }
+    .dir-notes {
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .dir-empty {
+      padding: 40px 16px;
+      text-align: center;
+      color: var(--color-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* ── Shul cards ── */
+    .shul-dir-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .shul-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .shul-card h4 {
+      font-size: 0.95rem;
+      margin: 0;
+      color: var(--color-dark);
+      line-height: 1.3;
+    }
+    .shul-card-type {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-green);
+    }
+    .shul-card-address {
+      font-size: 0.82rem;
+      color: var(--color-secondary);
+      line-height: 1.45;
+    }
+    .shul-card-address a { color: var(--color-secondary); text-decoration: underline; text-decoration-color: var(--color-border); }
+    .shul-card-address a:hover { color: var(--color-green); }
+    .shul-card-contacts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+    .shul-card-contacts a {
+      display: inline-flex; gap: 5px; align-items: center;
+      font-size: 0.78rem; font-weight: 600;
+      padding: 5px 10px; border: 1px solid var(--color-border);
+      border-radius: 100px; color: var(--color-dark);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .shul-card-contacts a:hover { border-color: var(--color-green); color: var(--color-green); }
+
+    /* ── Directory: legend, toggle, category sections, verify badges ── */
+    .dir-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+    }
+    .dir-legend-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dir-legend-dot::before {
+      content: '';
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dir-legend-dot.confirmed::before { background: var(--color-green); }
+    .dir-legend-dot.verify::before { background: #d4a017; }
+
+    .verify-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.85rem;
+      color: var(--color-dark);
+      padding: 6px 0;
+    }
+    .verify-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+    .verify-toggle-switch {
+      position: relative;
+      width: 38px;
+      height: 22px;
+      background: var(--color-border);
+      border-radius: 100px;
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+    .verify-toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 18px; height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform var(--transition);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .verify-toggle input:checked + .verify-toggle-switch { background: var(--color-green); }
+    .verify-toggle input:checked + .verify-toggle-switch::after { transform: translateX(16px); }
+    .verify-toggle input:focus-visible + .verify-toggle-switch { outline: 2px solid var(--color-green); outline-offset: 2px; }
+
+    .cat-jump {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      margin-top: 14px;
+      padding-bottom: 4px;
+    }
+    .cat-jump::-webkit-scrollbar { display: none; }
+    .cat-jump a {
+      flex-shrink: 0;
+      padding: 7px 13px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      white-space: nowrap;
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .cat-jump a:hover { border-color: var(--color-green); color: var(--color-green); }
+
+    .cat-section { margin-top: 36px; scroll-margin-top: calc(var(--nav-height) + 70px); }
+    .cat-section:first-of-type { margin-top: 24px; }
+    .cat-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .cat-header h3 {
+      font-size: 1.1rem;
+      margin: 0;
+      color: var(--color-dark);
+      font-weight: 600;
+    }
+    .cat-count {
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+    .cat-section.hidden { display: none; }
+
+    .verify-badge {
+      display: inline-block;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .verify-badge.confirmed { background: var(--color-green-muted); color: var(--color-green); }
+    .verify-badge.verify { background: #fdf3d5; color: #8a6210; }
+
+    .dir-town-tag {
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+      margin-top: -2px;
+    }
+
+    .dir-footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+      line-height: 1.6;
+    }
+    .dir-footer strong { color: var(--color-dark); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       NAV
+  ══════════════════════════════════════ -->
+  <nav id="nav">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img src="img/logo.png" alt="Greentree Acres" class="nav-logo-img" />
+        <span class="nav-logo-text">Greentree Acres</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html#history">Our Story</a></li>
+        <li><a href="index.html#amenities">Amenities</a></li>
+        <li><a href="memories.html">Memories</a></li>
+        <li><a href="ferndale.html">Ferndale History</a></li>
+        <li><a href="zmanim.html">Zmanim</a></li>
+        <li><a href="local.html">Local Info</a></li>
+        <li><a href="vues.html">Country Vues</a></li>
+        <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
+      </ul>
+
+      <span id="nav-weather"></span>
+      <span id="nav-pool"></span>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PAGE HEADER
+  ══════════════════════════════════════ -->
+  <section class="page-header">
+    <div class="container page-header-content">
+      <p class="eyebrow">Sullivan County · Catskills</p>
+      <h1>Local Info</h1>
+      <p>Emergency services, kosher businesses, and shuls in the neighborhood.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       JUMP NAV
+  ══════════════════════════════════════ -->
+  <div class="jump-nav" id="jump-nav">
+    <div class="jump-nav-inner">
+      <a href="#weather" class="jump-link" data-target="weather">Weather</a>
+      <a href="#emergency" class="jump-link" data-target="emergency">Emergency</a>
+      <a href="#directory" class="jump-link" data-target="directory">Directory</a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       WEATHER
+  ══════════════════════════════════════ -->
+  <section class="section" id="weather">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Ferndale, NY · 12734</p>
+        <h2>Weather</h2>
+        <p>Current conditions and 7-day forecast.</p>
+      </div>
+      <div id="weather-widget" class="reveal reveal-delay-1"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       EMERGENCY / VOLUNTEER
+  ══════════════════════════════════════ -->
+  <section class="section" id="emergency" style="background: var(--color-surface); border-top: 1px solid var(--color-border);">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Emergency & Volunteer Services</p>
+        <h2>If You Need Help</h2>
+        <p>Volunteer-run emergency services covering the Catskills. Save these numbers.</p>
+      </div>
+
+      <div class="emergency-grid reveal reveal-delay-1">
+        <div class="emergency-card">
+          <span class="em-label">Medical Emergency</span>
+          <h3>Catskills Hatzalah</h3>
+          <p>Volunteer ambulance corps serving 300+ vacation colonies and camps. 13 ambulances, 350+ volunteers. Founded 1984.</p>
+          <a href="tel:+17183871750" class="em-call em-emergency">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Emergency: (718) 387-1750
+          </a>
+          <span class="em-secondary">Non-emergency: <a href="tel:+17189989000">(718) 998-9000</a></span>
+          <span class="em-link">More: <a href="https://chatzalah.org" target="_blank" rel="noopener noreferrer">chatzalah.org</a></span>
+        </div>
+
+        <div class="emergency-card">
+          <span class="em-label">Non-Medical Help</span>
+          <h3>Catskills Chaveirim</h3>
+          <p>Volunteer chesed group helping with lockouts, jump starts, flat tires, lost items, and other non-emergency assistance.</p>
+          <a href="tel:+17184318181" class="em-call">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Call: (718) 431-8181
+          </a>
+          <span class="em-link">More: <a href="https://chaveirim.org" target="_blank" rel="noopener noreferrer">chaveirim.org</a></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       DIRECTORY (kosher businesses, shuls, mikvahs, services)
+  ══════════════════════════════════════ -->
+  <section class="section" id="directory">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Sullivan County Directory</p>
+        <h2>Local Businesses & Services</h2>
+        <p>Kosher supermarkets, restaurants, bakeries, shops, shuls, mikvahs, and community services. Tap a phone number to call. For davening times see the <a href="zmanim.html">Zmanim page</a>.</p>
+      </div>
+
+      <div class="dir-controls reveal reveal-delay-1">
+        <input type="search" id="dir-search" class="dir-search" placeholder="Search by name, town, or address…" aria-label="Search directory" />
+        <div class="dir-selects">
+          <select id="dir-town" aria-label="Filter by town"><option value="">All towns</option></select>
+          <label class="verify-toggle">
+            <input type="checkbox" id="dir-verified-only" />
+            <span class="verify-toggle-switch" aria-hidden="true"></span>
+            <span>Verified open only</span>
+          </label>
+        </div>
+        <div class="dir-legend">
+          <span class="dir-legend-dot confirmed"><span id="legend-confirmed">Verified open</span></span>
+          <span class="dir-legend-dot verify"><span id="legend-verify">Call to verify</span></span>
+        </div>
+        <div class="cat-jump" id="cat-jump" aria-label="Jump to category"></div>
+        <p class="dir-meta" id="dir-meta"></p>
+      </div>
+
+      <div id="dir-sections"></div>
+
+      <div class="dir-footer" id="dir-footer"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="img/logo.png" alt="Greentree Acres" class="footer-logo" />
+        <p>&copy; 2026 Greentree Acres. All rights reserved.</p>
+      </div>
+      <p>
+        Historical context courtesy of the
+        <a href="https://borschtbelthistoricalmarkerproject.org/ferndale" target="_blank" rel="noopener noreferrer">
+          Borscht Belt Historical Marker Project
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/weather.js" defer></script>
+  <script src="js/pool.js" defer></script>
+  <script>
+    (function () {
+      var state = {
+        data: null,
+        items: [],
+        categoryOrder: [],
+        q: '',
+        town: '',
+        verifiedOnly: false
+      };
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+      function slug(s) {
+        return String(s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+      }
+      function mapsUrl(addr) {
+        return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr);
+      }
+      function telHref(phone) {
+        var digits = (phone || '').replace(/[^\d]/g, '');
+        if (digits.length === 10) digits = '1' + digits;
+        return 'tel:+' + digits;
+      }
+      function webHref(w) {
+        if (!w) return '';
+        if (/^https?:\/\//i.test(w)) return w;
+        return 'https://' + w;
+      }
+
+      var PHONE_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+      var EMAIL_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+      var WEB_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+      var PIN_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+
+      function renderCard(it) {
+        var actions = '';
+        if (it.phone) actions += '<a class="dir-phone" href="' + telHref(it.phone) + '" aria-label="Call ' + esc(it.name) + '">' + PHONE_SVG + esc(it.phone) + '</a>';
+        if (it.email) actions += '<a class="dir-web" href="mailto:' + esc(it.email) + '" aria-label="Email ' + esc(it.name) + '">' + EMAIL_SVG + 'Email</a>';
+        if (it.website) actions += '<a class="dir-web" href="' + esc(webHref(it.website)) + '" target="_blank" rel="noopener noreferrer" aria-label="Website for ' + esc(it.name) + '">' + WEB_SVG + 'Website</a>';
+        if (it.address) actions += '<a class="dir-web" href="' + mapsUrl(it.address) + '" target="_blank" rel="noopener noreferrer" aria-label="Directions to ' + esc(it.name) + '">' + PIN_SVG + 'Directions</a>';
+
+        var badgeClass = it.verify_status === 'confirmed' ? 'confirmed' : 'verify';
+        var badgeLabel = it.verify_status === 'confirmed' ? 'Verified open' : 'Call to verify';
+
+        return '<article class="dir-card" data-id="' + esc(it.id) + '">' +
+          '<div class="dir-card-header">' +
+            '<h4>' + esc(it.name) + '</h4>' +
+            '<span class="verify-badge ' + badgeClass + '">' + badgeLabel + '</span>' +
+          '</div>' +
+          (it.town ? '<p class="dir-town-tag">' + esc(it.town) + '</p>' : '') +
+          (it.address ? '<p class="dir-address">' + esc(it.address) + '</p>' : '') +
+          (actions ? '<div class="dir-contacts">' + actions + '</div>' : '') +
+          (it.notes ? '<p class="dir-notes">' + esc(it.notes) + '</p>' : '') +
+        '</article>';
+      }
+
+      function filterItems() {
+        var q = state.q.trim().toLowerCase();
+        return state.items.filter(function (it) {
+          if (state.town && it.town !== state.town) return false;
+          if (state.verifiedOnly && it.verify_status !== 'confirmed') return false;
+          if (q) {
+            var hay = (it.name + ' ' + it.town + ' ' + it.address + ' ' + it.category + ' ' + (it.notes || '')).toLowerCase();
+            if (hay.indexOf(q) === -1) return false;
+          }
+          return true;
+        });
+      }
+
+      function render() {
+        var sectionsEl = document.getElementById('dir-sections');
+        var metaEl = document.getElementById('dir-meta');
+        var filtered = filterItems();
+
+        metaEl.textContent = filtered.length + (filtered.length === 1 ? ' listing' : ' listings');
+
+        if (!filtered.length) {
+          sectionsEl.innerHTML = '<div class="dir-empty">No listings match. Try clearing filters or search.</div>';
+          updateJumpVisibility([]);
+          return;
+        }
+
+        // Group by category
+        var groups = {};
+        filtered.forEach(function (it) {
+          if (!groups[it.category]) groups[it.category] = [];
+          groups[it.category].push(it);
+        });
+
+        // Sort each group alphabetically by name
+        Object.keys(groups).forEach(function (k) {
+          groups[k].sort(function (a, b) { return a.name.localeCompare(b.name); });
+        });
+
+        // Render in category_order
+        var html = '';
+        var visibleCats = [];
+        state.categoryOrder.forEach(function (cat) {
+          var items = groups[cat];
+          if (!items || !items.length) return;
+          visibleCats.push(cat);
+          html += '<section class="cat-section" id="cat-' + slug(cat) + '" aria-labelledby="cat-h-' + slug(cat) + '">' +
+            '<header class="cat-header">' +
+              '<h3 id="cat-h-' + slug(cat) + '">' + esc(cat) + '</h3>' +
+              '<span class="cat-count">' + items.length + '</span>' +
+            '</header>' +
+            '<div class="dir-grid">' +
+              items.map(renderCard).join('') +
+            '</div>' +
+          '</section>';
+        });
+        sectionsEl.innerHTML = html;
+        updateJumpVisibility(visibleCats);
+      }
+
+      function buildJump() {
+        var wrap = document.getElementById('cat-jump');
+        wrap.innerHTML = state.categoryOrder.map(function (cat) {
+          return '<a href="#cat-' + slug(cat) + '" data-cat="' + esc(cat) + '">' + esc(cat) + '</a>';
+        }).join('');
+      }
+
+      function updateJumpVisibility(visibleCats) {
+        document.querySelectorAll('#cat-jump a').forEach(function (a) {
+          var cat = a.getAttribute('data-cat');
+          a.style.display = visibleCats.indexOf(cat) === -1 ? 'none' : '';
+        });
+      }
+
+      function buildTownDropdown() {
+        var sel = document.getElementById('dir-town');
+        var towns = [];
+        state.items.forEach(function (it) { if (it.town && towns.indexOf(it.town) === -1) towns.push(it.town); });
+        towns.sort();
+        towns.forEach(function (t) {
+          var o = document.createElement('option');
+          o.value = t; o.textContent = t;
+          sel.appendChild(o);
+        });
+      }
+
+      function applyLegendText(legend) {
+        if (!legend) return;
+        if (legend.confirmed) document.getElementById('legend-confirmed').textContent = 'Verified open — ' + legend.confirmed.toLowerCase();
+        if (legend.verify) document.getElementById('legend-verify').textContent = 'Call to verify — ' + legend.verify.toLowerCase();
+      }
+
+      function applyFooter(data) {
+        var f = document.getElementById('dir-footer');
+        var src = data.source ? '<div><strong>Source:</strong> ' + esc(data.source) + '</div>' : '';
+        var compiled = data.compiled ? '<div><strong>Compiled:</strong> ' + esc(data.compiled) + '</div>' : '';
+        f.innerHTML = src + compiled +
+          '<div style="margin-top:8px">Catskills businesses are seasonal and change often — always call ahead. <em>Verified open</em> = advertised in the current issue.</div>';
+      }
+
+      fetch('js/sullivan_directory_FULL.json')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          state.data = data;
+          state.items = data.items || [];
+          state.categoryOrder = data.category_order || [];
+          applyLegendText(data.verify_legend);
+          applyFooter(data);
+          buildJump();
+          buildTownDropdown();
+          render();
+        })
+        .catch(function () {
+          document.getElementById('dir-sections').innerHTML = '<div class="dir-empty">Could not load directory. Please refresh.</div>';
+        });
+
+      document.getElementById('dir-search').addEventListener('input', function (e) {
+        state.q = e.target.value;
+        render();
+      });
+      document.getElementById('dir-town').addEventListener('change', function (e) {
+        state.town = e.target.value;
+        render();
+      });
+      document.getElementById('dir-verified-only').addEventListener('change', function (e) {
+        state.verifiedOnly = e.target.checked;
+        render();
+      });
+    })();
+
+    (function () {
+      var sections = ['weather', 'emergency', 'directory'];
+      var links = {};
+      document.querySelectorAll('.jump-link').forEach(function (a) {
+        links[a.getAttribute('data-target')] = a;
+      });
+
+      function updateActive() {
+        var scrollPos = window.scrollY + (document.getElementById('nav').offsetHeight || 64) + 80;
+        var current = sections[0];
+        sections.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el && el.offsetTop <= scrollPos) current = id;
+        });
+        Object.keys(links).forEach(function (k) {
+          links[k].classList.toggle('active', k === current);
+        });
+      }
+
+      window.addEventListener('scroll', updateActive, { passive: true });
+      updateActive();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+id,name,category,town,address,phone,email,website,verify_status,notes,source
+sc-001,Appletree Kosher Supermarket,Supermarkets & Groceries,Liberty,"1885 NY-52, Liberty, NY 12754",845-428-9400,,appletreekosher.com,confirmed,"Salad bar, sushi, takeout",Curated + Vues 6/25/26
+sc-002,Goldman's Grocery,Supermarkets & Groceries,Monticello,"38 Joyland Rd, Monticello, NY 12701",347-267-7274,,,confirmed,Alt 917-569-4790,Curated + Vues 6/25/26
+sc-003,Gourmet Glatt Kiamesha Lake,Supermarkets & Groceries,Kiamesha Lake,"4685 NY-42, Kiamesha Lake, NY 12751",845-609-3600,,gourmetglatt.com,confirmed,Prepared foods + pizza,Curated + Vues 6/25/26
+sc-004,Kosher Express on the 42,Supermarkets & Groceries,Kiamesha Lake,"4670 NY-42, Kiamesha Lake, NY 12751",845-791-7111,,,confirmed,Next to Cafe Express,Curated + Vues 6/25/26
+sc-005,Landau's Supermarket,Supermarkets & Groceries,South Fallsburg,"3 Railroad Plaza, South Fallsburg, NY 12779",845-436-1267,,landausupstate.com,confirmed,On-site Main St Pizza + Boosur section,Curated + Vues 6/25/26
+sc-006,Lemonade Kosher Supermarket,Supermarkets & Groceries,Liberty,"261 N Main St, Liberty, NY 12754",845-218-1244,,lemonadesupermarket.com,confirmed,Former Liberty Market; Zaftig Take-Out inside; KB Kosher Food = same plaza,Curated + Vues 6/25/26
+sc-007,Mountain Food (Mountain Kosher Food),Supermarkets & Groceries,Monticello,"286 E Broadway, Monticello, NY 12701",845-794-4600,,,confirmed,Also listed as Kosher Garden; nearby Mountain Fruit produce,Curated + Vues 6/25/26
+sc-008,Tyberg's Grocery,Supermarkets & Groceries,Swan Lake,"~41 Stanton Corner Rd, Swan Lake, NY 12783",,,,confirmed,New for 2026 (Vues),Curated + Vues 6/25/26
+sc-009,Yagdil Kosher Supermarket,Supermarkets & Groceries,Fallsburg,"33 Laurel Park Rd, Fallsburg, NY 12733",845-434-3663,chaim@yagdilkosher.com,,confirmed,Full-service anchor (845-434-FOOD),Curated + Vues 6/25/26
+sc-010,Zest Supermarket,Supermarkets & Groceries,Woodbourne,"425 NY-52, Woodbourne, NY 12788",845-434-1617,orders@zestkosher.com,zestsupermarket.com,confirmed,"Formerly Woodbourne Grocery; delivery, late hours",Curated + Vues 6/25/26
+sc-011,Aladdin Supermarket,Supermarkets & Groceries,Woodbourne,"184 Hasbrouck Dr (Kiryas Beirach Moshe), Woodbourne, NY 12788",,,,verify,Colony market,Curated + Vues 6/25/26
+sc-012,All Fresh Supermarket,Supermarkets & Groceries,White Lake,"Rt 17B, White Lake, NY 12786",,,,verify,"Separate 'All Fresh-Kosher Corner' at 706 Laurel Ave, Fallsburg (718-908-1987) - verify",Curated + Vues 6/25/26
+sc-013,Barron's Grocery,Supermarkets & Groceries,Fallsburg,"5574 NY-42, Fallsburg, NY 12733",,,,verify,NYS registry,Curated + Vues 6/25/26
+sc-014,Buy Rite Kosher Supermarket,Supermarkets & Groceries,Woodridge,"13 Greenfield Rd, Woodridge, NY 12789",845-434-7365,,,verify,Large summer location; houses Ossie's Fish + sushi; alt 845-434-1718,Curated + Vues 6/25/26
+sc-015,Camp Morris Grocery (Morris Food),Supermarkets & Groceries,Woodridge,"40 Camp Morris Rd, Woodridge, NY 12789",718-633-0262,,,verify,NYS registry; Rebbe's Choice retail,Curated + Vues 6/25/26
+sc-016,Catskill Kosher Center,Supermarkets & Groceries,Kiamesha Lake,"30 Feldman Cir, Kiamesha Lake, NY 12751",845-794-7623,,,verify,Convenience-size,Curated + Vues 6/25/26
+sc-017,Giti Garden Supermarket (Tomer Devorah),Supermarkets & Groceries,Woodridge,"1123 Glenwild Rd, Woodridge, NY 12789",845-436-1593,,,verify,NYS registry,Curated + Vues 6/25/26
+sc-018,Greenfresh Supermarket,Supermarkets & Groceries,Monticello,"3711 NY-42, Monticello, NY 12701",,,,verify,NYS registry / SNAP listing,Curated + Vues 6/25/26
+sc-019,Honeydew Supermarket,Supermarkets & Groceries,Woodridge,"7 Greenfield Rd, Woodridge, NY 12789",845-295-8100,,,verify,Groceries + housewares/toys,Curated + Vues 6/25/26
+sc-020,Kollel Grocery,Supermarkets & Groceries,Woodridge,"176 River Rd, Woodridge, NY 12789",845-662-1116,,,verify,NYS registry,Curated + Vues 6/25/26
+sc-021,Motty's Corner 55,Supermarkets & Groceries,White Lake,"3395 NY-55, White Lake, NY 12786",845-583-4080,,,verify,"Dairy + meat takeout, pizza, ice cream",Curated + Vues 6/25/26
+sc-022,Newday North,Supermarkets & Groceries,Swan Lake,"38 Stanton Corner Rd, Swan Lake, NY 12783",845-292-6851,,,verify,,Curated + Vues 6/25/26
+sc-023,Schreiber's Market with Melt,Supermarkets & Groceries,Monticello,"Mountain Sq, E Broadway, Monticello, NY 12701",,,,verify,"Fresh fruit, shakes, chocolates",Curated + Vues 6/25/26
+sc-024,Skopps Supermarket,Supermarkets & Groceries,Fallsburg,"404 Laurel Ave, Fallsburg, NY 12733",845-436-8731,skopps.orders@gmail.com,skoppssupermarket.com,verify,"~10,000 sq ft; pizza/sushi",Curated + Vues 6/25/26
+sc-025,Sunflower Kosher Market,Supermarkets & Groceries,Monticello,"347 E Broadway (Mountain Sq), Monticello, NY 12701",845-376-9000,,,verify,Tarnopol Kashrus; also listed 321 E Broadway,Curated + Vues 6/25/26
+sc-026,Woodbourne Supermarket,Supermarkets & Groceries,Woodbourne,"Main St, Woodbourne, NY 12788",,,,verify,Possible older name / 2nd store vs Zest - verify,Curated + Vues 6/25/26
+sc-027,Boosur Meat & Deli (South Fallsburg),"Butchers, Meat, Fish & Deli",South Fallsburg,"3 Railroad Plaza Ext, South Fallsburg, NY 12779",845-434-3689,sales@boosur.com,boosur.com,verify,Also listed 5215 Main St,Curated + Vues 6/25/26
+sc-028,Kosher Atlantic,"Butchers, Meat, Fish & Deli",South Fallsburg,"5092 Main St, South Fallsburg, NY 12779",845-794-3474,,,verify,Fresh fish + gefilte,Curated + Vues 6/25/26
+sc-029,Meal Mart,"Butchers, Meat, Fish & Deli",South Fallsburg,"Main St, South Fallsburg, NY 12779",845-434-3689,,,verify,Shares Boosur/Satmar phone - likely affiliated takeout,Curated + Vues 6/25/26
+sc-030,Ossie's Fish (New Jords LLC),"Butchers, Meat, Fish & Deli",Woodridge,"13 Greenfield Rd, Woodridge, NY 12789",,,,verify,Fish counter at Buy Rite / Center One,Curated + Vues 6/25/26
+sc-031,Satmar Meats (Woodbourne),"Butchers, Meat, Fish & Deli",Woodbourne,"433 NY-52, Woodbourne, NY 12788",,,satmarmeatsw.com,verify,Seasonal butcher + dry goods; shares plaza w/ Jerusalem II Pizza,Curated + Vues 6/25/26
+sc-032,Satmar Meats / Boosur Meat & Deli,"Butchers, Meat, Fish & Deli",Monticello,"352 E Broadway, Monticello, NY 12701",845-434-3689,sales@boosur.com,boosur.com,verify,"Butcher, deli, catering, Shabbos boxes; also satmarkjmeat.com; alt 347-221-0371",Curated + Vues 6/25/26
+sc-033,Fallsburg Bagels & Bakery,Bakeries,Fallsburg,"5692 NY-42, Fallsburg, NY 12733",845-434-1765,,,confirmed,"Bagels, pastries, omelets",Curated + Vues 6/25/26
+sc-034,Gombo's Heimishe Bakery,Bakeries,South Fallsburg,"5230 Main St, South Fallsburg, NY 12779",845-436-4107,,,confirmed,Landmark; seasonal Woodbourne branch on Main St,Curated + Vues 6/25/26
+sc-035,Rugelach Heimishe Bakery & Cafe,Bakeries,Monticello,"4437 NY-52, Monticello, NY 12701",845-796-0008,,,confirmed,Dairy cafe + bakery; alt 845-796-4796,Curated + Vues 6/25/26
+sc-036,Berry's Bake Shop,Bakeries,Bloomingburg,"5 North Rd, Bloomingburg, NY 12721",845-316-2220,,,verify,"Babka, challah, sandwiches",Curated + Vues 6/25/26
+sc-037,Swan Lake Bakery,Bakeries,Swan Lake,"Swan Lake, NY 12783",,,,verify,Also listed Monticello,Curated + Vues 6/25/26
+sc-038,Taam Eden Bakery,Bakeries,Monticello,"321 E Broadway (Mountain Sq), Monticello, NY 12701",718-484-8565,,,verify,Daily fresh; also inside Gourmet Glatt Kiamesha,Curated + Vues 6/25/26
+sc-039,Bass & Bourbon,"Pizza, Dairy, Cafes & Fast-Casual",White Lake,"1562 NY-17B, White Lake, NY 12786",845-513-8998,,,confirmed,Dairy sister of Bison & Bourbon; lakeside,Curated + Vues 6/25/26
+sc-040,Boat Cafe,"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"1188 NY-52, Loch Sheldrake, NY 12759",845-807-8006,,boatcafeny.com,confirmed,Dairy,Curated + Vues 6/25/26
+sc-041,Citrus Cafe,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"436 NY-52, Woodbourne, NY 12788",845-434-4600,,citruscafeny.com,confirmed,Dairy,Curated + Vues 6/25/26
+sc-042,Crunchies (Schnitzel Bar),"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"13 Green Ave Ext (Center One), Woodridge, NY 12789",845-436-6600,info@crunchiesny.com,crunchiesny.com,confirmed,Meat fast-casual,Curated + Vues 6/25/26
+sc-043,Falafel Tanami,"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"Formaggio / Sushi Tokyo lot, 1188 NY-52, Loch Sheldrake, NY 12759",,,,confirmed,"NEW 2026 falafel truck; from Avenue M, Brooklyn",Curated + Vues 6/25/26
+sc-044,Fialkoff's Pizza / Sprinkles (Four Corners),"Pizza, Dairy, Cafes & Fast-Casual",Fallsburg,"5670 NY-42, Fallsburg, NY 12733",845-434-0200,,fialkoffskosherpizza.com,confirmed,Four Corners; Sprinkles + Fialkoff's co-located (also 5672 NY-42),Curated + Vues 6/25/26
+sc-045,Flavors,"Pizza, Dairy, Cafes & Fast-Casual",South Fallsburg,"5206 Main St, South Fallsburg, NY 12779",845-352-8670,,,confirmed,Cafe,Curated + Vues 6/25/26
+sc-046,Formaggio Mio,"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"1132 NY-52, Loch Sheldrake, NY 12759",845-640-2552,,mendelsohnsupstate.com,confirmed,Dairy/Mediterranean,Curated + Vues 6/25/26
+sc-047,Liberty Kosher Pizza (Liberty),"Pizza, Dairy, Cafes & Fast-Casual",Liberty,"1885 NY-52, Liberty, NY 12754",845-292-7499,,libertykosherpizza.com,confirmed,,Curated + Vues 6/25/26
+sc-048,Liberty Kosher Pizza (Monticello),"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"512 Broadway, Monticello, NY 12701",845-292-7499,,libertykosherpizza.com,confirmed,Pizza + arcade,Curated + Vues 6/25/26
+sc-049,Nature's Delight by Aroma,"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"554 W Broadway, Monticello, NY 12701",845-796-0270,aromamonticello@aroma.com,aromamonticello.com,confirmed,Dairy cafe (a/k/a Aroma Monticello); sourdough pizza,Curated + Vues 6/25/26
+sc-050,Riverside Cafe & Diner / Smash House Burger,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"407 NY-52, Woodbourne, NY 12788",845-436-4663,,smashhouseburgers.com,confirmed,Diner year-round; Smash House burgers summer; alt 845-351-1010,Curated + Vues 6/25/26
+sc-051,Sushi Tokyo (Catskills),"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"1188 NY-52, Loch Sheldrake, NY 12759",845-943-2689,,sushitokyo.com,confirmed,Shares 1188 NY-52 w/ Boat Cafe + Green Lips,Curated + Vues 6/25/26
+sc-052,T-Spoons,"Pizza, Dairy, Cafes & Fast-Casual",South Fallsburg,"5220 Main St, South Fallsburg, NY 12779",845-434-3100,,,confirmed,,Curated + Vues 6/25/26
+sc-053,Bonnie's Place,"Pizza, Dairy, Cafes & Fast-Casual",Hurleyville,"710 Hurleyville Rd, Hurleyville, NY 12747",845-434-2511,,,verify,Chinese/American; also Vacation Village location,Curated + Vues 6/25/26
+sc-054,Bravo Pizza + Sushi Meshuga,"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"Green Ave, Woodridge, NY 12789",,,,verify,,Curated + Vues 6/25/26
+sc-055,Brooklyn Brick Oven,"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"1141 NY-52, Loch Sheldrake, NY 12759",,,,verify,,Curated + Vues 6/25/26
+sc-056,Cafe Au' Main,"Pizza, Dairy, Cafes & Fast-Casual",Bloomingburg,"Main St, Bloomingburg, NY 12721",,,,verify,,Curated + Vues 6/25/26
+sc-057,Cafe Chocolat,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"441 NY-52, Woodbourne, NY 12788",845-434-7641,,,verify,"Dairy, ice cream, desserts; alt 845-548-8230",Curated + Vues 6/25/26
+sc-058,Cafe Express,"Pizza, Dairy, Cafes & Fast-Casual",Kiamesha Lake,"4682 NY-42 (Kiamesha Lanes), Kiamesha Lake, NY 12751",845-794-3663,,,verify,Dairy/brunch,Curated + Vues 6/25/26
+sc-059,Casa Cava Pizza & Cafe,"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"321 E Broadway Ste 6-7 (Mountain Sq), Monticello, NY 12701",845-655-5888,,casacavapizzacafe.com,verify,CRC; alt 845-376-4040,Curated + Vues 6/25/26
+sc-060,Chezky's Pizza,"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"Broadway, Monticello, NY 12701",,,,verify,,Curated + Vues 6/25/26
+sc-061,Coby's Corner,"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"6 Broadway, Woodridge, NY 12789",845-434-1088,,,verify,Fleishig; changed hands over years,Curated + Vues 6/25/26
+sc-062,Fialkoff's Pizza (Fun Spot),"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"1308 NY-52, Loch Sheldrake, NY 12759",845-794-3420,,fialkoffskosherpizza.com,verify,Inside Fun Spot,Curated + Vues 6/25/26
+sc-063,Fialkoff's Pizza (Pizza Palace),"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"250 E Broadway, Monticello, NY 12701",845-794-3420,,fialkoffskosherpizza.com,verify,Catskills classic,Curated + Vues 6/25/26
+sc-064,Green Lips Juice & Acai Bar,"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"1188 NY-52, Loch Sheldrake, NY 12759",845-807-8006,,greenlips.com,verify,,Curated + Vues 6/25/26
+sc-065,i-Swirl,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"437 NY-52, Woodbourne, NY 12788",845-434-0334,,,verify,Frozen yogurt,Curated + Vues 6/25/26
+sc-066,Jerusalem II Pizza,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"433 NY-52, Woodbourne, NY 12788",845-434-7499,,j2pizza.com,verify,"Pizza, falafel, sushi",Curated + Vues 6/25/26
+sc-067,Kosher Inn,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"Main St, Woodbourne, NY 12788",845-434-7000,,,verify,Verify phone (shared w/ Raleigh listing),Curated + Vues 6/25/26
+sc-068,Kosher Pizza Plus,"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"347 E Broadway, Monticello, NY 12701",845-794-7499,,,verify,,Curated + Vues 6/25/26
+sc-069,Main Street Pizza,"Pizza, Dairy, Cafes & Fast-Casual",South Fallsburg,"5202 Main St (inside Landau's), South Fallsburg, NY 12779",845-434-5845,,,verify,,Curated + Vues 6/25/26
+sc-070,Ming Moon,"Pizza, Dairy, Cafes & Fast-Casual",South Fallsburg,"5202 Main St, South Fallsburg, NY 12779",845-434-2189,,,verify,Chinese,Curated + Vues 6/25/26
+sc-071,Mo's Grill,"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"4 Green Ave, Woodridge, NY 12789",845-693-4063,,,verify,,Curated + Vues 6/25/26
+sc-072,Mr. Schnitzel,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"Main St, Woodbourne, NY 12788",845-434-0555,,,verify,,Curated + Vues 6/25/26
+sc-073,Noble Nori,"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"554 W Broadway, Monticello, NY 12701",845-504-9554,,noblenori.com,verify,Sushi; with Nature's Delight/Aroma,Curated + Vues 6/25/26
+sc-074,Pezzto,"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"13 Green Ave (Center One), Woodridge, NY 12789",802-473-9986,,,verify,,Curated + Vues 6/25/26
+sc-075,Pizza D' Pie,"Pizza, Dairy, Cafes & Fast-Casual",Kiamesha Lake,"4682 NY-42 (Kiamesha Lanes), Kiamesha Lake, NY 12751",845-791-8140,,,verify,,Curated + Vues 6/25/26
+sc-076,Sasso,"Pizza, Dairy, Cafes & Fast-Casual",Rock Hill,"277 Rock Hill Dr, Rock Hill, NY 12775",845-202-2922,,sasso.rockresortny.com,verify,Italian dairy (w/ Rock Bistro),Curated + Vues 6/25/26
+sc-077,StarGelt Cafe,"Pizza, Dairy, Cafes & Fast-Casual",Loch Sheldrake,"1128 NY-52, Loch Sheldrake, NY 12759",845-436-6774,,,verify,Dairy,Curated + Vues 6/25/26
+sc-078,Starlight Cafe,"Pizza, Dairy, Cafes & Fast-Casual",Monticello,"299 Starlight Rd, Monticello, NY 12701",,,,verify,Possibly same as Starlight Bistro (23 Marina Rd) - verify,Curated + Vues 6/25/26
+sc-079,Swan Lake Pizza & Dairy (Tybergs),"Pizza, Dairy, Cafes & Fast-Casual",Swan Lake,"42 Stanton Corner Rd, Swan Lake, NY 12783",845-292-8814,,,verify,a/k/a Tybergs Kosher Pizzeria,Curated + Vues 6/25/26
+sc-080,The Bucket,"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"Broadway, Woodridge, NY 12789",,,,verify,,Curated + Vues 6/25/26
+sc-081,Tuscany Cafe & Pizzeria,"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"13 Greenfield Rd, Woodridge, NY 12789",845-666-9500,,,verify,Pizza/sushi,Curated + Vues 6/25/26
+sc-082,Upstate Subs,"Pizza, Dairy, Cafes & Fast-Casual",Kiamesha Lake,"NY-42, Kiamesha Lake, NY 12751",,,,verify,,Curated + Vues 6/25/26
+sc-083,Woodbourne Pizza,"Pizza, Dairy, Cafes & Fast-Casual",Woodbourne,"431 NY-52, Woodbourne, NY 12788",,,,verify,,Curated + Vues 6/25/26
+sc-084,Woodridge Kosher Pizza (Feller's),"Pizza, Dairy, Cafes & Fast-Casual",Woodridge,"9 Broadway / 14 Green Ave, Woodridge, NY 12789",845-436-7499,,,verify,a/k/a Fellers,Curated + Vues 6/25/26
+sc-085,Belvedere Steakhouse,Meat Restaurants & Steakhouses,Woodridge,"Woodridge, NY 12789 (verify exact address)",,,,confirmed,NEW 2026; three-floor fleishig; by Rock Bistro owner,Curated + Vues 6/25/26
+sc-086,Bison & Bourbon,Meat Restaurants & Steakhouses,White Lake,"1568 NY-17B, White Lake, NY 12786",845-250-4065,,,confirmed,Meat + dairy sections; lakeside,Curated + Vues 6/25/26
+sc-087,Prime Avenue,Meat Restaurants & Steakhouses,Monticello,"321 E Broadway (Mountain Sq, former Upside Burger), Monticello, NY 12701",,,,confirmed,NEW 2026; grill bar + Chinese; seats 150/70,Curated + Vues 6/25/26
+sc-088,The Flame,Meat Restaurants & Steakhouses,Monticello,"287 E Broadway, Monticello, NY 12701",845-478-8000,,thenyflame.com,confirmed,Meat/Chinese/steakhouse,Curated + Vues 6/25/26
+sc-089,Dougie's BBQ & Grill,Meat Restaurants & Steakhouses,Woodbourne,"440 NY-52, Woodbourne, NY 12788",845-436-4441,info@dougiesbbq.com,dougiesw.com,verify,BBQ/grill/sushi; OU,Curated + Vues 6/25/26
+sc-090,Grill on Broadway,Meat Restaurants & Steakhouses,Monticello,"279 E Broadway #277, Monticello, NY 12701",,,,verify,Meat takeout + catering,Curated + Vues 6/25/26
+sc-091,King of Delancey,Meat Restaurants & Steakhouses,Loch Sheldrake,"710 Loch Sheldrake-Hurleyville Rd, Loch Sheldrake, NY 12759",845-640-2853,,kodvv.com,verify,Meat + catering/events,Curated + Vues 6/25/26
+sc-092,Levy's,Meat Restaurants & Steakhouses,Swan Lake,"Swan Lake, NY 12783",,,,verify,,Curated + Vues 6/25/26
+sc-093,Meat N' Boat,Meat Restaurants & Steakhouses,Loch Sheldrake,"1158 NY-52, Loch Sheldrake, NY 12759",929-539-8696,,meatnboat.com,verify,Lakeside meat,Curated + Vues 6/25/26
+sc-094,Mountain Top Steakhouse,Meat Restaurants & Steakhouses,Woodbourne,"The Chalet Hotel, Woodbourne, NY 12788",845-434-5124,,,verify,Hotel steakhouse,Curated + Vues 6/25/26
+sc-095,Primecut Steakhouse,Meat Restaurants & Steakhouses,South Fallsburg,"The Raleigh Hotel, 680 Heiden Rd, South Fallsburg, NY 12779",845-434-7000,,,verify,Hotel steakhouse,Curated + Vues 6/25/26
+sc-096,Starlight Bistro,Meat Restaurants & Steakhouses,Kauneonga Lake,"23 Marina Rd, Monticello, NY 12701",,,,verify,Lakeside; Italian/pizza; see Starlight Cafe,Curated + Vues 6/25/26
+sc-097,Zaftig,Meat Restaurants & Steakhouses,Swan Lake,"2 Stanton Corner Rd, Swan Lake, NY 12783",845-513-0088,,,verify,Meat takeout + catering; counter inside Lemonade (Liberty),Curated + Vues 6/25/26
+sc-098,Cones Ice Cream,Ice Cream & Desserts,South Fallsburg,"5705 Main St, South Fallsburg, NY 12779",718-825-8790,,,confirmed,,Curated + Vues 6/25/26
+sc-099,Country Cool Desserts,Ice Cream & Desserts,Monticello,"287 E Broadway, Monticello, NY 12701",,,,verify,NYS registry,Curated + Vues 6/25/26
+sc-100,Garage Ice Cream,Ice Cream & Desserts,Loch Sheldrake,"1308 NY-52, Loch Sheldrake, NY 12759",,,,verify,,Curated + Vues 6/25/26
+sc-101,Kosher Ice Cream Truck,Ice Cream & Desserts,Liberty,"185 Carrier St, Liberty, NY 12754",347-977-9756,,,verify,Books events,Curated + Vues 6/25/26
+sc-102,Shlomie's Choklat,Ice Cream & Desserts,Woodridge,"13 Greenfield Rd, Woodridge, NY 12789",,,,verify,NYS registry,Curated + Vues 6/25/26
+sc-103,Simply Sweets Ice Cream,Ice Cream & Desserts,Monticello,"Broadway, Monticello, NY 12701",,,,verify,,Curated + Vues 6/25/26
+sc-104,Sprinkles Ice Cream,Ice Cream & Desserts,Woodridge,"Center One Mall, Woodridge, NY 12789",845-434-7203,,,verify,,Curated + Vues 6/25/26
+sc-105,BalaBatish Catering,Catering,Regionwide,Servicing all regional locations,732-719-4040,balabatishnj@gmail.com,,verify,Direct delivery to colonies/villas,Curated + Vues 6/25/26
+sc-106,Mountain Chef (Matamim Catering),Catering,Monticello,"1 Schroeder St, Monticello, NY 12701",845-500-5553,,,verify,,Curated + Vues 6/25/26
+sc-107,Taam Catering,Catering,Kiamesha Lake,"4656 NY-42, Kiamesha Lake, NY 12751",845-218-8226,,,verify,,Curated + Vues 6/25/26
+sc-108,Center One Judaica,"Judaica, Seforim & Toys",Woodridge,"13 Green Ave, Woodridge, NY 12789",845-693-4873,,,confirmed,"Seforim, toys, Judaica",Curated + Vues 6/25/26
+sc-109,ABC Toys & Gifts,"Judaica, Seforim & Toys",South Fallsburg,"5219 Main St, South Fallsburg, NY 12779",845-781-0346,abctoysinc@gmail.com,abctoysusa.com,verify,Catskill Kids Fun Zone,Curated + Vues 6/25/26
+sc-110,Hakol B'Sefer Judaica,"Judaica, Seforim & Toys",Woodbourne,"443 NY-52, Woodbourne, NY 12788",845-434-2626,,,verify,"Seforim, Judaica, toys",Curated + Vues 6/25/26
+sc-111,KB Seforim and Judaica,"Judaica, Seforim & Toys",Liberty,"51 Twin Bridge Rd, Liberty, NY 12754",347-578-4449,,,verify,,Curated + Vues 6/25/26
+sc-112,Keter Judaica,"Judaica, Seforim & Toys",Monticello,"321 E Broadway (Mountain Sq), Monticello, NY 12701",1-888-685-3837,,keterjudaica.com,verify,Judaica & Seforim (1-888-68-KETER),Curated + Vues 6/25/26
+sc-113,Toys 4 U,"Judaica, Seforim & Toys",Monticello,"321 E Broadway (Mountain Sq), Monticello, NY 12701",845-241-7080,,,verify,Toys & books,Curated + Vues 6/25/26
+sc-114,Yufah Judaica,"Judaica, Seforim & Toys",Bloomingburg,"17 Winterton Rd, Bloomingburg, NY 12721",845-733-8308,,,verify,,Curated + Vues 6/25/26
+sc-115,Kidichic,Apparel & Footwear,Monticello,"321 E Broadway (Mountain Sq), Monticello, NY 12701",,,,confirmed,Kids' apparel; next to Prime Avenue,Curated + Vues 6/25/26
+sc-116,Kosher Socks (Pack for Camp),Apparel & Footwear,South Fallsburg,"Main St, South Fallsburg, NY 12779",845-693-1111,,packforcamp.com,confirmed,Camp gear,Curated + Vues 6/25/26
+sc-117,Majek Furs,Apparel & Footwear,Monticello,"312 E Broadway, Monticello, NY 12701",845-796-4800,,majekfurs.com,confirmed,Furs/outerwear; advertised this issue,Curated + Vues 6/25/26
+sc-118,Mynal Kids Shoes,Apparel & Footwear,Monticello,"321 E Broadway (Mountain Sq), Monticello, NY 12701",845-888-7463,,,verify,Footwear,Curated + Vues 6/25/26
+sc-119,Discount Furniture & Mattress,"Home, Hardware & Furniture",Monticello,"186 E Broadway, Monticello, NY 12701",845-796-7653,,,confirmed,Heimishe-owned; delivery; also 845-434-5877,Curated + Vues 6/25/26
+sc-120,Home Square,"Home, Hardware & Furniture",Monticello,"335 E Broadway, Monticello, NY 12701",845-685-6000,sales@yourhomesquare.com,shophomesquare.com,verify,"Hardware, housewares, appliances",Curated + Vues 6/25/26
+sc-121,ON Board,"Home, Hardware & Furniture",Monticello,"Mountain Sq, E Broadway, Monticello, NY 12701",,,,verify,Presentation boards,Curated + Vues 6/25/26
+sc-122,Catskills Urgent Care,Health & Medical,Catskills,Sullivan County (multiple),845-794-8522,,,confirmed,Advertised; also 845-434-5060,Curated + Vues 6/25/26
+sc-123,ODA Primary Health Care (Monticello),Health & Medical,Monticello,"Monticello, NY 12701",845-794-5090,,oda.nyc,confirmed,Advertised this issue,Curated + Vues 6/25/26
+sc-124,ODA Primary Health Care (Woodridge),Health & Medical,Woodridge,"Woodridge, NY 12789",845-434-2060,,oda.nyc,confirmed,Advertised this issue,Curated + Vues 6/25/26
+sc-125,Rock Hill Pharmacy,Health & Medical,Rock Hill,"Rock Hill, NY 12775",845-791-1515,,rockhillrx.com,confirmed,Pharmacy w/ Hallmark dept; advertised this issue,Curated + Vues 6/25/26
+sc-126,SeeView Optical,Health & Medical,Monticello,"Monticello, NY 12701",845-640-1154,seeviewoptical@gmail.com,seeview.optical,confirmed,Optical; advertised this issue,Curated + Vues 6/25/26
+sc-127,Woodbourne Medical Center,Health & Medical,Woodbourne,"432 NY-52, Woodbourne, NY 12788",845-436-6666,,,confirmed,Advertised this issue,Curated + Vues 6/25/26
+sc-128,Party Master,Simcha & Party Services,Monticello,"Monticello, NY 12701",845-434-6210,,,confirmed,Party supplies; advertised this issue,Curated + Vues 6/25/26
+sc-129,Bowling on Broadway,Recreation & Attractions,Monticello,"498 Broadway, Monticello, NY 12701",,,,confirmed,,Curated + Vues 6/25/26
+sc-130,Fortress Bikes,Recreation & Attractions,Catskills,Sullivan County,845-843-9555,,fortressbikes.com,confirmed,Bike rentals; reservations suggested,Curated + Vues 6/25/26
+sc-131,Dome 2030 & Arcade,Recreation & Attractions,Monticello,"321 E Broadway Ste 3, Monticello, NY 12701",,,,verify,,Curated + Vues 6/25/26
+sc-132,Hoopla Arcade & Skyride,Recreation & Attractions,Monticello,"321 E Broadway (Mountain Sq), Monticello, NY 12701",718-480-0444,info@hooplavip.com,,verify,Family entertainment,Curated + Vues 6/25/26
+sc-133,Smart Style Hair Salon,Professional & Other Services,Monticello,"37 North Main St, Monticello, NY 12701",845-794-1121,,,confirmed,Advertised this issue,Curated + Vues 6/25/26
+sc-134,Sruli's Cleaners,Professional & Other Services,Woodridge,"Across from Patis Bakery, Woodridge, NY 12789",,,,confirmed,NEW 2026 dry cleaner,Curated + Vues 6/25/26
+sc-135,Levi Local Heimish Handyman,Professional & Other Services,Sullivan County,Catskills local,845-777-7288,,,verify,Handyman,Curated + Vues 6/25/26
+sc-136,The Catskill Pages,Professional & Other Services,Regionwide,"1762 50th St, Brooklyn, NY 11204 (region-wide distribution)",718-435-1409,info@catskillpages.com,catskillpages.com,verify,Community directory; alt 845-292-5559,Curated + Vues 6/25/26
+sc-137,The Chalet Hotel,Hotels (Kosher Programs),Woodbourne,"Woodbourne, NY 12788",845-434-5124,,,verify,Hosts Mountain Top Steakhouse,Curated + Vues 6/25/26
+sc-138,The Kartrite Resort,Hotels (Kosher Programs),Monticello,"555 Resorts World Dr, Monticello, NY 12701",844-527-8748,,thekartrite.com,verify,Kosher/Shabbat programming,Curated + Vues 6/25/26
+sc-139,The Raleigh Hotel,Hotels (Kosher Programs),South Fallsburg,"680 Heiden Rd, South Fallsburg, NY 12779",845-434-7000,,,verify,Glatt kosher hotel (Primecut Steakhouse),Curated + Vues 6/25/26
+sc-140,Bethel Creamery,Food Producer,Bethel,"Bethel area, NY",,,,verify,Organic kosher yogurt/milk,Curated + Vues 6/25/26
+sc-141,Bais Medresh of Monticello,Synagogues & Batei Medrash,Monticello,50 Nelshore Dr,,,,verify,Synagogue,Prior list
+sc-142,Chabad of Monticello,Synagogues & Batei Medrash,Monticello,15 North St (also 8 Fiske Ave),,,,verify,Chabad,Prior list
+sc-143,Chabad of Rock Hill,Synagogues & Batei Medrash,Rock Hill,242 Old Sackett Rd,845-397-8000,,,verify,Chabad,Prior list
+sc-144,Chabad of Swan Lake,Synagogues & Batei Medrash,Swan Lake,105 Lake View Dr,,,,verify,Chabad,Prior list
+sc-145,Chabad of the Catskills,Synagogues & Batei Medrash,Fallsburg,69 Estate Dr,845-434-8570,,,verify,Chabad,Prior list
+sc-146,Dushinsky-Shteeble,Synagogues & Batei Medrash,Monticello,7 Forestburg Rd (Rt 42),,,,verify,Synagogue,Prior list
+sc-147,K'hal Yereim,Synagogues & Batei Medrash,Woodridge,25 Highland Ave,,,,verify,Synagogue,Prior list
+sc-148,Kollel of South Fallsburg,Synagogues & Batei Medrash,South Fallsburg,187 Lake St,,,,verify,Study center,Prior list
+sc-149,Kollel Zichron Moshe,Synagogues & Batei Medrash,Monticello,159 E Broadway,,,,verify,Study center,Prior list
+sc-150,Ohavei Shalom,Synagogues & Batei Medrash,Woodridge,14 Maurice Rose St,,,,verify,Synagogue,Prior list
+sc-151,Shaloh Center,Synagogues & Batei Medrash,Dairyland,Synagogue Rd,,,,verify,Synagogue,Prior list
+sc-152,South Fallsburg Hebrew Association,Synagogues & Batei Medrash,South Fallsburg,South Fallsburg,,,,verify,Communal org,Prior list
+sc-153,The Woodbourne Shul (Cong. Bnei Israel),Synagogues & Batei Medrash,Woodbourne,457 NY-52,,,thewoodbourneshul.com,verify,Synagogue,Prior list
+sc-154,Tiferes Moshe,Synagogues & Batei Medrash,Monticello,55 St John St,845-807-8110,,,verify,Synagogue,Prior list
+sc-155,Tifereth Israel (Landfield Ave Synagogue),Synagogues & Batei Medrash,Monticello,18 Landfield Ave,845-794-8470,,landfieldavenueshul.org,verify,Synagogue,Prior list
+sc-156,Viznitz Gibbers Shul,Synagogues & Batei Medrash,Kiamesha Lake,169 Barnes Blvd,,,,verify,Synagogue,Prior list
+sc-157,White Lake Shul,Synagogues & Batei Medrash,Kauneonga Lake,36 Lake St,,,,verify,Synagogue,Prior list
+sc-158,Yeshiva Gedolah Zichron Moshe,Synagogues & Batei Medrash,South Fallsburg,84 Laurel Park Rd,845-434-5277,,,verify,Yeshiva,Prior list
+sc-159,Yeshivas TTL Monticello,Synagogues & Batei Medrash,Monticello,18 Landfield Ave,845-397-0703,,,verify,Yeshiva,Prior list
+sc-160,Camp Sternberg Mikvah,Mikvahs,Fallsburg,"97 Camp Utopia Rd, Fallsburg, NY 12733",845-543-3417,,,confirmed,By appointment,Vues 6/25/26
+sc-161,Fallsburg Community Mikvah,Mikvahs,Fallsburg,"195 Brickman Rd, Fallsburg, NY 12733",845-915-1200,,,confirmed,,Vues 6/25/26
+sc-162,Mikva Tahara (Kiryas Beirach Moshe),Mikvahs,Woodbourne,"58 Hasbrouck Dr, Woodbourne, NY 12788",917-747-7304,,,confirmed,,Vues 6/25/26
+sc-163,Mikva Taharas Mordechai,Mikvahs,Woodridge,"Satmar Kollel Country, Woodridge, NY 12789",845-436-7960,,,confirmed,All year,Vues 6/25/26
+sc-164,Mikva Taharas of Woodridge,Mikvahs,Woodridge,"Across from Main Shul, Woodridge, NY 12789",845-434-4987,,,confirmed,,Vues 6/25/26
+sc-165,Mikvah Divrei Chaim,Mikvahs,Kauneonga Lake,"Khal Divrei Chaim, West Shore Rd, Kauneonga Lake, NY 12749",845-583-6605,,,confirmed,,Vues 6/25/26
+sc-166,Mikvah Shearith Hapletah,Mikvahs,Woodbourne,"318 Firehouse Rd (Klausenberg Bung.), Woodbourne, NY 12788",845-434-5111,,,confirmed,,Vues 6/25/26
+sc-167,Mikvah Tahara Bnos Yaakov,Mikvahs,Swan Lake,"Swan Lake, NY 12783",845-292-5291,,,confirmed,,Vues 6/25/26
+sc-168,Mikvah Tahara D'Skolya,Mikvahs,Fallsburg,"5690 NY-42 (near Four Corners), Fallsburg, NY 12733",845-436-3333,,,confirmed,By appointment,Vues 6/25/26
+sc-169,Mikvah Tahara of Swan Lake,Mikvahs,Swan Lake,"Main St (right side of shul), Swan Lake, NY 12783",845-292-3703,,,confirmed,,Vues 6/25/26
+sc-170,Lake Forest Synagogue & Mikvah,Mikvahs,Fallsburg,Locust St,,,,verify,Synagogue / Mikvah,Prior list
+sc-171,Monticello Ritual Mikvah,Mikvahs,Monticello,16 North St,,,,verify,Mikvah,Prior list
+sc-172,Bikur Cholim of Catskills,Emergency & Community Services,Catskills,Sullivan County,845-583-7100,,,confirmed,Ellenville 845-339-4640,Vues 6/25/26
+sc-173,Catskills Hatzalah / Matzil,Emergency & Community Services,Catskills,Sullivan County,833-628-9457,,,confirmed,Emergency 833-MATZIL7; Monticello 845-794-4422; matzil.org,Vues 6/25/26
+sc-174,Chai Lifeline,Emergency & Community Services,Catskills,Sullivan County,212-465-1300,,,confirmed,,Vues 6/25/26
+sc-175,Hamaspik,Emergency & Community Services,Ferndale,Sullivan County,845-356-8400,,,confirmed,Ferndale 845-292-6600,Vues 6/25/26
+sc-176,Misaskim of the Catskills,Emergency & Community Services,Woodridge,Sullivan County,845-434-6893,,,confirmed,Office 845-777-4877,Vues 6/25/26
+sc-177,Woodridge Police,Emergency & Community Services,Woodridge,"Woodridge, NY 12789",845-434-6644,,,confirmed,,Vues 6/25/26

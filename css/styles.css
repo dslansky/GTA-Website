@@ -142,8 +142,9 @@ p { color: var(--color-secondary); line-height: 1.75; }
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.4rem;
   list-style: none;
+  align-items: center;
 }
 
 .nav-links a {
@@ -151,6 +152,12 @@ p { color: var(--color-secondary); line-height: 1.75; }
   font-weight: 500;
   color: rgba(255,255,255,0.85);
   transition: color var(--transition);
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .nav-links { gap: 1.1rem; }
+  .nav-links a { font-size: 0.83rem; }
 }
 
 .nav-links a:hover { color: white; }
@@ -165,6 +172,7 @@ p { color: var(--color-secondary); line-height: 1.75; }
   background: white;
   color: var(--color-green) !important;
   border-radius: 100px;
+  white-space: nowrap;
   transition: background var(--transition), color var(--transition), opacity var(--transition) !important;
 }
 
@@ -1080,6 +1088,11 @@ footer {
   .gallery-item--wide { grid-column: span 2; }
 }
 
+@media (max-width: 1024px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: flex !important; }
+}
+
 @media (max-width: 680px) {
   :root { --nav-height: 56px; }
   .section { padding: 80px 0; }
@@ -1571,3 +1584,351 @@ footer {
     width: fit-content;
   }
 }
+
+/* ── PWA install hint banner (iOS) ── */
+#pwa-hint {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: var(--color-dark);
+  color: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  animation: pwa-hint-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pwa-hint-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.pwa-hint-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.pwa-hint-text strong { font-weight: 600; font-size: 0.92rem; }
+.pwa-hint-text span { font-size: 0.8rem; opacity: 0.85; }
+.pwa-hint-text em { font-style: normal; font-weight: 600; }
+.pwa-hint-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0 6px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.pwa-hint-close:hover { opacity: 1; }
+@keyframes pwa-hint-in {
+  from { transform: translateY(120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Nav weather badge ── */
+#nav-weather { display: flex; align-items: center; margin-left: 8px; }
+.nav-weather-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.12);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: white;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: background var(--transition);
+}
+.nav-weather-link:hover { background: rgba(255,255,255,0.22); color: white; }
+#nav.scrolled .nav-weather-link { background: var(--color-surface); color: var(--color-dark); }
+#nav.scrolled .nav-weather-link:hover { background: var(--color-green-muted); color: var(--color-green); }
+.nav-weather-icon { font-size: 1rem; line-height: 1; }
+.nav-weather-temp { font-size: 0.82rem; }
+@media (max-width: 900px) {
+  #nav-weather { order: -1; margin-left: 0; margin-right: 12px; }
+}
+
+/* ── Weather widget (Local Info) ── */
+#weather-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+.wx-current {
+  background: linear-gradient(135deg, var(--color-green) 0%, var(--color-green-light) 100%);
+  color: white;
+  padding: 22px 24px;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.wx-current-main {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.wx-current-icon { font-size: 3.5rem; line-height: 1; }
+.wx-current-temp { font-size: 3rem; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.wx-unit { font-size: 1.4rem; font-weight: 400; opacity: 0.85; margin-left: 2px; }
+.wx-current-label { font-size: 0.95rem; opacity: 0.95; margin-top: 4px; }
+.wx-current-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+  font-size: 0.88rem;
+  opacity: 0.95;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.25);
+}
+.wx-forecast {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+@media (max-width: 700px) {
+  .wx-forecast { grid-template-columns: repeat(4, 1fr); }
+  .wx-forecast .wx-day:nth-child(n+5) { display: none; }
+}
+@media (max-width: 420px) {
+  .wx-forecast { grid-template-columns: repeat(3, 1fr); }
+  .wx-forecast .wx-day:nth-child(n+4) { display: none; }
+}
+.wx-day {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+.wx-day-name { font-size: 0.78rem; font-weight: 600; color: var(--color-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.wx-day-icon { font-size: 1.6rem; line-height: 1; }
+.wx-day-temps { display: flex; gap: 8px; font-variant-numeric: tabular-nums; font-size: 0.88rem; }
+.wx-hi { font-weight: 600; color: var(--color-dark); }
+.wx-lo { color: var(--color-secondary); }
+.wx-pop { font-size: 0.72rem; color: var(--color-green); font-weight: 600; min-height: 1em; }
+.wx-err { color: var(--color-secondary); font-size: 0.9rem; padding: 20px; text-align: center; }
+
+/* ── Nav pool badge ── */
+#nav-pool { display: flex; align-items: center; margin-left: 6px; }
+.nav-pool-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
+  color: white;
+  background: rgba(255,255,255,0.12);
+  transition: background var(--transition);
+  font-family: var(--font);
+}
+.nav-pool-link:hover { background: rgba(255,255,255,0.22); }
+.nav-pool-open { background: rgba(58,125,50,0.85); }
+.nav-pool-open:hover { background: var(--color-green); }
+.nav-pool-closed { background: rgba(196,58,58,0.7); }
+.nav-pool-closed:hover { background: rgba(196,58,58,0.95); }
+#nav.scrolled .nav-pool-link { background: var(--color-surface); color: var(--color-dark); }
+#nav.scrolled .nav-pool-open { background: var(--color-green-muted); color: var(--color-green); }
+#nav.scrolled .nav-pool-closed { background: #fde0e0; color: #a83030; }
+.nav-pool-icon { font-size: 1rem; line-height: 1; }
+.nav-pool-text { font-size: 0.8rem; }
+@media (max-width: 900px) {
+  #nav-pool { order: -1; margin-left: 0; margin-right: 8px; }
+}
+
+/* ── Pool modal ── */
+.pool-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  padding: 16px;
+}
+.pool-modal-overlay.open { opacity: 1; pointer-events: all; }
+.pool-modal {
+  background: white;
+  border-radius: var(--radius);
+  width: min(520px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  transform: scale(0.96);
+  transition: transform 0.25s;
+}
+.pool-modal-overlay.open .pool-modal { transform: scale(1); }
+.pool-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.pool-modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0;
+}
+.pool-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-secondary);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.pool-modal-close:hover { color: var(--color-dark); background: var(--color-surface); }
+
+.pool-current {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+.pool-current-open { background: var(--color-green-muted); }
+.pool-current-closed { background: #fde0e0; }
+.pool-current-icon { font-size: 2.2rem; line-height: 1; }
+.pool-current-text { display: flex; flex-direction: column; gap: 2px; }
+.pool-current-label { font-size: 1rem; font-weight: 700; color: var(--color-dark); }
+.pool-current-detail { font-size: 0.85rem; color: var(--color-secondary); }
+.pool-current-open .pool-current-label { color: var(--color-green); }
+.pool-current-closed .pool-current-label { color: #a83030; }
+
+.pool-schedule { display: flex; flex-direction: column; gap: 18px; }
+.pool-day h4 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+  margin: 0 0 8px;
+}
+.pool-day ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pool-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  border: 1px solid var(--color-border);
+}
+.pool-slot-time { font-variant-numeric: tabular-nums; color: var(--color-dark); font-weight: 600; }
+.pool-slot-group { font-size: 0.8rem; font-weight: 600; }
+.pool-slot-ladies { background: #f5ecf6; border-color: #e6d3e8; }
+.pool-slot-ladies .pool-slot-group { color: #8a3aa6; }
+.pool-slot-men { background: #e6f0f7; border-color: #d0e0ee; }
+.pool-slot-men .pool-slot-group { color: #2a5e8a; }
+.pool-slot-closed { background: var(--color-surface); color: var(--color-secondary); justify-content: center; }
+
+/* ── Pool safety + emergency ── */
+.pool-safety {
+  margin-top: 22px;
+  padding: 16px 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+.pool-safety h4 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  margin: 0 0 10px;
+}
+.pool-safety ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pool-safety li {
+  font-size: 0.83rem;
+  color: var(--color-secondary);
+  line-height: 1.5;
+  padding-left: 18px;
+  position: relative;
+}
+.pool-safety li::before {
+  content: '•';
+  position: absolute;
+  left: 4px;
+  color: var(--color-green);
+  font-weight: 700;
+}
+.pool-safety li strong { color: var(--color-dark); }
+
+.pool-emergency {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1.5px solid #c43a3a;
+  border-radius: var(--radius-sm);
+  background: #fef5f5;
+}
+.pool-emergency-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c43a3a;
+  margin-bottom: 10px;
+}
+.pool-emergency-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pool-emergency-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 16px;
+  border-radius: 100px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: white;
+  transition: opacity var(--transition);
+}
+.pool-emergency-btn:hover { color: white; opacity: 0.88; }
+.pool-emergency-911 { background: #c43a3a; }
+.pool-emergency-hatzalah { background: var(--color-green); }

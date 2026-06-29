@@ -124,3 +124,38 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') prevImage();
   if (e.key === 'ArrowRight') nextImage();
 });
+
+// ── PWA: register service worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+// ── iOS Add-to-Home-Screen hint ──
+(function () {
+  const ua = window.navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isStandalone = window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed = localStorage.getItem('gta-pwa-hint-dismissed');
+  if (!isIOS || isStandalone || dismissed) return;
+
+  setTimeout(() => {
+    const banner = document.createElement('div');
+    banner.id = 'pwa-hint';
+    banner.innerHTML =
+      '<div class="pwa-hint-inner">' +
+        '<div class="pwa-hint-text">' +
+          '<strong>Add to Home Screen</strong>' +
+          '<span>Tap <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin:0 2px"><path d="M6.5 1v9M3 4.5L6.5 1 10 4.5M2 8v6h9V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> then <em>Add to Home Screen</em></span>' +
+        '</div>' +
+        '<button class="pwa-hint-close" aria-label="Dismiss">&times;</button>' +
+      '</div>';
+    document.body.appendChild(banner);
+    banner.querySelector('.pwa-hint-close').addEventListener('click', () => {
+      banner.remove();
+      localStorage.setItem('gta-pwa-hint-dismissed', '1');
+    });
+  }, 2500);
+})();

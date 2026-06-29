@@ -12,6 +12,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#3a7d32" />
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/img/icons/favicon-32.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Greentree" />
 </head>
 <body>
 
@@ -31,9 +39,13 @@
         <li><a href="memories.html">Memories</a></li>
         <li><a href="ferndale.html">Ferndale History</a></li>
         <li><a href="zmanim.html">Zmanim</a></li>
-        <li><a href="shop.html">Shop</a></li>
+        <li><a href="local.html">Local Info</a></li>
+        <li><a href="vues.html">Country Vues</a></li>
         <li><a class="nav-cta" href="#contact">Get in Touch</a></li>
       </ul>
+
+      <span id="nav-weather"></span>
+      <span id="nav-pool"></span>
 
       <button class="nav-toggle" id="navToggle" aria-label="Open menu">
         <span></span><span></span><span></span>
@@ -57,15 +69,6 @@
         <a href="#contact" class="btn btn-outline-white">Get in Touch</a>
       </div>
     </div>
-
-    <a href="ferndale.html#event" class="hero-event-badge">
-      <div class="hero-event-badge-pulse"></div>
-      <div class="hero-event-badge-body">
-        <span class="hero-event-badge-date">Jun 28, 2026</span>
-        <span class="hero-event-badge-title">Ferndale Marker Dedication</span>
-      </div>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
 
     <div class="hero-scroll">Scroll</div>
   </section>
@@ -101,49 +104,6 @@
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════
-       BORSCHT BELT BANNER
-  ══════════════════════════════════════ -->
-  <section id="bbhmp-banner">
-    <div class="container">
-      <div class="bbhmp-banner-inner">
-
-        <div class="bbhmp-banner-text reveal">
-          <p class="eyebrow">June 28, 2026 · Ferndale, NY</p>
-          <h2>Borscht Belt Historical<br />Marker Dedication</h2>
-          <p>The Borscht Belt Historical Marker Project is unveiling its 16th historic marker right here in Ferndale — honoring the hamlet's legacy and the dozens of colonies, including ours, that defined Catskills Jewish summer life. Free and open to the public.</p>
-          <div class="bbhmp-banner-actions">
-            <a href="ferndale.html#event" class="btn btn-primary">Event Details</a>
-            <a href="https://www.instagram.com/borschtbelthistoricalmarkers/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-white">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-              Follow on Instagram
-            </a>
-          </div>
-        </div>
-
-        <div class="bbhmp-banner-card reveal reveal-delay-1">
-          <div class="bbhmp-banner-date">
-            <span class="bbhmp-banner-month">June</span>
-            <span class="bbhmp-banner-day">28</span>
-          </div>
-          <div class="bbhmp-banner-slots">
-            <div class="bbhmp-banner-slot">
-              <span class="bbhmp-banner-slot-time">4:00 PM</span>
-              <span class="bbhmp-banner-slot-desc">Marker Dedication</span>
-              <span class="bbhmp-banner-slot-loc">Maurice Gerry's · 9 Ferndale Rd</span>
-            </div>
-            <div class="bbhmp-banner-divider"></div>
-            <div class="bbhmp-banner-slot">
-              <span class="bbhmp-banner-slot-time">5:00 – 7:00 PM</span>
-              <span class="bbhmp-banner-slot-desc">"Find Me in Ferndale!"</span>
-              <span class="bbhmp-banner-slot-loc">Otto's · Liberty · Free &amp; public</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
 
   <!-- ══════════════════════════════════════
        AMENITIES
@@ -434,5 +394,7 @@
 
 
   <script src="js/main.js"></script>
+  <script src="js/weather.js" defer></script>
+  <script src="js/pool.js" defer></script>
 </body>
 </html>

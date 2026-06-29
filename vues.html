@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Country Vues — Greentree Acres</title>
+  <meta name="description" content="The latest issue of Country Vues, the Catskills' weekly community magazine. Auto-updates every week." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#3a7d32" />
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/img/icons/favicon-32.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Greentree" />
+
+  <style>
+    .vues-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 24px 0 16px;
+    }
+    .vues-wrap {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+    .vues-wrap iframe {
+      display: block;
+      width: 100%;
+      height: min(90vh, 1000px);
+      border: 0;
+    }
+    @media (max-width: 700px) {
+      .vues-wrap iframe { height: 80vh; }
+    }
+    .vues-fallback {
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--color-secondary);
+      background: var(--color-surface);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       NAV
+  ══════════════════════════════════════ -->
+  <nav id="nav">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img src="img/logo.png" alt="Greentree Acres" class="nav-logo-img" />
+        <span class="nav-logo-text">Greentree Acres</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html#history">Our Story</a></li>
+        <li><a href="index.html#amenities">Amenities</a></li>
+        <li><a href="memories.html">Memories</a></li>
+        <li><a href="ferndale.html">Ferndale History</a></li>
+        <li><a href="zmanim.html">Zmanim</a></li>
+        <li><a href="local.html">Local Info</a></li>
+        <li><a href="vues.html">Country Vues</a></li>
+        <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
+      </ul>
+
+      <span id="nav-weather"></span>
+      <span id="nav-pool"></span>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PAGE HEADER
+  ══════════════════════════════════════ -->
+  <section class="page-header">
+    <div class="container page-header-content">
+      <p class="eyebrow">Catskills · Weekly</p>
+      <h1>Country Vues</h1>
+      <p>The latest issue of Country Vues, the Catskills' weekly community magazine. Updates automatically each week.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FLIPBOOK
+  ══════════════════════════════════════ -->
+  <section class="section" id="vues">
+    <div class="container">
+      <div class="vues-actions reveal">
+        <a href="https://view.flipdocs.com/?PID=1000204" target="_blank" rel="noopener noreferrer" class="btn-open">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open in new tab
+        </a>
+      </div>
+
+      <div class="vues-wrap reveal reveal-delay-1">
+        <iframe
+          src="https://view.flipdocs.com/?PID=1000204"
+          loading="lazy"
+          title="Country Vues — current issue"
+        ></iframe>
+        <p class="vues-fallback">Not loading? <a href="https://view.flipdocs.com/?PID=1000204" target="_blank" rel="noopener noreferrer">Open Country Vues in a new tab</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="img/logo.png" alt="Greentree Acres" class="footer-logo" />
+        <p>&copy; 2026 Greentree Acres. All rights reserved.</p>
+      </div>
+      <p>
+        Historical context courtesy of the
+        <a href="https://borschtbelthistoricalmarkerproject.org/ferndale" target="_blank" rel="noopener noreferrer">
+          Borscht Belt Historical Marker Project
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/weather.js" defer></script>
+  <script src="js/pool.js" defer></script>
+</body>
+</html>
