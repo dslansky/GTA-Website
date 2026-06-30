@@ -438,12 +438,13 @@
       }
       const el = document.getElementById('today-gazette');
       el.innerHTML =
-        '<span class="today-card-icon">📰</span>' +
+        '<span class="today-card-icon-badge"><span class="today-card-icon">📰</span></span>' +
         '<div class="today-card-body">' +
           '<p class="today-card-eyebrow">Gazette</p>' +
           '<h3>' + escToday(latest.title || 'GTA Gazette') + '</h3>' +
           (dateLabel ? '<p class="today-card-detail">' + escToday(dateLabel) + '</p>' : '') +
-        '</div>';
+        '</div>' +
+        '<span class="today-card-arrow">›</span>';
       el.style.display = '';
     }).catch(() => {});
 
@@ -452,11 +453,12 @@
       if (!latest) return;
       const el = document.getElementById('today-video');
       el.innerHTML =
-        '<span class="today-card-icon">▶️</span>' +
+        '<span class="today-card-icon-badge"><span class="today-card-icon">▶️</span></span>' +
         '<div class="today-card-body">' +
           '<p class="today-card-eyebrow">New Video</p>' +
           '<h3>' + escToday(latest.title || 'Watch now') + '</h3>' +
-        '</div>';
+        '</div>' +
+        '<span class="today-card-arrow">›</span>';
       el.style.display = '';
     }).catch(() => {});
 

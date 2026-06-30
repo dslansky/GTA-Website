@@ -224,12 +224,13 @@
     var s = currentStatus();
     el.className = 'today-card today-' + s.tone;
     el.innerHTML =
-      '<span class="today-card-icon">' + s.icon + '</span>' +
+      '<span class="today-card-icon-badge"><span class="today-card-icon">' + s.icon + '</span></span>' +
       '<div class="today-card-body">' +
         '<p class="today-card-eyebrow">Pool</p>' +
         '<h3>' + (s.open ? s.label + ' swimming' : s.label) + '</h3>' +
         (s.detail ? '<p class="today-card-detail">' + s.detail + '</p>' : '') +
-      '</div>';
+      '</div>' +
+      '<span class="today-card-arrow">›</span>';
     el.onclick = openModal;
   }
 

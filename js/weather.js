@@ -105,12 +105,13 @@
     var c = data.current;
     var info = codeInfo(c.weather_code);
     el.innerHTML =
-      '<span class="today-card-icon">' + info.icon + '</span>' +
+      '<span class="today-card-icon-badge"><span class="today-card-icon">' + info.icon + '</span></span>' +
       '<div class="today-card-body">' +
         '<p class="today-card-eyebrow">Weather</p>' +
         '<h3>' + Math.round(c.temperature_2m) + '°F</h3>' +
         '<p class="today-card-detail">' + info.label + '</p>' +
-      '</div>';
+      '</div>' +
+      '<span class="today-card-arrow">›</span>';
   }
 
   function render(data) {

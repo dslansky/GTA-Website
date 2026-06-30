@@ -27,7 +27,7 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function render(zm, conv) {
+  function render(zm, conv, gregorianLabel) {
     var el = document.getElementById('today-zmanim');
     if (!el) return;
     var times = zm.times || {};
@@ -36,17 +36,22 @@
     var hebrew = conv && conv.hebrew ? esc(conv.hebrew) : '';
 
     el.innerHTML =
-      '<span class="today-card-icon">🕯️</span>' +
+      '<span class="today-card-icon-badge"><span class="today-card-icon">🕯️</span></span>' +
       '<div class="today-card-body">' +
-        '<p class="today-card-eyebrow">' + (hebrew || 'Zmanim') + '</p>' +
+        '<p class="today-card-eyebrow">Zmanim</p>' +
         '<h3>Shkiah ' + (shkia ? esc(shkia) : '—') + '</h3>' +
         '<p class="today-card-detail">' + (tzeit ? 'Tzeit ' + esc(tzeit) : '') + '</p>' +
-      '</div>';
+        '<p class="today-card-detail today-card-detail-sub">' + esc(gregorianLabel) + (hebrew ? ' · ' + hebrew : '') + '</p>' +
+      '</div>' +
+      '<span class="today-card-arrow">›</span>';
   }
 
   var date = todayNY();
   var parts = date.split('-');
   var y = parts[0], m = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+  var gregorianLabel = new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric'
+  });
 
   Promise.all([
     fetch('https://www.hebcal.com/zmanim?cfg=json&geo=zip&zip=12734&tzid=America%2FNew_York&date=' + date),
@@ -54,6 +59,6 @@
   ]).then(function (responses) {
     return Promise.all(responses.map(function (r) { return r.json(); }));
   }).then(function (data) {
-    render(data[0], data[1]);
+    render(data[0], data[1], gregorianLabel);
   }).catch(function () {});
 })();
