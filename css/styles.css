@@ -190,6 +190,73 @@ p { color: var(--color-secondary); line-height: 1.75; }
   color: white !important;
 }
 
+/* ── Nav dropdowns (Community / Resources) ── */
+.nav-dropdown { position: relative; }
+
+.nav-dropdown-toggle {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+
+.nav-dropdown-toggle:hover { color: white; }
+#nav.scrolled .nav-dropdown-toggle { color: var(--color-secondary); }
+#nav.scrolled .nav-dropdown-toggle:hover { color: var(--color-dark); }
+
+@media (max-width: 1180px) {
+  .nav-dropdown-toggle { font-size: 0.82rem; }
+}
+
+.nav-dropdown-caret { font-size: 0.6em; transition: transform var(--transition); }
+.nav-dropdown:hover .nav-dropdown-caret,
+.nav-dropdown:focus-within .nav-dropdown-caret,
+.nav-dropdown.open .nav-dropdown-caret { transform: rotate(180deg); }
+
+.nav-dropdown-menu {
+  list-style: none;
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  min-width: 190px;
+  background: white;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(6px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu,
+.nav-dropdown.open .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.nav-dropdown-menu a {
+  display: block;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--color-dark) !important;
+}
+
+.nav-dropdown-menu a:hover { background: var(--color-green-muted); color: var(--color-green) !important; }
+
 /* Mobile nav toggle */
 .nav-toggle {
   display: none;
@@ -527,6 +594,72 @@ p { color: var(--color-secondary); line-height: 1.75; }
 
 .amenity-card h3 { margin-bottom: 0.5rem; font-size: 1.1rem; }
 .amenity-card p { font-size: 0.9rem; }
+
+/* =========================================
+   TODAY AT GREENTREE (live status hub)
+   ========================================= */
+#today {
+  padding: 56px 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.today-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.today-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.today-card {
+  appearance: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.today-card:hover {
+  border-color: var(--color-green);
+  box-shadow: 0 8px 28px rgba(58, 125, 50, 0.12);
+  transform: translateY(-2px);
+  color: inherit;
+}
+
+.today-card-icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+.today-card-body { min-width: 0; }
+
+.today-card-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+  margin-bottom: 4px;
+}
+
+.today-card h3 { font-size: 1.05rem; margin: 0 0 2px; }
+.today-card-detail { font-size: 0.82rem; color: var(--color-secondary); margin: 0; line-height: 1.4; }
+
+.today-card.today-open { border-color: var(--color-green); background: var(--color-green-muted); }
+
+@media (max-width: 680px) {
+  #today { padding: 40px 0; }
+  .today-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .today-card { padding: 16px; }
+}
 
 /* =========================================
    GALLERY
@@ -1600,6 +1733,27 @@ footer {
     display: inline-block;
     width: fit-content;
   }
+  .nav-dropdown { width: 100%; }
+  .nav-dropdown-toggle {
+    color: var(--color-dark);
+    font-size: 1rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .nav-dropdown-menu {
+    position: static;
+    min-width: 0;
+    transform: none !important;
+    opacity: 1;
+    visibility: visible;
+    box-shadow: none;
+    background: rgba(0,0,0,0.04);
+    margin-top: 10px;
+    padding: 6px;
+    display: none;
+  }
+  .nav-dropdown.open .nav-dropdown-menu { display: block; }
+  .nav-dropdown-menu a { font-size: 0.95rem; padding: 10px 14px; }
 }
 
 /* ── PWA install hint banner (iOS) ── */
@@ -2038,61 +2192,6 @@ footer {
 }
 .notify-toggle:hover { border-color: var(--color-green); color: var(--color-green); }
 
-/* ── Gazette homepage banner ── */
-#gazette-banner {
-  padding: 40px 0;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-}
-.gz-banner-card {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 22px 26px;
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
-  color: inherit;
-}
-.gz-banner-card:hover {
-  border-color: var(--color-green);
-  box-shadow: 0 8px 28px rgba(58, 125, 50, 0.15);
-  transform: translateY(-2px);
-  color: inherit;
-}
-.gz-banner-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--radius-sm);
-  background: var(--color-green-muted);
-  color: var(--color-green);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.gz-banner-text { flex: 1; min-width: 0; }
-.gz-banner-text .eyebrow { margin-bottom: 4px; font-size: 0.7rem; }
-.gz-banner-text h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-dark);
-  margin: 0;
-  line-height: 1.3;
-}
-.gz-banner-arrow {
-  color: var(--color-green);
-  flex-shrink: 0;
-  transition: transform var(--transition);
-}
-.gz-banner-card:hover .gz-banner-arrow { transform: translateX(4px); }
-@media (max-width: 600px) {
-  .gz-banner-card { gap: 14px; padding: 18px 20px; }
-  .gz-banner-icon { width: 48px; height: 48px; }
-  .gz-banner-icon svg { width: 30px; height: 30px; }
-  .gz-banner-text h2 { font-size: 1.05rem; }
-}
 
 /* ── Pool status banner (sticky below nav) ── */
 #pool-status-banner {

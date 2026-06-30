@@ -99,9 +99,24 @@
       '<div class="wx-forecast">' + days + '</div>';
   }
 
+  function renderToday(data) {
+    var el = document.getElementById('today-weather');
+    if (!el || !data || !data.current) return;
+    var c = data.current;
+    var info = codeInfo(c.weather_code);
+    el.innerHTML =
+      '<span class="today-card-icon">' + info.icon + '</span>' +
+      '<div class="today-card-body">' +
+        '<p class="today-card-eyebrow">Weather</p>' +
+        '<h3>' + Math.round(c.temperature_2m) + '°F</h3>' +
+        '<p class="today-card-detail">' + info.label + '</p>' +
+      '</div>';
+  }
+
   function render(data) {
     renderNav(data);
     renderWidget(data);
+    renderToday(data);
   }
 
   function loadCached() {

@@ -36,12 +36,22 @@
       <ul class="nav-links">
         <li><a href="#history">Our Story</a></li>
         <li><a href="#amenities">Amenities</a></li>
-        <li><a href="memories.html">Memories</a></li>
-        <li><a href="ferndale.html">Ferndale History</a></li>
-        <li><a href="zmanim.html">Zmanim</a></li>
-        <li><a href="local.html">Local Info</a></li>
-        <li><a href="gazette.html">Gazette</a></li>
-        <li><a href="vues.html">Country Vues</a></li>
+        <li class="nav-dropdown">
+          <button type="button" class="nav-dropdown-toggle">Community <span class="nav-dropdown-caret">▾</span></button>
+          <ul class="nav-dropdown-menu">
+            <li><a href="memories.html">Memories</a></li>
+            <li><a href="gazette.html">Gazette</a></li>
+            <li><a href="vues.html">Country Vues</a></li>
+          </ul>
+        </li>
+        <li class="nav-dropdown">
+          <button type="button" class="nav-dropdown-toggle">Resources <span class="nav-dropdown-caret">▾</span></button>
+          <ul class="nav-dropdown-menu">
+            <li><a href="zmanim.html">Zmanim</a></li>
+            <li><a href="local.html">Local Info</a></li>
+            <li><a href="ferndale.html">Ferndale History</a></li>
+          </ul>
+        </li>
         <li><a class="nav-cta" href="#contact">Get in Touch</a></li>
       </ul>
 
@@ -74,23 +84,22 @@
   </section>
 
   <!-- ══════════════════════════════════════
-       GAZETTE BANNER
+       TODAY AT GREENTREE
   ══════════════════════════════════════ -->
-  <section id="gazette-banner" style="display:none;">
+  <section id="today">
     <div class="container">
-      <a href="gazette.html" class="gz-banner-card">
-        <div class="gz-banner-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2z"/><path d="M16 4v5h5M8 13h8M8 17h6M8 9h2"/></svg>
-        </div>
-        <div class="gz-banner-text">
-          <p class="eyebrow">This Week's Gazette</p>
-          <h2 id="gz-banner-title">GTA Gazette</h2>
-          <p id="gz-banner-date" style="font-size: 0.88rem; color: var(--color-secondary); margin-top: 4px;"></p>
-        </div>
-        <div class="gz-banner-arrow">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-        </div>
-      </a>
+      <div class="today-header reveal">
+        <p class="eyebrow">Right Now</p>
+        <h2>Today at Greentree</h2>
+      </div>
+
+      <div class="today-grid">
+        <button type="button" id="today-pool" class="today-card reveal reveal-delay-1" aria-label="Pool status — tap for full schedule"></button>
+        <a href="local.html#weather" id="today-weather" class="today-card reveal reveal-delay-2" aria-label="Weather"></a>
+        <a href="zmanim.html" id="today-zmanim" class="today-card reveal reveal-delay-3" aria-label="Today's zmanim"></a>
+        <a href="gazette.html" id="today-gazette" class="today-card reveal reveal-delay-4" style="display:none;" aria-label="Latest Gazette issue"></a>
+        <a href="memories.html" id="today-video" class="today-card reveal reveal-delay-4" style="display:none;" aria-label="Latest video"></a>
+      </div>
     </div>
   </section>
 
@@ -415,15 +424,40 @@
 
 
   <script>
+    function escToday(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     fetch('/gazette-data').then(r => r.json()).then(d => {
       const latest = (d.issues || [])[0];
       if (!latest) return;
-      document.getElementById('gz-banner-title').textContent = latest.title || 'GTA Gazette';
+      let dateLabel = '';
       if (latest.issueDate) {
         const date = new Date(latest.issueDate + 'T12:00:00');
-        document.getElementById('gz-banner-date').textContent = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        dateLabel = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       }
-      document.getElementById('gazette-banner').style.display = '';
+      const el = document.getElementById('today-gazette');
+      el.innerHTML =
+        '<span class="today-card-icon">📰</span>' +
+        '<div class="today-card-body">' +
+          '<p class="today-card-eyebrow">Gazette</p>' +
+          '<h3>' + escToday(latest.title || 'GTA Gazette') + '</h3>' +
+          (dateLabel ? '<p class="today-card-detail">' + escToday(dateLabel) + '</p>' : '') +
+        '</div>';
+      el.style.display = '';
+    }).catch(() => {});
+
+    fetch('/youtube-videos').then(r => r.json()).then(d => {
+      const latest = (d.videos || [])[0];
+      if (!latest) return;
+      const el = document.getElementById('today-video');
+      el.innerHTML =
+        '<span class="today-card-icon">▶️</span>' +
+        '<div class="today-card-body">' +
+          '<p class="today-card-eyebrow">New Video</p>' +
+          '<h3>' + escToday(latest.title || 'Watch now') + '</h3>' +
+        '</div>';
+      el.style.display = '';
     }).catch(() => {});
 
     // Contact form submit tracking — mirror to our admin
@@ -465,5 +499,6 @@
   <script src="js/main.js"></script>
   <script src="js/weather.js" defer></script>
   <script src="js/pool.js" defer></script>
+  <script src="js/zmanim-widget.js" defer></script>
 </body>
 </html>

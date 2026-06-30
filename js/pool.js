@@ -218,9 +218,25 @@
     if (modal) modal.classList.remove('open');
   }
 
+  function renderToday() {
+    var el = document.getElementById('today-pool');
+    if (!el) return;
+    var s = currentStatus();
+    el.className = 'today-card today-' + s.tone;
+    el.innerHTML =
+      '<span class="today-card-icon">' + s.icon + '</span>' +
+      '<div class="today-card-body">' +
+        '<p class="today-card-eyebrow">Pool</p>' +
+        '<h3>' + (s.open ? s.label + ' swimming' : s.label) + '</h3>' +
+        (s.detail ? '<p class="today-card-detail">' + s.detail + '</p>' : '') +
+      '</div>';
+    el.onclick = openModal;
+  }
+
   function renderAll() {
     renderNav();
     renderBanner();
+    renderToday();
   }
 
   if (document.body) renderAll();
