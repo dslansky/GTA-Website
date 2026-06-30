@@ -717,7 +717,7 @@ async function handleAdminSchedule(request, env, url) {
 
 // ── Gazette ─────────────────────────────────────────────────────────────────
 
-const MAX_GAZETTE_BYTES = 30 * 1024 * 1024;
+const MAX_GAZETTE_BYTES = 80 * 1024 * 1024;
 
 async function handleAdminGazette(request, env, url) {
   const key = url.searchParams.get('key');

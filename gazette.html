@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>GTA Gazette — Greentree Acres</title>
-  <meta name="description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Read this week's edition and browse past issues." />
+  <meta name="description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Browse every issue from the archive." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,88 +21,181 @@
   <meta name="apple-mobile-web-app-title" content="Greentree" />
 
   <style>
-    .gz-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin: 24px 0 16px;
+    .gz-page-header {
+      background: var(--color-dark);
+      padding: 100px 0 32px;
+      text-align: center;
     }
-    .gz-embed-wrap {
+    body.has-pool-banner .gz-page-header {
+      padding-top: calc(100px + 42px + env(safe-area-inset-top));
+    }
+    @media (max-width: 768px) {
+      body.has-pool-banner .gz-page-header {
+        padding-top: calc(80px + 38px + env(safe-area-inset-top));
+      }
+    }
+    .gz-page-header h1 {
+      color: white;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      margin-bottom: 4px;
+    }
+    .gz-page-header p {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .gz-viewer {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 20px 0 32px;
+    }
+    .gz-current-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .gz-current-text { min-width: 0; flex: 1; }
+    .gz-current-text .eyebrow {
+      margin-bottom: 4px;
+      font-size: 0.7rem;
+    }
+    .gz-current-text h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin: 0;
+      line-height: 1.3;
+    }
+    .gz-current-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .gz-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--color-border);
+      background: white;
+      color: var(--color-dark);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .gz-btn:hover { border-color: var(--color-green); color: var(--color-green); }
+    .gz-btn-primary { background: var(--color-green); color: white; border-color: var(--color-green); }
+    .gz-btn-primary:hover { background: var(--color-green-light); border-color: var(--color-green-light); color: white; opacity: 1; }
+
+    .gz-embed {
       border: 1px solid var(--color-border);
       border-radius: var(--radius);
       overflow: hidden;
-      background: var(--color-surface);
+      background: white;
+      box-shadow: var(--shadow);
     }
-    .gz-embed-wrap iframe {
+    .gz-embed iframe {
       display: block;
       width: 100%;
-      height: min(90vh, 1100px);
+      height: 92vh;
+      max-height: 1300px;
       border: 0;
+      background: #525659;
     }
-    @media (max-width: 700px) {
-      .gz-embed-wrap iframe { height: 75vh; }
+    @media (max-width: 768px) {
+      .gz-embed iframe { height: 78vh; }
     }
     .gz-embed-fallback {
       padding: 10px 16px;
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--color-secondary);
       background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
     }
-    .gz-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 18px;
+
+    .gz-archive-section {
+      padding: 56px 0 80px;
+    }
+    .gz-archive-header {
+      margin-bottom: 24px;
+    }
+    .gz-archive-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin: 0;
+    }
+    .gz-archive-header p {
       font-size: 0.88rem;
       color: var(--color-secondary);
-      margin-top: 12px;
-    }
-    .gz-meta strong { color: var(--color-dark); }
-
-    .gz-archive {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 12px;
-      margin-top: 24px;
-    }
-    .gz-archive-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .gz-archive-card h4 {
-      font-size: 0.95rem;
-      margin: 0;
-      color: var(--color-dark);
-      line-height: 1.3;
-    }
-    .gz-archive-date {
-      font-size: 0.78rem;
-      color: var(--color-secondary);
-      font-weight: 600;
-    }
-    .gz-archive-actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
       margin-top: 4px;
     }
-    .gz-archive-actions a {
-      flex: 1;
-      text-align: center;
-      padding: 8px 14px;
+
+    .gz-year-group { margin-bottom: 36px; }
+    .gz-year-group h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-green);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .gz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    .gz-card {
+      background: white;
       border: 1px solid var(--color-border);
-      border-radius: 100px;
-      font-size: 0.78rem;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: var(--font);
+      text-align: left;
+      color: inherit;
+    }
+    .gz-card:hover {
+      border-color: var(--color-green);
+      box-shadow: 0 4px 14px rgba(58, 125, 50, 0.12);
+      transform: translateY(-2px);
+    }
+    .gz-card.active {
+      border-color: var(--color-green);
+      background: var(--color-green-muted);
+      box-shadow: 0 4px 14px rgba(58, 125, 50, 0.15);
+    }
+    .gz-card-date {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-green);
+    }
+    .gz-card-title {
+      font-size: 0.9rem;
       font-weight: 600;
       color: var(--color-dark);
-      transition: border-color var(--transition), color var(--transition);
+      line-height: 1.35;
     }
-    .gz-archive-actions a:hover { border-color: var(--color-green); color: var(--color-green); }
+    .gz-card.active .gz-card-title { color: var(--color-green); }
+    .gz-card-parsha {
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+      line-height: 1.4;
+    }
+
     .gz-empty {
       padding: 40px 16px;
       text-align: center;
@@ -144,58 +237,57 @@
   </nav>
 
   <!-- ══════════════════════════════════════
-       PAGE HEADER
+       COMPACT HEADER
   ══════════════════════════════════════ -->
-  <section class="page-header">
-    <div class="container page-header-content">
-      <p class="eyebrow">Weekly Newsletter · GTA</p>
+  <section class="gz-page-header">
+    <div class="container">
+      <p class="eyebrow" style="color:rgba(255,255,255,0.5);">Weekly Newsletter</p>
       <h1>The GTA Gazette</h1>
-      <p>Our weekly colony newsletter. Read this week's edition below, or browse the archive.</p>
+      <p>Every issue ever published. Tap any edition below to read it.</p>
     </div>
   </section>
 
   <!-- ══════════════════════════════════════
-       LATEST ISSUE
+       VIEWER
   ══════════════════════════════════════ -->
-  <section class="section" id="latest">
+  <section class="gz-viewer" id="viewer">
     <div class="container">
-      <div class="reveal" id="latest-header">
-        <p class="eyebrow" id="latest-eyebrow">Latest Issue</p>
-        <h2 id="latest-title">Loading…</h2>
-        <div class="gz-meta" id="latest-meta"></div>
+      <div class="gz-current-bar">
+        <div class="gz-current-text">
+          <p class="eyebrow" id="gz-current-eyebrow">Now Viewing</p>
+          <h2 id="gz-current-title">Loading…</h2>
+        </div>
+        <div class="gz-current-actions" id="gz-current-actions" style="display:none;">
+          <a id="gz-download" href="#" download class="gz-btn gz-btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>
+          <a id="gz-open" href="#" target="_blank" rel="noopener noreferrer" class="gz-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open in new tab
+          </a>
+        </div>
       </div>
 
-      <div class="gz-actions reveal reveal-delay-1" id="latest-actions" style="display:none;">
-        <a id="latest-download" href="#" download class="btn-download">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download PDF
-        </a>
-        <a id="latest-open" href="#" target="_blank" rel="noopener noreferrer" class="btn-open">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Open in new tab
-        </a>
+      <div class="gz-embed" id="gz-embed-wrap">
+        <iframe id="gz-embed" title="GTA Gazette PDF" loading="lazy"></iframe>
+        <p class="gz-embed-fallback">PDF appears blank? Use <strong>Open in new tab</strong>.</p>
       </div>
 
-      <div class="gz-embed-wrap reveal reveal-delay-2" id="latest-embed-wrap" style="display:none;">
-        <iframe id="latest-embed" title="Latest GTA Gazette" loading="lazy"></iframe>
-        <p class="gz-embed-fallback">If the PDF appears blank, use <strong>Open in new tab</strong> above.</p>
-      </div>
-
-      <div class="gz-empty" id="empty-state" style="display:none;">No issues uploaded yet. Check back soon.</div>
+      <div class="gz-empty" id="gz-empty" style="display:none;">No issues uploaded yet. Check back soon.</div>
     </div>
   </section>
 
   <!-- ══════════════════════════════════════
        ARCHIVE
   ══════════════════════════════════════ -->
-  <section class="section" id="archive" style="background: var(--color-surface); border-top: 1px solid var(--color-border); display:none;">
+  <section class="gz-archive-section">
     <div class="container">
-      <div class="reveal">
-        <p class="eyebrow">Archive</p>
-        <h2>Past Issues</h2>
-        <p>All previous GTA Gazette editions.</p>
+      <div class="gz-archive-header">
+        <h2>All Issues</h2>
+        <p id="gz-archive-count">Loading archive…</p>
       </div>
-      <div class="gz-archive reveal reveal-delay-1" id="archive-grid"></div>
+      <div id="gz-archive"></div>
     </div>
   </section>
 
@@ -225,64 +317,90 @@
       function esc(s) {
         return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       }
-      function formatDate(iso) {
+      function formatDate(iso, opts) {
         if (!iso) return '';
-        const d = new Date(iso + 'T12:00:00');
-        return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        var d = new Date(iso + 'T12:00:00');
+        return d.toLocaleDateString('en-US', opts || { month: 'long', day: 'numeric', year: 'numeric' });
+      }
+      function yearOf(iso) { return (iso || '').slice(0, 4); }
+
+      var state = { issues: [], currentId: null };
+
+      function selectIssue(id, scroll) {
+        var iss = state.issues.find(function (i) { return i.id === id; });
+        if (!iss) return;
+        state.currentId = id;
+        var pdfUrl = '/gazette/' + encodeURIComponent(iss.id) + '/pdf';
+        document.getElementById('gz-current-title').textContent = iss.title || ('GTA Gazette · ' + formatDate(iss.issueDate));
+        document.getElementById('gz-current-eyebrow').textContent = (iss === state.issues[0] ? 'Latest · ' : '') + formatDate(iss.issueDate);
+        document.getElementById('gz-download').href = pdfUrl;
+        document.getElementById('gz-open').href = pdfUrl;
+        document.getElementById('gz-embed').src = pdfUrl;
+        document.getElementById('gz-current-actions').style.display = '';
+
+        document.querySelectorAll('.gz-card').forEach(function (c) {
+          c.classList.toggle('active', c.getAttribute('data-id') === id);
+        });
+
+        if (scroll) {
+          document.getElementById('viewer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+
+      function renderArchive() {
+        var wrap = document.getElementById('gz-archive');
+        var countEl = document.getElementById('gz-archive-count');
+        if (!state.issues.length) {
+          countEl.textContent = '';
+          wrap.innerHTML = '';
+          return;
+        }
+        countEl.textContent = state.issues.length + ' issue' + (state.issues.length === 1 ? '' : 's') + ' · sorted newest first';
+
+        var byYear = {};
+        state.issues.forEach(function (i) {
+          var y = yearOf(i.issueDate) || 'Other';
+          (byYear[y] = byYear[y] || []).push(i);
+        });
+
+        var years = Object.keys(byYear).sort().reverse();
+        wrap.innerHTML = years.map(function (y) {
+          return '<div class="gz-year-group">' +
+            '<h3>' + esc(y) + '</h3>' +
+            '<div class="gz-grid">' +
+              byYear[y].map(function (iss) {
+                return '<button type="button" class="gz-card" data-id="' + esc(iss.id) + '" aria-label="View ' + esc(iss.title) + '">' +
+                  '<span class="gz-card-date">' + esc(formatDate(iss.issueDate, { month: 'short', day: 'numeric' })) + '</span>' +
+                  '<span class="gz-card-title">' + esc(iss.title || ('Issue · ' + formatDate(iss.issueDate))) + '</span>' +
+                  (iss.parsha ? '<span class="gz-card-parsha">' + esc(iss.parsha) + '</span>' : '') +
+                '</button>';
+              }).join('') +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        wrap.addEventListener('click', function (e) {
+          var btn = e.target.closest('.gz-card');
+          if (!btn) return;
+          selectIssue(btn.getAttribute('data-id'), true);
+        });
       }
 
       fetch('/gazette-data')
-        .then(r => r.json())
-        .then(data => {
-          const issues = data.issues || [];
-          const empty = document.getElementById('empty-state');
-          const titleEl = document.getElementById('latest-title');
-          const eyebrowEl = document.getElementById('latest-eyebrow');
-          const metaEl = document.getElementById('latest-meta');
-
-          if (!issues.length) {
-            empty.style.display = 'block';
-            titleEl.textContent = 'No issues yet';
-            metaEl.innerHTML = '';
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          state.issues = data.issues || [];
+          if (!state.issues.length) {
+            document.getElementById('gz-empty').style.display = 'block';
+            document.getElementById('gz-embed-wrap').style.display = 'none';
+            document.getElementById('gz-current-title').textContent = 'No issues yet';
             return;
           }
-
-          const latest = issues[0];
-          const pdfUrl = '/gazette/' + encodeURIComponent(latest.id) + '/pdf';
-
-          titleEl.textContent = latest.title || 'GTA Gazette';
-          eyebrowEl.textContent = formatDate(latest.issueDate);
-          metaEl.innerHTML =
-            (latest.parsha ? '<span><strong>Parsha:</strong> ' + esc(latest.parsha) + '</span>' : '') +
-            '<span><strong>Issue:</strong> ' + esc(formatDate(latest.issueDate)) + '</span>';
-
-          document.getElementById('latest-download').href = pdfUrl;
-          document.getElementById('latest-open').href = pdfUrl;
-          document.getElementById('latest-embed').src = pdfUrl;
-          document.getElementById('latest-actions').style.display = '';
-          document.getElementById('latest-embed-wrap').style.display = '';
-
-          // Archive
-          const past = issues.slice(1);
-          if (past.length) {
-            document.getElementById('archive').style.display = '';
-            document.getElementById('archive-grid').innerHTML = past.map(g => {
-              const u = '/gazette/' + encodeURIComponent(g.id) + '/pdf';
-              return '<div class="gz-archive-card">' +
-                '<span class="gz-archive-date">' + esc(formatDate(g.issueDate)) + '</span>' +
-                '<h4>' + esc(g.title || 'GTA Gazette') + '</h4>' +
-                (g.parsha ? '<span style="font-size:0.78rem;color:var(--color-secondary);">' + esc(g.parsha) + '</span>' : '') +
-                '<div class="gz-archive-actions">' +
-                  '<a href="' + u + '" target="_blank" rel="noopener noreferrer">View</a>' +
-                  '<a href="' + u + '" download>Download</a>' +
-                '</div>' +
-              '</div>';
-            }).join('');
-          }
+          renderArchive();
+          selectIssue(state.issues[0].id, false);
         })
-        .catch(() => {
-          document.getElementById('latest-title').textContent = 'Could not load issues';
-          document.getElementById('latest-meta').innerHTML = '<span>Please refresh the page.</span>';
+        .catch(function () {
+          document.getElementById('gz-current-title').textContent = 'Could not load issues';
         });
     })();
   </script>
