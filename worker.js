@@ -41,6 +41,15 @@ export default {
     if (gazPdfMatch) {
       return handleGazettePdf(env, gazPdfMatch[1]);
     }
+    if (url.pathname === '/youtube-videos') {
+      return handleYoutubeVideos(env);
+    }
+    if (url.pathname === '/track/contact-view') {
+      return handleContactView(request, env);
+    }
+    if (url.pathname === '/track/contact-submit') {
+      return handleContactSubmit(request, env);
+    }
     if (url.pathname === '/push/vapid-key') {
       return new Response(VAPID_PUBLIC_KEY, {
         headers: { ...CORS, 'Content-Type': 'text/plain' },
@@ -126,7 +135,7 @@ async function handleOrder(request, env, url) {
     }
 
     const list = await env.ORDERS.list();
-    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_') && !k.name.startsWith('sched_') && !k.name.startsWith('gazette_'));
+    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_') && !k.name.startsWith('sched_') && !k.name.startsWith('gazette_') && !k.name.startsWith('cv_') && !k.name.startsWith('cs_') && !k.name.startsWith('youtube_') && !k.name.startsWith('push_meta'));
     if (!orderKeys.length) {
       return csv('id,timestamp,name,email,items,total\n');
     }
@@ -292,6 +301,9 @@ async function handleAdmin(request, env, url) {
 
   const gazettes = await listGazettes(env);
 
+  const contactViews = await listContactViews(env, 50);
+  const contactSubmits = await listContactSubmits(env, 50);
+
   const renderItem = (m) => {
     const thumb = m.hasPhoto
       ? `<img src="/memory/${m.id}/photo" style="width:110px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" />`
@@ -345,7 +357,7 @@ async function handleAdmin(request, env, url) {
         <div class="sched-row-body">${esc(s.body)}</div>
       </div>
       <div class="sched-row-actions">
-        <a href="/admin?key=${key}&edit=${encodeURIComponent(s.id)}#sched-form" class="btn-mini">Edit</a>
+        <a href="/admin?key=${key}&edit=${encodeURIComponent(s.id)}#notifications" class="btn-mini">Edit</a>
         <form method="POST" action="/admin/schedule?key=${key}" style="display:inline;">
           <input type="hidden" name="action" value="toggle" />
           <input type="hidden" name="id" value="${esc(s.id)}" />
@@ -383,10 +395,47 @@ async function handleAdmin(request, env, url) {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>GTA Admin</title>
   <style>
-    body { font-family: -apple-system, sans-serif; max-width: 820px; margin: 0 auto; padding: 24px; background: #f5f5f7; }
-    h1 { color: #1d1d1f; font-size: 1.5rem; margin-bottom: 4px; }
-    .subtitle { color: #6e6e73; font-size: 0.875rem; margin-bottom: 32px; }
+    body { font-family: -apple-system, sans-serif; max-width: 880px; margin: 0 auto; padding: 0 16px 60px; background: #f5f5f7; color: #1d1d1f; }
+    .admin-header {
+      position: sticky; top: 0; z-index: 50;
+      background: #f5f5f7; padding: 16px 0 0;
+      margin: 0 -16px 0;
+      border-bottom: 1px solid #d2d2d7;
+    }
+    .admin-header-inner { padding: 0 16px; }
+    h1 { color: #1d1d1f; font-size: 1.25rem; margin: 0 0 4px; }
+    .subtitle { color: #6e6e73; font-size: 0.78rem; margin-bottom: 12px; }
+    .subtitle a { color: #3a7d32; }
+    .tab-nav {
+      display: flex; gap: 4px;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-nav button {
+      background: transparent;
+      border: none;
+      padding: 10px 16px 12px;
+      font-family: inherit; font-size: 0.9rem; font-weight: 600;
+      color: #6e6e73;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-nav button:hover { color: #1d1d1f; }
+    .tab-nav button.active { color: #3a7d32; border-bottom-color: #3a7d32; }
+    .tab-nav .pill {
+      background: #e8f2e6; color: #3a7d32;
+      font-size: 0.65rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
+    .tab-panel { display: none; padding-top: 24px; }
+    .tab-panel.active { display: block; }
     h2 { color: #3a7d32; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin: 28px 0 12px; }
+    h2:first-child { margin-top: 0; }
     .empty { color: #999; font-size: 0.875rem; padding: 16px 0; }
     .panel { background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
     .panel input, .panel textarea, .panel select {
@@ -428,82 +477,204 @@ async function handleAdmin(request, env, url) {
   </style>
 </head>
 <body>
-  <h1>GTA Admin</h1>
-  <p class="subtitle">Memory moderation + push notifications. Orders export: <a href="/order?key=${key}">/order?key=${key}</a></p>
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <h1>GTA Admin</h1>
+      <p class="subtitle">Orders export: <a href="/order?key=${key}">CSV</a></p>
+      <nav class="tab-nav" role="tablist">
+        <button data-tab="notifications" role="tab">🔔 Notifications</button>
+        <button data-tab="gazette" role="tab">📰 Gazette <span class="pill">${gazettes.length}</span></button>
+        <button data-tab="memories" role="tab">💭 Memories${pending.length ? ` <span class="pill">${pending.length}</span>` : ''}</button>
+        <button data-tab="analytics" role="tab">📊 Analytics</button>
+      </nav>
+    </div>
+  </header>
 
-  <h2>Send Notification Now</h2>
-  <div class="panel">
-    <p class="count" style="margin-bottom:14px;">${liveLabel}</p>
-    <form method="POST" action="/admin/notify?key=${key}" onsubmit="return confirm('Send to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
-      <label for="ntitle">Title</label>
-      <input id="ntitle" name="title" type="text" required maxlength="80" placeholder="e.g. Pool closed today" />
-      <label for="nbody">Message</label>
-      <textarea id="nbody" name="body" required maxlength="240" placeholder="Brief details…"></textarea>
-      <label for="nurl">Link (optional, where tap opens)</label>
-      <input id="nurl" name="url" type="text" placeholder="/local.html" value="/" />
-      <button type="submit">Send Now</button>
-    </form>
-    <p style="margin-top:14px;font-size:0.78rem;color:#6e6e73;">Presets: <span class="preset" onclick="setNotif('Pool closed today','Pool closed today due to weather. Stay tuned for updates.','/local.html')">Pool closed (weather)</span> <span class="preset" onclick="setNotif('Pool re-opening','Pool is now open. Have fun!','/local.html')">Pool re-open</span> <span class="preset" onclick="setNotif('Event tonight','Join us at 8pm in the casino.','/')">Event tonight</span></p>
-  </div>
-
-  <a id="schedules"></a>
-  <h2>Scheduled Notifications (${schedules.length})</h2>
-  <div class="panel">
-    ${schedules.length ? schedules.map(renderSched).join('') : '<p class="empty">No schedules yet.</p>'}
-  </div>
-
-  <a id="sched-form"></a>
-  <h2>${editing ? 'Edit Schedule' : 'Add New Schedule'}</h2>
-  <div class="panel">
-    <form method="POST" action="/admin/schedule?key=${key}">
-      <input type="hidden" name="action" value="save" />
-      <input type="hidden" name="id" value="${esc(formId)}" />
-
-      <label>Title</label>
-      <input name="title" type="text" required maxlength="80" value="${esc(formTitle)}" placeholder="e.g. Pool closes at 6pm" />
-
-      <label>Message</label>
-      <textarea name="body" required maxlength="240" placeholder="Body of notification">${esc(formBody)}</textarea>
-
-      <label>Link (where tap opens)</label>
-      <input name="url" type="text" value="${esc(formUrl)}" placeholder="/local.html" />
-
-      <label>Dynamic content (optional)</label>
-      <select name="dynamic">
-        <option value="" ${formDyn === '' ? 'selected' : ''}>None (use message above as-is)</option>
-        <option value="zmanim" ${formDyn === 'zmanim' ? 'selected' : ''}>Live Shabbos zmanim (replaces body with candle lighting + havdalah)</option>
-        <option value="weather" ${formDyn === 'weather' ? 'selected' : ''}>Live weather alert (only sends if storm/heavy rain forecast today)</option>
-      </select>
-
-      <label>Schedule Type</label>
-      <div class="type-tabs">
-        <label><input type="radio" name="type" value="weekly" ${formType === 'weekly' ? 'checked' : ''} onchange="document.getElementById('weekly-fields').style.display=this.checked?'block':'none';document.getElementById('once-fields').style.display='none'" /><span>Recurring (Weekly)</span></label>
-        <label><input type="radio" name="type" value="once" ${formType === 'once' ? 'checked' : ''} onchange="document.getElementById('once-fields').style.display=this.checked?'block':'none';document.getElementById('weekly-fields').style.display='none'" /><span>One-Time</span></label>
+  <main>
+    <!-- ── NOTIFICATIONS ── -->
+    <section class="tab-panel" data-panel="notifications" role="tabpanel">
+      <h2>Send Notification Now</h2>
+      <div class="panel">
+        <p class="count" style="margin-bottom:14px;">${liveLabel}</p>
+        <form method="POST" action="/admin/notify?key=${key}" onsubmit="return confirm('Send to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
+          <label for="ntitle">Title</label>
+          <input id="ntitle" name="title" type="text" required maxlength="80" placeholder="e.g. Pool closed today" />
+          <label for="nbody">Message</label>
+          <textarea id="nbody" name="body" required maxlength="240" placeholder="Brief details…"></textarea>
+          <label for="nurl">Link (optional, where tap opens)</label>
+          <input id="nurl" name="url" type="text" placeholder="/local.html" value="/" />
+          <button type="submit">Send Now</button>
+        </form>
+        <p style="margin-top:14px;font-size:0.78rem;color:#6e6e73;">Presets: <span class="preset" onclick="setNotif('Pool closed today','Pool closed today due to weather. Stay tuned for updates.','/local.html')">Pool closed (weather)</span> <span class="preset" onclick="setNotif('Pool re-opening','Pool is now open. Have fun!','/local.html')">Pool re-open</span> <span class="preset" onclick="setNotif('Event tonight','Join us at 8pm in the casino.','/')">Event tonight</span></p>
       </div>
 
-      <div id="weekly-fields" style="display:${formType === 'weekly' ? 'block' : 'none'}">
-        <label>Days</label>
-        <div class="days-grid">
-          ${DAY_NAMES.map(d => `<label><input type="checkbox" name="day_${d}" ${formDays.includes(d) ? 'checked' : ''} /> ${d}</label>`).join('')}
-        </div>
-        <label>Time (Eastern)</label>
-        <input name="time" type="time" value="${esc(formTime)}" />
+      <a id="schedules"></a>
+      <h2>Scheduled (${schedules.length})</h2>
+      <div class="panel">
+        ${schedules.length ? schedules.map(renderSched).join('') : '<p class="empty">No schedules yet.</p>'}
       </div>
 
-      <div id="once-fields" style="display:${formType === 'once' ? 'block' : 'none'}">
-        <label>Date &amp; Time (Eastern)</label>
-        <input name="datetime" type="datetime-local" value="${esc(formDT)}" />
+      <a id="sched-form"></a>
+      <h2>${editing ? 'Edit Schedule' : 'Add New Schedule'}</h2>
+      <div class="panel">
+        <form method="POST" action="/admin/schedule?key=${key}">
+          <input type="hidden" name="action" value="save" />
+          <input type="hidden" name="id" value="${esc(formId)}" />
+
+          <label>Title</label>
+          <input name="title" type="text" required maxlength="80" value="${esc(formTitle)}" placeholder="e.g. Pool closes at 6pm" />
+
+          <label>Message</label>
+          <textarea name="body" required maxlength="240" placeholder="Body of notification">${esc(formBody)}</textarea>
+
+          <label>Link (where tap opens)</label>
+          <input name="url" type="text" value="${esc(formUrl)}" placeholder="/local.html" />
+
+          <label>Dynamic content (optional)</label>
+          <select name="dynamic">
+            <option value="" ${formDyn === '' ? 'selected' : ''}>None (use message above as-is)</option>
+            <option value="zmanim" ${formDyn === 'zmanim' ? 'selected' : ''}>Live Shabbos zmanim (candle lighting + havdalah)</option>
+            <option value="weather" ${formDyn === 'weather' ? 'selected' : ''}>Live weather alert (only fires if storm/heavy rain)</option>
+          </select>
+
+          <label>Schedule Type</label>
+          <div class="type-tabs">
+            <label><input type="radio" name="type" value="weekly" ${formType === 'weekly' ? 'checked' : ''} onchange="document.getElementById('weekly-fields').style.display=this.checked?'block':'none';document.getElementById('once-fields').style.display='none'" /><span>Recurring (Weekly)</span></label>
+            <label><input type="radio" name="type" value="once" ${formType === 'once' ? 'checked' : ''} onchange="document.getElementById('once-fields').style.display=this.checked?'block':'none';document.getElementById('weekly-fields').style.display='none'" /><span>One-Time</span></label>
+          </div>
+
+          <div id="weekly-fields" style="display:${formType === 'weekly' ? 'block' : 'none'}">
+            <label>Days</label>
+            <div class="days-grid">
+              ${DAY_NAMES.map(d => `<label><input type="checkbox" name="day_${d}" ${formDays.includes(d) ? 'checked' : ''} /> ${d}</label>`).join('')}
+            </div>
+            <label>Time (Eastern)</label>
+            <input name="time" type="time" value="${esc(formTime)}" />
+          </div>
+
+          <div id="once-fields" style="display:${formType === 'once' ? 'block' : 'none'}">
+            <label>Date &amp; Time (Eastern)</label>
+            <input name="datetime" type="datetime-local" value="${esc(formDT)}" />
+          </div>
+
+          <label><input type="checkbox" name="enabled" ${formEnabled ? 'checked' : ''} style="width:auto;margin-right:6px;" /> Enabled</label>
+
+          <div style="margin-top:14px;display:flex;gap:8px;">
+            <button type="submit">${editing ? 'Save Changes' : 'Add Schedule'}</button>
+            ${editing ? `<a href="/admin?key=${key}#notifications" class="btn-mini" style="padding:10px 18px;">Cancel</a>` : ''}
+          </div>
+          <p style="margin-top:10px;font-size:0.75rem;color:#999;">Cron tick runs every 15 min. Schedule fires within 15 min of selected time.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ── GAZETTE ── -->
+    <section class="tab-panel" data-panel="gazette" role="tabpanel">
+      <h2>Upload New Issue</h2>
+      <div class="panel">
+        <form method="POST" action="/admin/gazette?key=${key}" enctype="multipart/form-data">
+          <input type="hidden" name="action" value="upload" />
+          <label>Title (optional, auto-generated from parsha if blank)</label>
+          <input name="title" type="text" maxlength="120" placeholder="e.g. GTA Gazette — Welcome Back Edition" />
+          <label>Parsha</label>
+          <input name="parsha" type="text" maxlength="80" placeholder="e.g. Chukas – Balak" />
+          <label>Issue Date</label>
+          <input name="issueDate" type="date" required value="${new Date().toISOString().slice(0,10)}" />
+          <label>PDF File</label>
+          <input name="pdf" type="file" accept="application/pdf,.pdf" required />
+          <button type="submit">Upload Issue</button>
+        </form>
       </div>
 
-      <label><input type="checkbox" name="enabled" ${formEnabled ? 'checked' : ''} style="width:auto;margin-right:6px;" /> Enabled</label>
-
-      <div style="margin-top:14px;display:flex;gap:8px;">
-        <button type="submit">${editing ? 'Save Changes' : 'Add Schedule'}</button>
-        ${editing ? `<a href="/admin?key=${key}#schedules" class="btn-mini" style="padding:10px 18px;">Cancel</a>` : ''}
+      <h2>All Issues (${gazettes.length})</h2>
+      <div class="panel">
+        ${gazettes.length ? gazettes.map(g => `
+          <div class="sched-row">
+            <div class="sched-row-main">
+              <div class="sched-row-top">
+                <strong>${esc(g.title || 'GTA Gazette')}</strong>
+              </div>
+              <div class="sched-row-meta">${esc(g.issueDate || '')}${g.parsha ? ' · ' + esc(g.parsha) : ''} · <span style="color:#999;">${esc(g.filename || '')}</span></div>
+            </div>
+            <div class="sched-row-actions">
+              <a href="/gazette/${esc(g.id)}/pdf" target="_blank" rel="noopener" class="btn-mini">View PDF</a>
+              <form method="POST" action="/admin/gazette?key=${key}" style="display:inline;" onsubmit="return confirm('Delete this issue?')">
+                <input type="hidden" name="action" value="delete" />
+                <input type="hidden" name="id" value="${esc(g.id)}" />
+                <button class="btn-mini btn-del">Delete</button>
+              </form>
+            </div>
+          </div>
+        `).join('') : '<p class="empty">No issues uploaded yet.</p>'}
       </div>
-      <p style="margin-top:10px;font-size:0.75rem;color:#999;">Note: cron tick runs every 15 min. Schedule fires within 15 min of selected time.</p>
-    </form>
-  </div>
+    </section>
+
+    <!-- ── MEMORIES ── -->
+    <section class="tab-panel" data-panel="memories" role="tabpanel">
+      <h2>Pending (${pending.length})</h2>
+      ${pending.length ? pending.map(renderItem).join('') : '<p class="empty">None pending.</p>'}
+      <h2>Approved (${approved.length})</h2>
+      ${approved.length ? approved.map(renderItem).join('') : '<p class="empty">None approved yet.</p>'}
+      <h2>Rejected (${rejected.length})</h2>
+      ${rejected.length ? rejected.map(renderItem).join('') : '<p class="empty">None.</p>'}
+    </section>
+
+    <!-- ── ANALYTICS ── -->
+    <section class="tab-panel" data-panel="analytics" role="tabpanel">
+      <h2>Contact Form Submissions (last year, max 50)</h2>
+      <div class="panel">
+        ${contactSubmits.length ? `<p class="count" style="margin-bottom:10px;">${contactSubmits.length} submission${contactSubmits.length === 1 ? '' : 's'}</p>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+            <thead>
+              <tr style="background:#f5f5f7;text-align:left;">
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">When (ET)</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Name</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Email</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Phone</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">IP</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Country</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${contactSubmits.map(v => {
+                const when = new Date(v.ts).toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+                const msg = (v.message || '').length > 120 ? esc(v.message.slice(0, 117)) + '…' : esc(v.message || '');
+                return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-variant-numeric:tabular-nums;white-space:nowrap;">${esc(when)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${esc(v.name)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;"><a href="mailto:${esc(v.email)}">${esc(v.email)}</a></td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-variant-numeric:tabular-nums;">${esc(v.phone || '')}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.78rem;">${esc(v.ip)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${esc(v.country || '—')}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:0.8rem;color:#444;">${msg}</td></tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>` : '<p class="empty">No submissions captured yet.</p>'}
+      </div>
+
+      <h2>Contact Form Views (last 90 days, max 50)</h2>
+      <div class="panel">
+        ${contactViews.length ? `<p class="count" style="margin-bottom:10px;">${contactViews.length} recent view${contactViews.length === 1 ? '' : 's'}</p>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+            <thead>
+              <tr style="background:#f5f5f7;text-align:left;">
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">When (ET)</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">IP</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Country</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Referer</th>
+                <th style="padding:8px;border-bottom:1px solid #d2d2d7;">Device</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${contactViews.map(v => {
+                const when = new Date(v.ts).toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+                const device = /iPhone|iPad|iPod/i.test(v.ua) ? 'iOS' : /Android/i.test(v.ua) ? 'Android' : /Mac/i.test(v.ua) ? 'Mac' : /Windows/i.test(v.ua) ? 'Windows' : 'Other';
+                const ref = v.referer ? new URL(v.referer).pathname : '—';
+                return `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee;font-variant-numeric:tabular-nums;">${esc(when)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:0.78rem;">${esc(v.ip)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${esc(v.country || '—')}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:0.78rem;color:#6e6e73;">${esc(ref)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;">${esc(device)}</td></tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>` : '<p class="empty">No contact form views logged yet.</p>'}
+      </div>
+    </section>
+  </main>
 
   <script>
     function setNotif(t, b, u) {
@@ -511,52 +682,35 @@ async function handleAdmin(request, env, url) {
       document.getElementById('nbody').value = b;
       document.getElementById('nurl').value = u;
     }
+
+    (function () {
+      var TABS = ['notifications', 'gazette', 'memories', 'analytics'];
+      var DEFAULT_TAB = 'notifications';
+      var initial = (location.hash || '').replace('#', '').split('-')[0];
+      if (TABS.indexOf(initial) === -1) initial = DEFAULT_TAB;
+      // If editing a schedule, force notifications tab
+      ${editing ? "initial = 'notifications';" : ''}
+
+      function setTab(name) {
+        TABS.forEach(function (t) {
+          var btn = document.querySelector('.tab-nav [data-tab="' + t + '"]');
+          var panel = document.querySelector('.tab-panel[data-panel="' + t + '"]');
+          if (btn) btn.classList.toggle('active', t === name);
+          if (panel) panel.classList.toggle('active', t === name);
+        });
+        if (history.replaceState) history.replaceState(null, '', '#' + name);
+      }
+
+      document.querySelectorAll('.tab-nav button').forEach(function (b) {
+        b.addEventListener('click', function () { setTab(b.dataset.tab); });
+      });
+
+      setTab(initial);
+
+      // If editing, scroll to form after layout settles
+      ${editing ? "setTimeout(function () { var el = document.getElementById('sched-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);" : ''}
+    })();
   </script>
-
-  <a id="gazette"></a>
-  <h2>GTA Gazette (${gazettes.length} issue${gazettes.length === 1 ? '' : 's'})</h2>
-  <div class="panel">
-    <form method="POST" action="/admin/gazette?key=${key}" enctype="multipart/form-data">
-      <input type="hidden" name="action" value="upload" />
-      <label>Title (optional, auto-generated from parsha if blank)</label>
-      <input name="title" type="text" maxlength="120" placeholder="e.g. GTA Gazette — Welcome Back Edition" />
-      <label>Parsha</label>
-      <input name="parsha" type="text" maxlength="80" placeholder="e.g. Chukas – Balak" />
-      <label>Issue Date</label>
-      <input name="issueDate" type="date" required value="${new Date().toISOString().slice(0,10)}" />
-      <label>PDF File</label>
-      <input name="pdf" type="file" accept="application/pdf,.pdf" required />
-      <button type="submit">Upload Issue</button>
-    </form>
-  </div>
-
-  <div class="panel">
-    ${gazettes.length ? gazettes.map(g => `
-      <div class="sched-row">
-        <div class="sched-row-main">
-          <div class="sched-row-top">
-            <strong>${esc(g.title || 'GTA Gazette')}</strong>
-          </div>
-          <div class="sched-row-meta">${esc(g.issueDate || '')}${g.parsha ? ' · ' + esc(g.parsha) : ''} · <span style="color:#999;">${esc(g.filename || '')}</span></div>
-        </div>
-        <div class="sched-row-actions">
-          <a href="/gazette/${esc(g.id)}/pdf" target="_blank" rel="noopener" class="btn-mini">View PDF</a>
-          <form method="POST" action="/admin/gazette?key=${key}" style="display:inline;" onsubmit="return confirm('Delete this issue?')">
-            <input type="hidden" name="action" value="delete" />
-            <input type="hidden" name="id" value="${esc(g.id)}" />
-            <button class="btn-mini btn-del">Delete</button>
-          </form>
-        </div>
-      </div>
-    `).join('') : '<p class="empty">No issues uploaded yet.</p>'}
-  </div>
-
-  <h2>Memories — Pending (${pending.length})</h2>
-  ${pending.length ? pending.map(renderItem).join('') : '<p class="empty">None pending.</p>'}
-  <h2>Approved (${approved.length})</h2>
-  ${approved.length ? approved.map(renderItem).join('') : '<p class="empty">None approved yet.</p>'}
-  <h2>Rejected (${rejected.length})</h2>
-  ${rejected.length ? rejected.map(renderItem).join('') : '<p class="empty">None.</p>'}
 </body>
 </html>`;
 
@@ -711,7 +865,7 @@ async function handleAdminSchedule(request, env, url) {
 
   return new Response(null, {
     status: 302,
-    headers: { Location: '/admin?key=' + key + '#schedules' },
+    headers: { Location: '/admin?key=' + key + '#notifications' },
   });
 }
 
@@ -1195,6 +1349,7 @@ function nyLocalIsoToUTC(iso) {
 async function runScheduledTick(env) {
   await seedDefaultsIfEmpty(env);
   await seedPoolChangeoversIfMissing(env);
+  await checkNewVideoAndNotify(env);
   const now = nyNow();
   const scheds = await listSchedules(env);
 
@@ -1257,6 +1412,163 @@ async function fetchShabbosZmanim() {
   } catch {
     return null;
   }
+}
+
+// ── Contact form view tracking ──────────────────────────────────────────────
+
+async function handleContactView(request, env) {
+  if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const ip      = request.headers.get('cf-connecting-ip') || '';
+  const country = request.headers.get('cf-ipcountry') || '';
+  const ua      = request.headers.get('user-agent') || '';
+  const referer = request.headers.get('referer') || '';
+
+  // Reverse timestamp so KV list sorts newest first
+  const ts = Date.now();
+  const key = 'cv_' + (9999999999999 - ts) + '_' + Math.random().toString(36).slice(2, 6);
+
+  await env.ORDERS.put(key, JSON.stringify({
+    ts: new Date(ts).toISOString(),
+    ip, country, ua, referer,
+  }), { expirationTtl: 60 * 60 * 24 * 90 }); // 90 days
+
+  return json({ ok: true });
+}
+
+async function listContactViews(env, limit) {
+  const list = await env.ORDERS.list({ prefix: 'cv_', limit: limit || 100 });
+  if (!list.keys.length) return [];
+  const all = await Promise.all(
+    list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
+  );
+  return all;
+}
+
+async function handleContactSubmit(request, env) {
+  if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const ip      = request.headers.get('cf-connecting-ip') || '';
+  const country = request.headers.get('cf-ipcountry') || '';
+  const ua      = request.headers.get('user-agent') || '';
+  const referer = request.headers.get('referer') || '';
+
+  let name = '', email = '', phone = '', message = '';
+  try {
+    const ct = request.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      const b = await request.json();
+      name = (b.name || '').toString();
+      email = (b.email || b.emailaddress || '').toString();
+      phone = (b.phone || '').toString();
+      message = (b.message || '').toString();
+    } else {
+      const fd = await request.formData();
+      name = (fd.get('name') || '').toString();
+      email = (fd.get('email') || fd.get('emailaddress') || '').toString();
+      phone = (fd.get('phone') || '').toString();
+      message = (fd.get('message') || '').toString();
+    }
+  } catch {}
+
+  const ts = Date.now();
+  const key = 'cs_' + (9999999999999 - ts) + '_' + Math.random().toString(36).slice(2, 6);
+  await env.ORDERS.put(key, JSON.stringify({
+    ts: new Date(ts).toISOString(),
+    ip, country, ua, referer, name, email, phone, message,
+  }), { expirationTtl: 60 * 60 * 24 * 365 }); // 1 year
+
+  return json({ ok: true });
+}
+
+async function listContactSubmits(env, limit) {
+  const list = await env.ORDERS.list({ prefix: 'cs_', limit: limit || 100 });
+  if (!list.keys.length) return [];
+  return Promise.all(
+    list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
+  );
+}
+
+// ── YouTube channel feed ────────────────────────────────────────────────────
+
+const YOUTUBE_CHANNEL_ID = 'UCfDFwcXj87z5vgIrjz64dxw';
+// IDs of videos removed from channel that YouTube RSS still returns
+const YOUTUBE_BLOCKLIST = new Set([
+  'Yd5a2z6WuBU', // Naftali Blumenthal Havdalah Part 2 — deleted 2026-06-30
+]);
+
+async function fetchChannelVideos() {
+  try {
+    const res = await fetch('https://www.youtube.com/feeds/videos.xml?channel_id=' + YOUTUBE_CHANNEL_ID, {
+      cf: { cacheTtl: 600, cacheEverything: true },
+    });
+    if (!res.ok) return [];
+    const xml = await res.text();
+    const videos = [];
+    const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
+    let m;
+    while ((m = entryRegex.exec(xml)) !== null) {
+      const entry = m[1];
+      const id        = (entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/) || [])[1];
+      const title     = (entry.match(/<title>([^<]+)<\/title>/) || [])[1];
+      const published = (entry.match(/<published>([^<]+)<\/published>/) || [])[1];
+      if (id && !YOUTUBE_BLOCKLIST.has(id)) videos.push({
+        id,
+        title: (title || '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'),
+        published,
+        thumbnail: 'https://img.youtube.com/vi/' + id + '/hqdefault.jpg',
+      });
+    }
+    return videos;
+  } catch {
+    return [];
+  }
+}
+
+async function handleYoutubeVideos(env) {
+  // Cache via KV for 30 min
+  const cached = await env.ORDERS.get('youtube_cache');
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    if (Date.now() - parsed.t < 30 * 60 * 1000) {
+      return json({ videos: parsed.v });
+    }
+  }
+  const videos = await fetchChannelVideos();
+  await env.ORDERS.put('youtube_cache', JSON.stringify({ t: Date.now(), v: videos }));
+  return json({ videos });
+}
+
+async function checkNewVideoAndNotify(env) {
+  const videos = await fetchChannelVideos();
+  if (!videos.length) return;
+  const latest = videos[0];
+  const metaRaw = await env.ORDERS.get('youtube_meta');
+  const meta = metaRaw ? JSON.parse(metaRaw) : { lastVideoId: null };
+  if (!meta.lastVideoId) {
+    // First run — set baseline, no notification
+    await env.ORDERS.put('youtube_meta', JSON.stringify({
+      lastVideoId: latest.id,
+      lastTitle: latest.title,
+      lastChecked: new Date().toISOString(),
+    }));
+    return;
+  }
+  if (latest.id === meta.lastVideoId) {
+    return;
+  }
+  await sendPushToAll(env, {
+    title: '🎥 New colony video',
+    body: latest.title,
+    url: '/memories.html',
+  });
+  await env.ORDERS.put('youtube_meta', JSON.stringify({
+    lastVideoId: latest.id,
+    lastTitle: latest.title,
+    lastChecked: new Date().toISOString(),
+  }));
 }
 
 // ── Weather alerts (NWS official + Open-Meteo forecast extremes) ────────────

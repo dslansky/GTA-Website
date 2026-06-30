@@ -27,7 +27,7 @@
     "confirmed": "Advertised/listed in current issue - open now",
     "verify": "Carried over - call to verify"
   },
-  "count": 178,
+  "count": 179,
   "items": [
     {
       "name": "Appletree Kosher Supermarket",
@@ -2342,6 +2342,19 @@
       "notes": "Volunteer EMS; non-emergency 718-998-9000; serves 300+ colonies and camps",
       "source": "Curated",
       "id": "sc-178"
+    },
+    {
+      "id": "sc-179",
+      "name": "Patis Bakery",
+      "category": "Bakeries",
+      "town": "Woodridge",
+      "address": "13 Broadway, Woodridge, NY 12789",
+      "phone": "845-640-2978",
+      "email": "PatisUpstate@gmail.com",
+      "website": "",
+      "verify_status": "confirmed",
+      "notes": "Coffee, smoothies, pastries, acai bowls, sandwiches, salads. Seating 80+, delivery, catering. Tartikov hashgacha (Rabbi Yechiel Babad)",
+      "source": "Confirmed 2026-06-30"
     }
   ]
 }

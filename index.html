@@ -365,7 +365,7 @@
         </div>
 
         <div class="contact-form-wrapper reveal reveal-delay-1">
-          <form action="https://api.web3forms.com/submit" method="POST">
+          <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
             <input type="hidden" name="access_key" value="69aabe46-d8a2-4e24-95c5-71f98aa46221" />
             <input type="hidden" name="subject" value="New message from greentreebungalows.com" />
             <input type="hidden" name="redirect" value="false" />
@@ -425,6 +425,42 @@
       }
       document.getElementById('gazette-banner').style.display = '';
     }).catch(() => {});
+
+    // Contact form submit tracking — mirror to our admin
+    (function () {
+      var form = document.getElementById('contact-form');
+      if (!form) return;
+      form.addEventListener('submit', function () {
+        try {
+          var fd = new FormData(form);
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon('/track/contact-submit', fd);
+          } else {
+            fetch('/track/contact-submit', { method: 'POST', body: fd, keepalive: true }).catch(function () {});
+          }
+        } catch (e) {}
+      });
+    })();
+
+    // Contact form view tracking (one beacon per tab session)
+    (function () {
+      try {
+        if (sessionStorage.getItem('gta-cv-sent')) return;
+        var target = document.getElementById('contact');
+        if (!target || !('IntersectionObserver' in window)) return;
+        var io = new IntersectionObserver(function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) {
+              sessionStorage.setItem('gta-cv-sent', '1');
+              fetch('/track/contact-view', { method: 'POST', keepalive: true }).catch(function () {});
+              io.disconnect();
+              return;
+            }
+          }
+        }, { threshold: 0.3 });
+        io.observe(target);
+      } catch (e) {}
+    })();
   </script>
   <script src="js/main.js"></script>
   <script src="js/weather.js" defer></script>

@@ -395,7 +395,7 @@
         <p>A summer in pictures and video — the pool, the entertainment, the moments that make GTA unforgettable.</p>
       </div>
 
-      <div class="video-grid reveal reveal-delay-1">
+      <div class="video-grid reveal reveal-delay-1" id="video-grid">
 
         <div class="video-card" data-video-id="4tal2ohB4xA">
           <div class="video-thumb">
@@ -703,6 +703,38 @@
   <script src="js/weather.js" defer></script>
   <script src="js/pool.js" defer></script>
   <script>
+    // Prepend live YouTube channel videos to video-grid
+    (function () {
+      function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+      function yearOf(iso) { return iso ? new Date(iso).getFullYear() : ''; }
+      fetch('/youtube-videos')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var grid = document.getElementById('video-grid');
+          if (!grid) return;
+          var existingIds = new Set();
+          grid.querySelectorAll('.video-card').forEach(function (c) {
+            existingIds.add(c.getAttribute('data-video-id'));
+          });
+          var fresh = (data.videos || []).filter(function (v) { return !existingIds.has(v.id); });
+          if (!fresh.length) return;
+          var html = fresh.map(function (v) {
+            var year = yearOf(v.published);
+            return '<div class="video-card" data-video-id="' + esc(v.id) + '">' +
+              '<div class="video-thumb">' +
+                '<img src="' + esc(v.thumbnail) + '" alt="' + esc(v.title) + '" loading="lazy" />' +
+                '<div class="video-play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>' +
+              '</div>' +
+              '<p class="video-title">' + esc(v.title) + (year ? ' <span class="video-tag">' + year + '</span>' : '') + '</p>' +
+            '</div>';
+          }).join('');
+          grid.insertAdjacentHTML('afterbegin', html);
+          // Rebind click handlers (main.js already attached listeners by selector — re-trigger)
+          if (window.GTABindVideoCards) window.GTABindVideoCards();
+        })
+        .catch(function () {});
+    })();
+
     (function () {
       var memories = [];
       var currentEra = 'all';

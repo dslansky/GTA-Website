@@ -62,8 +62,11 @@ function closeVideo() {
   document.body.style.overflow = '';
 }
 
-document.querySelectorAll('.video-card').forEach(card => {
-  card.addEventListener('click', () => openVideo(card.dataset.videoId));
+// Delegated click so dynamically-added cards (live YouTube feed) also work
+document.addEventListener('click', e => {
+  if (!videoModal) return;
+  const card = e.target.closest('.video-card');
+  if (card && card.dataset.videoId) openVideo(card.dataset.videoId);
 });
 
 document.getElementById('video-modal-close') && document.getElementById('video-modal-close').addEventListener('click', closeVideo);

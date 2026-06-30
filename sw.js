@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v20-2026-06-30';
+const CACHE_VERSION = 'gta-v29-2026-06-30';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 
@@ -57,7 +57,9 @@ function isPassthroughPath(url) {
          url.pathname.startsWith('/admin') ||
          url.pathname.startsWith('/push/') ||
          url.pathname.startsWith('/gazette/') ||
-         url.pathname === '/gazette-data';
+         url.pathname === '/gazette-data' ||
+         url.pathname === '/youtube-videos' ||
+         url.pathname.startsWith('/track/');
 }
 
 self.addEventListener('fetch', (event) => {
