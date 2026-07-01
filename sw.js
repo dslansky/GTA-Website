@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v31-2026-06-30';
+const CACHE_VERSION = 'gta-v32-2026-06-30';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 
@@ -157,8 +157,9 @@ self.addEventListener('notificationclick', (event) => {
     if (sameOrigin && 'navigate' in sameOrigin) {
       try {
         const navigated = await sameOrigin.navigate(targetUrl);
-        if (navigated) return navigated.focus();
-        return sameOrigin.focus();
+        // WebKit can resolve navigate() with a client whose URL never
+        // actually changed — only trust it if the URL really matches.
+        if (navigated && navigated.url === targetUrl) return navigated.focus();
       } catch {}
     }
     return self.clients.openWindow(targetUrl);
