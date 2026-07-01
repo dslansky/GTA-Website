@@ -50,6 +50,7 @@
     el.innerHTML = '<a href="local.html#weather" class="nav-weather-link" aria-label="' + info.label + ', ' + temp + '°F">' +
       '<span class="nav-weather-icon">' + info.icon + '</span>' +
       '<span class="nav-weather-temp">' + temp + '°</span>' +
+      '<span class="nav-weather-label">' + info.label + '</span>' +
     '</a>';
   }
 
