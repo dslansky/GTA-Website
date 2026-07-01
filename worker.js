@@ -1311,42 +1311,76 @@ async function handleUpdates(request, env, url) {
   }
   await env.ORDERS.delete(rlKey);
 
-  let formData;
-  try {
-    formData = await request.formData();
-  } catch {
-    return json({ success: false, error: 'Invalid form data' }, 400);
+  // iOS Shortcuts' per-field "File" picker in a multipart Form body proved
+  // unreliable in practice — so a photo/video post can also arrive as a raw
+  // request body whose Content-Type is the media's own MIME type, with the
+  // caption passed as a ?text= query param instead of a form field. This is
+  // Shortcuts' "Request Body: File" mode, which uses a plain, reliable value
+  // picker rather than the nested Form-field one.
+  const contentType = (request.headers.get('Content-Type') || '').split(';')[0].trim();
+  const isRawMedia = ALLOWED_PHOTO_TYPES.includes(contentType) || ALLOWED_VIDEO_TYPES.includes(contentType);
+
+  let text = '';
+  let mediaType = 'none';
+  let mediaContentType = null;
+  let mediaBytes = null;
+
+  if (isRawMedia) {
+    text = (url.searchParams.get('text') || '').trim();
+    mediaType = ALLOWED_PHOTO_TYPES.includes(contentType) ? 'image' : 'video';
+    mediaContentType = contentType;
+    mediaBytes = await request.arrayBuffer();
+    if (!mediaBytes.byteLength) {
+      return json({ success: false, error: 'Empty file' }, 400);
+    }
+    const maxBytes = mediaType === 'image' ? MAX_PHOTO_BYTES : MAX_VIDEO_BYTES;
+    if (mediaBytes.byteLength > maxBytes) {
+      return json({ success: false, error: 'File too large' }, 400);
+    }
+  } else {
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch {
+      return json({ success: false, error: 'Invalid form data' }, 400);
+    }
+
+    // iOS Shortcuts auto-capitalizes the first letter of a Form field's key
+    // when you type it in — accept both casings rather than fight that.
+    text = (formData.get('text') || formData.get('Text') || '').toString().trim();
+    const media = formData.get('media') || formData.get('Media');
+    const hasMedia = media && typeof media !== 'string' && media.size > 0;
+
+    if (!text && !hasMedia) {
+      return json({ success: false, error: 'Nothing to post' }, 400);
+    }
+
+    if (hasMedia) {
+      if (ALLOWED_PHOTO_TYPES.includes(media.type)) {
+        mediaType = 'image';
+      } else if (ALLOWED_VIDEO_TYPES.includes(media.type)) {
+        mediaType = 'video';
+      } else {
+        return json({ success: false, error: 'Unsupported media type' }, 400);
+      }
+      const maxBytes = mediaType === 'image' ? MAX_PHOTO_BYTES : MAX_VIDEO_BYTES;
+      if (media.size > maxBytes) {
+        return json({ success: false, error: 'File too large' }, 400);
+      }
+      mediaContentType = media.type;
+      mediaBytes = await media.arrayBuffer();
+    }
   }
 
-  // iOS Shortcuts auto-capitalizes the first letter of a Form field's key
-  // when you type it in — accept both casings rather than fight that.
-  const text  = (formData.get('text') || formData.get('Text') || '').toString().trim();
-  const media = formData.get('media') || formData.get('Media');
-  const hasMedia = media && typeof media !== 'string' && media.size > 0;
-
-  if (!text && !hasMedia) {
+  if (!text && mediaType === 'none') {
     return json({ success: false, error: 'Nothing to post' }, 400);
   }
 
   const id = Date.now().toString() + Math.random().toString(36).slice(2, 6);
-  let mediaType = 'none';
-  let mediaContentType = null;
 
-  if (hasMedia) {
-    if (ALLOWED_PHOTO_TYPES.includes(media.type)) {
-      mediaType = 'image';
-    } else if (ALLOWED_VIDEO_TYPES.includes(media.type)) {
-      mediaType = 'video';
-    } else {
-      return json({ success: false, error: 'Unsupported media type' }, 400);
-    }
-    const maxBytes = mediaType === 'image' ? MAX_PHOTO_BYTES : MAX_VIDEO_BYTES;
-    if (media.size > maxBytes) {
-      return json({ success: false, error: 'File too large' }, 400);
-    }
-    mediaContentType = media.type;
-    await env.MEMORIES.put('update_' + id, await media.arrayBuffer(), {
-      httpMetadata: { contentType: media.type },
+  if (mediaBytes) {
+    await env.MEMORIES.put('update_' + id, mediaBytes, {
+      httpMetadata: { contentType: mediaContentType },
     });
   }
 
