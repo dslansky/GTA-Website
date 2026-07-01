@@ -15,6 +15,15 @@ export default {
     if (url.pathname === '/gallery-data') {
       return handleGalleryData(env);
     }
+    if (url.pathname === '/updates' || url.pathname.startsWith('/updates/')) {
+      return handleUpdates(request, env, url);
+    }
+    if (url.pathname === '/updates-data') {
+      return handleUpdatesData(env);
+    }
+    if (url.pathname === '/admin/updates') {
+      return handleAdminUpdates(request, env, url);
+    }
     if (url.pathname === '/admin/login') {
       return handleAdminLogin(request, env, url);
     }
@@ -469,6 +478,7 @@ async function handleAdmin(request, env, url) {
   const editing = editId ? schedules.find(s => s.id === editId) : null;
 
   const gazettes = await listGazettes(env);
+  const updates = await listUpdates(env);
 
   const contactViews = await listContactViews(env, 50);
   const contactSubmits = await listContactSubmits(env, 50);
@@ -493,6 +503,32 @@ async function handleAdmin(request, env, url) {
           ${m.status !== 'approved' ? `<button name="action" value="approve" style="padding:6px 14px;background:#3a7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">Approve</button>` : ''}
           ${m.status !== 'rejected' ? `<button name="action" value="reject" style="padding:6px 14px;background:#e53e3e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">Reject</button>` : ''}
           <button name="action" value="delete" onclick="return confirm('Delete permanently?')" style="padding:6px 14px;background:#666;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">Delete</button>
+        </form>
+      </div>
+    </div>`;
+  };
+
+  const renderUpdate = (u) => {
+    const thumb = u.mediaType === 'image'
+      ? `<img src="/updates/${u.id}/media" style="width:90px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0;" />`
+      : u.mediaType === 'video'
+        ? `<video src="/updates/${u.id}/media" style="width:90px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0;" muted></video>`
+        : '';
+    const textPreview = u.text
+      ? (u.text.length > 140 ? esc(u.text.slice(0, 137)) + '…' : esc(u.text))
+      : '<em style="color:#999;">(no caption)</em>';
+    return `<div style="display:flex;gap:14px;padding:16px;border:1px solid #d2d2d7;border-radius:12px;margin-bottom:10px;background:#fff;align-items:flex-start;">
+      ${thumb}
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="background:#e8f2e6;color:#3a7d32;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:100px;text-transform:uppercase;">${u.mediaType}</span>
+          <small style="color:#999;">${ago(u.timestamp) || new Date(u.timestamp).toLocaleDateString()}</small>
+        </div>
+        <p style="font-size:0.875rem;color:#444;margin-bottom:10px;line-height:1.5;">${textPreview}</p>
+        <form method="POST" action="/admin/updates" style="display:inline;" onsubmit="return confirm('Delete this update?')">
+          <input type="hidden" name="action" value="delete" />
+          <input type="hidden" name="id" value="${esc(u.id)}" />
+          <button class="btn-mini btn-del">Delete</button>
         </form>
       </div>
     </div>`;
@@ -654,6 +690,7 @@ async function handleAdmin(request, env, url) {
         <button data-tab="notifications" role="tab">🔔 Notifications</button>
         <button data-tab="gazette" role="tab">📰 Gazette <span class="pill">${gazettes.length}</span></button>
         <button data-tab="memories" role="tab">💭 Memories${pending.length ? ` <span class="pill">${pending.length}</span>` : ''}</button>
+        <button data-tab="updates" role="tab">📣 Updates <span class="pill">${updates.length}</span></button>
         <button data-tab="analytics" role="tab">📊 Analytics</button>
       </nav>
     </div>
@@ -789,6 +826,12 @@ async function handleAdmin(request, env, url) {
       ${rejected.length ? rejected.map(renderItem).join('') : '<p class="empty">None.</p>'}
     </section>
 
+    <!-- ── UPDATES ── -->
+    <section class="tab-panel" data-panel="updates" role="tabpanel">
+      <h2>Colony Updates (${updates.length})</h2>
+      ${updates.length ? updates.map(renderUpdate).join('') : '<p class="empty">No updates posted yet — forward one from WhatsApp via the Shortcut.</p>'}
+    </section>
+
     <!-- ── ANALYTICS ── -->
     <section class="tab-panel" data-panel="analytics" role="tabpanel">
       <h2>Contact Form Submissions (last year, max 50)</h2>
@@ -854,7 +897,7 @@ async function handleAdmin(request, env, url) {
     }
 
     (function () {
-      var TABS = ['notifications', 'gazette', 'memories', 'analytics'];
+      var TABS = ['notifications', 'gazette', 'memories', 'updates', 'analytics'];
       var DEFAULT_TAB = 'notifications';
       var initial = (location.hash || '').replace('#', '').split('-')[0];
       if (TABS.indexOf(initial) === -1) initial = DEFAULT_TAB;
@@ -991,7 +1034,7 @@ async function handleAdminAction(request, env, url) {
 
   return new Response(null, {
     status: 302,
-    headers: { Location: '/admin?key=' + key },
+    headers: { Location: '/admin#memories' },
   });
 }
 
@@ -1102,7 +1145,7 @@ async function handleAdminSchedule(request, env, url) {
 
   return new Response(null, {
     status: 302,
-    headers: { Location: '/admin?key=' + key + '#notifications' },
+    headers: { Location: '/admin#notifications' },
   });
 }
 
@@ -1124,7 +1167,7 @@ async function handleAdminGazette(request, env, url) {
       await env.MEMORIES.delete('gazette/' + id + '.jpg');
       await env.ORDERS.delete('gazette_' + id);
     }
-    return new Response(null, { status: 302, headers: { Location: '/admin?key=' + key + '#gazette' } });
+    return new Response(null, { status: 302, headers: { Location: '/admin#gazette' } });
   }
 
   // upload
@@ -1174,7 +1217,7 @@ async function handleAdminGazette(request, env, url) {
 
   return new Response(null, {
     status: 302,
-    headers: { Location: '/admin?key=' + key + '#gazette' },
+    headers: { Location: '/admin#gazette' },
   });
 }
 
@@ -1219,6 +1262,141 @@ async function listGazettes(env) {
   );
   all.sort((a, b) => (b.issueDate || '').localeCompare(a.issueDate || ''));
   return all;
+}
+
+// ── Colony Updates (WhatsApp forwards via iOS Shortcut) ─────────────────────
+// Posted through a bearer-style X-Api-Key header, not the admin session cookie
+// — a Shortcut has no cookie jar, and a scoped key can be rotated on its own
+// without touching ADMIN_PASSWORD_HASH/SESSION_SECRET if the phone is lost.
+// No moderation queue: only the key holder can post, so items publish immediately.
+
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime'];
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+
+async function handleUpdates(request, env, url) {
+  const mediaMatch = url.pathname.match(/^\/updates\/([^/]+)\/media$/);
+  if (request.method === 'GET' && mediaMatch) {
+    const obj = await env.MEMORIES.get('update_' + mediaMatch[1]);
+    if (!obj) return new Response('Not found', { status: 404 });
+    return new Response(obj.body, {
+      headers: {
+        'Content-Type': obj.httpMetadata?.contentType || 'application/octet-stream',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
+  }
+
+  if (request.method !== 'POST' || url.pathname !== '/updates') {
+    return new Response('Not found', { status: 404 });
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const rlKey = 'updates_auth_fail_' + ip;
+  const failCount = parseInt((await env.ORDERS.get(rlKey)) || '0', 10);
+  if (failCount >= 8) {
+    return json({ success: false, error: 'Too many attempts — try again in a few minutes.' }, 429);
+  }
+
+  const provided = request.headers.get('X-Api-Key') || '';
+  const expected = env.UPDATES_API_KEY || '';
+  let keyOk = expected.length > 0 && provided.length === expected.length;
+  if (keyOk) {
+    let diff = 0;
+    for (let i = 0; i < expected.length; i++) diff |= provided.charCodeAt(i) ^ expected.charCodeAt(i);
+    keyOk = diff === 0;
+  }
+  if (!keyOk) {
+    await env.ORDERS.put(rlKey, String(failCount + 1), { expirationTtl: 600 });
+    return json({ success: false, error: 'Unauthorized' }, 401);
+  }
+  await env.ORDERS.delete(rlKey);
+
+  let formData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return json({ success: false, error: 'Invalid form data' }, 400);
+  }
+
+  const text  = (formData.get('text') || '').toString().trim();
+  const media = formData.get('media');
+  const hasMedia = media && typeof media !== 'string' && media.size > 0;
+
+  if (!text && !hasMedia) {
+    return json({ success: false, error: 'Nothing to post' }, 400);
+  }
+
+  const id = Date.now().toString() + Math.random().toString(36).slice(2, 6);
+  let mediaType = 'none';
+  let mediaContentType = null;
+
+  if (hasMedia) {
+    if (ALLOWED_PHOTO_TYPES.includes(media.type)) {
+      mediaType = 'image';
+    } else if (ALLOWED_VIDEO_TYPES.includes(media.type)) {
+      mediaType = 'video';
+    } else {
+      return json({ success: false, error: 'Unsupported media type' }, 400);
+    }
+    const maxBytes = mediaType === 'image' ? MAX_PHOTO_BYTES : MAX_VIDEO_BYTES;
+    if (media.size > maxBytes) {
+      return json({ success: false, error: 'File too large' }, 400);
+    }
+    mediaContentType = media.type;
+    await env.MEMORIES.put('update_' + id, await media.arrayBuffer(), {
+      httpMetadata: { contentType: media.type },
+    });
+  }
+
+  await env.ORDERS.put('update_' + id, JSON.stringify({
+    id,
+    text,
+    mediaType,
+    mediaContentType,
+    timestamp: new Date().toISOString(),
+  }));
+
+  return json({ success: true, id });
+}
+
+async function handleUpdatesData(env) {
+  const list = await env.ORDERS.list({ prefix: 'update_' });
+  if (!list.keys.length) return json({ updates: [] });
+  const all = await Promise.all(
+    list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
+  );
+  all.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+  return json({ updates: all.slice(0, 20) });
+}
+
+async function listUpdates(env) {
+  const list = await env.ORDERS.list({ prefix: 'update_' });
+  if (!list.keys.length) return [];
+  const all = await Promise.all(
+    list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
+  );
+  all.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+  return all;
+}
+
+async function handleAdminUpdates(request, env, url) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const fd = await request.formData();
+  const action = fd.get('action');
+  const id = fd.get('id');
+
+  if (action === 'delete' && id) {
+    const raw = await env.ORDERS.get('update_' + id);
+    if (raw) {
+      const u = JSON.parse(raw);
+      await env.ORDERS.delete('update_' + id);
+      if (u.mediaType !== 'none') await env.MEMORIES.delete('update_' + id);
+    }
+  }
+
+  return new Response(null, { status: 302, headers: { Location: '/admin#updates' } });
 }
 
 // ── Push subscriptions ──────────────────────────────────────────────────────

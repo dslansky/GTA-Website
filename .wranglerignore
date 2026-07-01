@@ -3,6 +3,7 @@
 .claude
 worker.js
 wrangler.toml
+.dev.vars
 business listings/
 business listings.zip
 *.HEIC

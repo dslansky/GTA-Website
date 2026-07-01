@@ -110,6 +110,19 @@
   </section>
 
   <!-- ══════════════════════════════════════
+       COLONY UPDATES
+  ══════════════════════════════════════ -->
+  <section id="updates" style="display:none;">
+    <div class="container">
+      <div class="updates-header reveal">
+        <p class="eyebrow">From the Colony</p>
+        <h2>Latest Updates</h2>
+      </div>
+      <div class="updates-list" id="updates-list"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
        HISTORY
   ══════════════════════════════════════ -->
   <section class="section" id="history">
@@ -485,6 +498,41 @@
         '</div>' +
         '<span class="today-card-arrow">›</span>';
       el.style.display = '';
+    }).catch(() => {});
+
+    function timeAgoUpdates(iso) {
+      const ms = Date.now() - Date.parse(iso);
+      const min = Math.floor(ms / 60000);
+      if (min < 1) return 'just now';
+      if (min < 60) return min + ' min ago';
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return hr + ' hr ago';
+      const d = Math.floor(hr / 24);
+      return d + ' day' + (d === 1 ? '' : 's') + ' ago';
+    }
+
+    fetch('/updates-data').then(r => r.json()).then(d => {
+      const items = (d.updates || []).slice(0, 5);
+      if (!items.length) return;
+      const listEl = document.getElementById('updates-list');
+      listEl.innerHTML = items.map(u => {
+        let media = '';
+        if (u.mediaType === 'image') {
+          media = '<div class="update-card-media"><img src="/updates/' + encodeURIComponent(u.id) + '/media" loading="lazy" alt=""></div>';
+        } else if (u.mediaType === 'video') {
+          media = '<div class="update-card-media"><video src="/updates/' + encodeURIComponent(u.id) + '/media" controls playsinline preload="metadata"></video></div>';
+        }
+        const cardClass = 'update-card' + (u.mediaType === 'none' ? ' update-card--none' : '');
+        const text = u.text ? '<p class="update-card-text">' + escToday(u.text) + '</p>' : '';
+        return '<div class="' + cardClass + '">' +
+          media +
+          '<div class="update-card-body">' +
+            text +
+            '<p class="update-card-time">' + timeAgoUpdates(u.timestamp) + '</p>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      document.getElementById('updates').style.display = '';
     }).catch(() => {});
 
     // Contact form submit tracking — mirror to our admin

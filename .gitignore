@@ -1,6 +1,7 @@
 .claude/
 .DS_Store
 .wrangler/
+.dev.vars
 *.zip
 *.HEIC
 *.heic
