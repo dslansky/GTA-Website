@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v30-2026-06-30';
+const CACHE_VERSION = 'gta-v31-2026-06-30';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 
@@ -12,6 +12,7 @@ const SHELL_URLS = [
   '/local.html',
   '/vues.html',
   '/gazette.html',
+  '/entertainment.html',
   '/css/styles.css',
   '/js/main.js',
   '/js/weather.js',
@@ -60,6 +61,7 @@ function isPassthroughPath(url) {
          url.pathname.startsWith('/gazette/') ||
          url.pathname === '/gazette-data' ||
          url.pathname === '/youtube-videos' ||
+         url.pathname === '/entertainment-data' ||
          url.pathname.startsWith('/track/');
 }
 

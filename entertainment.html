@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Entertainment — Greentree Acres</title>
+  <meta name="description" content="Saturday Night Entertainment at Greentree Acres — the full Summer 2026 lineup, from mentalists to Melave Malka." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#3a7d32" />
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/img/icons/favicon-32.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Greentree" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       NAV
+  ══════════════════════════════════════ -->
+  <nav id="nav">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img src="img/logo.png" alt="Greentree Acres" class="nav-logo-img" />
+        <span class="nav-logo-text">Greentree Acres</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html#history">Our Story</a></li>
+        <li><a href="index.html#amenities">Amenities</a></li>
+        <li><a href="entertainment.html">Entertainment</a></li>
+        <li><a href="memories.html">Memories</a></li>
+        <li><a href="ferndale.html">Ferndale History</a></li>
+        <li><a href="zmanim.html">Zmanim</a></li>
+        <li><a href="local.html">Local Info</a></li>
+        <li><a href="gazette.html">Gazette</a></li>
+        <li><a href="vues.html">Country Vues</a></li>
+        <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
+      </ul>
+
+      <span id="nav-weather"></span>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PAGE HEADER
+  ══════════════════════════════════════ -->
+  <section class="page-header">
+    <div class="container page-header-content">
+      <p class="eyebrow">Saturday Nights · All Summer Long</p>
+      <h1>Entertainment</h1>
+      <p>From mentalists to Melave Malka, every Saturday night at Greentree Acres brings something new. Here's what's coming up.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       COMING UP
+  ══════════════════════════════════════ -->
+  <section class="section--sm" id="ent-coming-up">
+    <div class="container">
+      <div id="ent-highlight" class="ent-highlight">
+        <p class="ent-highlight-status">Loading this week's lineup…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FULL SEASON LINEUP
+  ══════════════════════════════════════ -->
+  <section class="section" id="ent-season" style="background: var(--color-surface);">
+    <div class="container">
+      <div class="ent-season-header reveal">
+        <p class="eyebrow">The Full Lineup</p>
+        <h2>Summer 2026</h2>
+      </div>
+      <div id="ent-season-list" class="ent-season-list"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       LATEST VIDEO TEASER
+  ══════════════════════════════════════ -->
+  <section class="section--sm" id="ent-video">
+    <div class="container">
+      <div class="ent-video-header reveal">
+        <p class="eyebrow">From Past Weeks</p>
+        <h2>Latest from Our Channel</h2>
+      </div>
+      <div id="ent-video-card" class="ent-video-card" style="display:none;"></div>
+      <p class="ent-video-more"><a href="memories.html">See more on our Memories page →</a></p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="img/logo.png" alt="Greentree Acres" class="footer-logo" />
+        <p>&copy; 2026 Greentree Acres. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function escEnt(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function formatEntDate(dateStr) {
+      var d = new Date(dateStr + 'T12:00:00');
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    }
+
+    fetch('/entertainment-data').then(function (r) { return r.json(); }).then(function (d) {
+      var lineup = (d.lineup || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+      var todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+
+      var upcoming = lineup.find(function (e) { return e.date >= todayStr; });
+      if (!upcoming) upcoming = lineup[lineup.length - 1];
+
+      var highlightEl = document.getElementById('ent-highlight');
+      if (upcoming) {
+        highlightEl.className = 'ent-highlight' + (upcoming.noEntertainment ? ' ent-highlight-off' : '');
+        highlightEl.innerHTML =
+          '<p class="ent-highlight-eyebrow">' + (upcoming.date === todayStr ? 'Tonight' : 'Coming Up') + '</p>' +
+          '<div class="ent-highlight-main">' +
+            '<span class="ent-highlight-emoji">' + (upcoming.emoji || '🎭') + '</span>' +
+            '<div>' +
+              '<h2>' + escEnt(upcoming.title) + '</h2>' +
+              '<p class="ent-highlight-detail">' + escEnt(formatEntDate(upcoming.date)) + (upcoming.time ? ' · ' + escEnt(upcoming.time) : '') + '</p>' +
+              (upcoming.note ? '<p class="ent-highlight-note">' + escEnt(upcoming.note) + '</p>' : '') +
+            '</div>' +
+          '</div>' +
+          (upcoming.link ? '<a class="btn btn-outline-green ent-highlight-link" href="' + upcoming.link + '" target="_blank" rel="noopener noreferrer">' + escEnt(upcoming.linkLabel || 'Learn more') + '</a>' : '');
+      }
+
+      var listEl = document.getElementById('ent-season-list');
+      listEl.innerHTML = lineup.map(function (e) {
+        var isPast = e.date < todayStr;
+        var cls = 'ent-row' + (e.noEntertainment ? ' ent-row-off' : '') + (isPast ? ' ent-row-past' : '');
+        return '<div class="' + cls + '">' +
+          '<span class="ent-row-date">' + escEnt(formatEntDate(e.date)) + '</span>' +
+          '<span class="ent-row-emoji">' + (e.emoji || '') + '</span>' +
+          '<span class="ent-row-title">' + escEnt(e.title) + '</span>' +
+          '<span class="ent-row-time">' + escEnt(e.time || e.note || '') + '</span>' +
+          (e.link ? '<a class="ent-row-link" href="' + e.link + '" target="_blank" rel="noopener noreferrer">' + escEnt(e.linkLabel || 'Learn more') + '</a>' : '') +
+        '</div>';
+      }).join('');
+    }).catch(function () {
+      document.getElementById('ent-highlight').innerHTML = '<p class="ent-highlight-status">Check back soon for this week’s lineup.</p>';
+    });
+
+    fetch('/youtube-videos').then(function (r) { return r.json(); }).then(function (d) {
+      var latest = (d.videos || [])[0];
+      if (!latest) return;
+      var el = document.getElementById('ent-video-card');
+      el.innerHTML =
+        '<a class="ent-video-link-card" href="https://www.youtube.com/watch?v=' + encodeURIComponent(latest.id) + '" target="_blank" rel="noopener noreferrer">' +
+          '<img src="' + latest.thumbnail + '" alt="" class="ent-video-thumb" />' +
+          '<span class="ent-video-title">' + escEnt(latest.title || 'Watch now') + '</span>' +
+        '</a>';
+      el.style.display = '';
+    }).catch(function () {});
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/weather.js" defer></script>
+  <script src="js/pool.js" defer></script>
+</body>
+</html>

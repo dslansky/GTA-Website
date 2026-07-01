@@ -36,6 +36,7 @@
       <ul class="nav-links">
         <li><a href="#history">Our Story</a></li>
         <li><a href="#amenities">Amenities</a></li>
+        <li><a href="entertainment.html">Entertainment</a></li>
         <li><a href="memories.html">Memories</a></li>
         <li><a href="ferndale.html">Ferndale History</a></li>
         <li><a href="zmanim.html">Zmanim</a></li>
@@ -87,6 +88,7 @@
         <button type="button" id="today-pool" class="today-card reveal reveal-delay-1" aria-label="Pool status — tap for full schedule"></button>
         <a href="local.html#weather" id="today-weather" class="today-card reveal reveal-delay-2" aria-label="Weather"></a>
         <a href="zmanim.html" id="today-zmanim" class="today-card reveal reveal-delay-3" aria-label="Today's zmanim"></a>
+        <a href="entertainment.html" id="today-entertainment" class="today-card reveal reveal-delay-4" style="display:none;" aria-label="Saturday night entertainment"></a>
         <a href="gazette.html" id="today-gazette" class="today-card reveal reveal-delay-4" style="display:none;" aria-label="Latest Gazette issue"></a>
         <a href="memories.html" id="today-video" class="today-card reveal reveal-delay-4" style="display:none;" aria-label="Latest video"></a>
       </div>
@@ -433,6 +435,25 @@
           '<p class="today-card-eyebrow">Gazette</p>' +
           '<h3>' + escToday(latest.title || 'GTA Gazette') + '</h3>' +
           (dateLabel ? '<p class="today-card-detail">' + escToday(dateLabel) + '</p>' : '') +
+        '</div>' +
+        '<span class="today-card-arrow">›</span>';
+      el.style.display = '';
+    }).catch(() => {});
+
+    fetch('/entertainment-data').then(r => r.json()).then(d => {
+      const lineup = (d.lineup || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+      const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+      const upcoming = lineup.find(e => e.date >= todayStr);
+      if (!upcoming || upcoming.noEntertainment) return;
+      const isTonight = upcoming.date === todayStr;
+      const dateLabel = new Date(upcoming.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+      const el = document.getElementById('today-entertainment');
+      el.innerHTML =
+        '<span class="today-card-icon-badge"><span class="today-card-icon">' + (upcoming.emoji || '🎭') + '</span></span>' +
+        '<div class="today-card-body">' +
+          '<p class="today-card-eyebrow">' + (isTonight ? 'Entertainment Tonight' : 'Entertainment') + '</p>' +
+          '<h3>' + escToday(upcoming.title) + '</h3>' +
+          '<p class="today-card-detail">' + escToday(dateLabel) + (upcoming.time ? ' · ' + escToday(upcoming.time) : '') + '</p>' +
         '</div>' +
         '<span class="today-card-arrow">›</span>';
       el.style.display = '';

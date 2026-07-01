@@ -2210,3 +2210,112 @@ body.has-pool-banner .jump-nav {
 footer {
   padding-bottom: calc(60px + env(safe-area-inset-bottom));
 }
+
+/* =========================================
+   ENTERTAINMENT PAGE
+   ========================================= */
+.ent-highlight {
+  max-width: 720px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+}
+.ent-highlight.ent-highlight-off { background: var(--color-surface); }
+.ent-highlight-status { color: var(--color-secondary); }
+
+.ent-highlight-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-green);
+  margin-bottom: 1rem;
+}
+
+.ent-highlight-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: left;
+}
+.ent-highlight-emoji { font-size: 3rem; line-height: 1; flex-shrink: 0; }
+.ent-highlight-main h2 { font-size: 1.6rem; margin-bottom: 4px; }
+.ent-highlight-detail { color: var(--color-secondary); margin: 0; }
+.ent-highlight-note { color: var(--color-secondary); font-style: italic; margin: 4px 0 0; }
+.ent-highlight-link { margin-top: 24px; }
+
+@media (max-width: 600px) {
+  .ent-highlight { padding: 24px 20px; }
+  .ent-highlight-main { flex-direction: column; text-align: center; gap: 12px; }
+  .ent-highlight-emoji { font-size: 2.4rem; }
+}
+
+.ent-season-header { text-align: center; margin-bottom: 40px; }
+
+.ent-season-list {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ent-row {
+  display: grid;
+  grid-template-columns: 160px 28px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+}
+.ent-row.ent-row-past { opacity: 0.55; }
+.ent-row.ent-row-off { background: var(--color-surface); font-style: italic; }
+
+.ent-row-date { font-size: 0.85rem; color: var(--color-secondary); white-space: nowrap; }
+.ent-row-emoji { font-size: 1.3rem; text-align: center; }
+.ent-row-title { font-weight: 600; color: var(--color-dark); }
+.ent-row-time { font-size: 0.85rem; color: var(--color-secondary); white-space: nowrap; }
+.ent-row-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-green);
+  white-space: nowrap;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 680px) {
+  .ent-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .ent-row-emoji { font-size: 1.5rem; order: -1; }
+}
+
+.ent-video-header { text-align: center; margin-bottom: 32px; }
+
+.ent-video-card { max-width: 480px; margin: 0 auto; }
+.ent-video-link-card {
+  display: block;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.ent-video-link-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.ent-video-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+.ent-video-title {
+  display: block;
+  padding: 14px 16px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+.ent-video-more { text-align: center; margin-top: 20px; }
+.ent-video-more a { color: var(--color-green); font-weight: 500; }

@@ -37,6 +37,9 @@ export default {
     if (url.pathname === '/gazette-data') {
       return handleGazetteData(env);
     }
+    if (url.pathname === '/entertainment-data') {
+      return json({ lineup: ENTERTAINMENT_LINEUP });
+    }
     const gazPdfMatch = url.pathname.match(/^\/gazette\/([^/]+)\/pdf$/);
     if (gazPdfMatch) {
       return handleGazettePdf(env, gazPdfMatch[1]);
@@ -1346,10 +1349,56 @@ function nyLocalIsoToUTC(iso) {
   return d.getTime() + 4 * 60 * 60 * 1000;
 }
 
+function addDaysToDateStr(dateStr, days) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0, 10);
+}
+
+// Friday noon teaser + Saturday 10pm reminder for that week's entertainment.
+// Cron is */15, so the :00-:14 window at each fixed hour fires exactly once.
+async function checkEntertainmentAlertsAndNotify(env) {
+  const now = nyNow();
+  const today = now.iso.slice(0, 10);
+
+  if (now.weekdayName === 'FRI' && now.hour === 12 && now.minute < 15) {
+    const saturday = addDaysToDateStr(today, 1);
+    const entry = ENTERTAINMENT_LINEUP.find(e => e.date === saturday);
+    if (entry && !entry.noEntertainment) {
+      const flagKey = 'ent_alert_' + saturday + '_fri';
+      if (!(await env.ORDERS.get(flagKey))) {
+        await sendPushToAll(env, {
+          title: 'This Saturday Night 🎉',
+          body: entry.emoji + ' ' + entry.title + (entry.time ? ' at ' + entry.time : ''),
+          url: '/entertainment.html',
+        });
+        await env.ORDERS.put(flagKey, '1');
+      }
+    }
+  }
+
+  if (now.weekdayName === 'SAT' && now.hour === 22 && now.minute < 15) {
+    const entry = ENTERTAINMENT_LINEUP.find(e => e.date === today);
+    if (entry && !entry.noEntertainment) {
+      const flagKey = 'ent_alert_' + today + '_sat';
+      if (!(await env.ORDERS.get(flagKey))) {
+        await sendPushToAll(env, {
+          title: 'Tonight! 🌟',
+          body: entry.title + (entry.time ? ' starts at ' + entry.time : ''),
+          url: '/entertainment.html',
+        });
+        await env.ORDERS.put(flagKey, '1');
+      }
+    }
+  }
+}
+
 async function runScheduledTick(env) {
   await seedDefaultsIfEmpty(env);
   await seedPoolChangeoversIfMissing(env);
   await checkNewVideoAndNotify(env);
+  await checkEntertainmentAlertsAndNotify(env);
   const now = nyNow();
   const scheds = await listSchedules(env);
 
@@ -1490,6 +1539,23 @@ async function listContactSubmits(env, limit) {
     list.keys.map(k => env.ORDERS.get(k.name).then(v => JSON.parse(v)))
   );
 }
+
+// ── Saturday Night Entertainment ────────────────────────────────────────────
+
+const ENTERTAINMENT_LINEUP = [
+  { date: '2026-06-27', emoji: '🌟', title: 'Opening Weekend' },
+  { date: '2026-07-04', emoji: '🧠', title: 'Mentalist David Levitan', time: '11:00 PM',
+    link: 'https://davidlevitan.com/', linkLabel: 'Visit website' },
+  { date: '2026-07-11', emoji: '🎶', title: 'Melave Malka' },
+  { date: '2026-07-18', emoji: '🕯️', title: '9 Days', noEntertainment: true, note: 'No entertainment this week' },
+  { date: '2026-07-25', emoji: '🎸', title: 'Nachamu with Eli Levin', time: '11:00 PM',
+    link: 'https://www.instagram.com/elilevinmusic/', linkLabel: 'Follow on Instagram' },
+  { date: '2026-08-01', emoji: '🎨', title: 'Resin Art with Lisa', time: '11:00 PM',
+    link: 'https://www.instagram.com/resinartbylisa', linkLabel: 'Follow on Instagram' },
+  { date: '2026-08-08', emoji: '🎤', title: 'Dovi Neuberger', time: '11:00 PM',
+    link: 'https://www.instagram.com/dovineuburger/', linkLabel: 'Follow on Instagram' },
+  { date: '2026-08-15', emoji: '🎲', title: 'GTA Game Night', time: '11:00 PM' },
+];
 
 // ── YouTube channel feed ────────────────────────────────────────────────────
 
