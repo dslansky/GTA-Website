@@ -163,51 +163,81 @@
 
     .gz-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+      gap: 16px;
     }
     .gz-card {
       background: white;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
-      padding: 14px 16px;
+      padding: 0;
+      overflow: hidden;
       cursor: pointer;
       transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
       display: flex;
       flex-direction: column;
-      gap: 6px;
       font-family: var(--font);
       text-align: left;
       color: inherit;
     }
     .gz-card:hover {
       border-color: var(--color-green);
-      box-shadow: 0 4px 14px rgba(58, 125, 50, 0.12);
-      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(58, 125, 50, 0.16);
+      transform: translateY(-3px);
     }
     .gz-card.active {
       border-color: var(--color-green);
-      background: var(--color-green-muted);
-      box-shadow: 0 4px 14px rgba(58, 125, 50, 0.15);
+      box-shadow: 0 10px 24px rgba(58, 125, 50, 0.2);
     }
+    .gz-card-cover {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      background: linear-gradient(160deg, var(--color-green-muted), var(--color-surface));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .gz-card-cover img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+    .gz-card-cover-icon { font-size: 1.7rem; opacity: 0.3; position: relative; z-index: 0; }
+    .gz-card-body {
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .gz-card.active .gz-card-body { background: var(--color-green-muted); }
     .gz-card-date {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--color-green);
     }
     .gz-card-title {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--color-dark);
-      line-height: 1.35;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .gz-card.active .gz-card-title { color: var(--color-green); }
     .gz-card-parsha {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       color: var(--color-secondary);
-      line-height: 1.4;
+      line-height: 1.3;
     }
 
     .gz-empty {
@@ -384,9 +414,15 @@
             '<div class="gz-grid">' +
               byYear[y].map(function (iss) {
                 return '<button type="button" class="gz-card" data-id="' + esc(iss.id) + '" aria-label="View ' + esc(iss.title) + '">' +
-                  '<span class="gz-card-date">' + esc(formatDate(iss.issueDate, { month: 'short', day: 'numeric' })) + '</span>' +
-                  '<span class="gz-card-title">' + esc(iss.title || ('Issue · ' + formatDate(iss.issueDate))) + '</span>' +
-                  (iss.parsha ? '<span class="gz-card-parsha">' + esc(iss.parsha) + '</span>' : '') +
+                  '<span class="gz-card-cover">' +
+                    '<span class="gz-card-cover-icon">📰</span>' +
+                    '<img src="/gazette/' + esc(iss.id) + '/thumb" alt="" loading="lazy" onerror="this.remove()" />' +
+                  '</span>' +
+                  '<span class="gz-card-body">' +
+                    '<span class="gz-card-date">' + esc(formatDate(iss.issueDate, { month: 'short', day: 'numeric' })) + '</span>' +
+                    '<span class="gz-card-title">' + esc(iss.title || ('Issue · ' + formatDate(iss.issueDate))) + '</span>' +
+                    (iss.parsha ? '<span class="gz-card-parsha">' + esc(iss.parsha) + '</span>' : '') +
+                  '</span>' +
                 '</button>';
               }).join('') +
             '</div>' +

@@ -1,7 +1,6 @@
 // ── Constants ──────────────────────────────────────────────────────────────
 const VAPID_PUBLIC_KEY = 'BPLFfznOz6Q8kgyWywVN6Jcjb7zt71ZCUjVmi8mmu_EliFXhL3HtGKl2y5yYa-oBl37UNSivtr0Wloxju-kzubk';
 const VAPID_CONTACT = 'mailto:dslansky@gmail.com';
-const ADMIN_KEY = 'lobos2026';
 
 export default {
   async fetch(request, env) {
@@ -15,6 +14,12 @@ export default {
     }
     if (url.pathname === '/gallery-data') {
       return handleGalleryData(env);
+    }
+    if (url.pathname === '/admin/login') {
+      return handleAdminLogin(request, env, url);
+    }
+    if (url.pathname === '/admin/logout') {
+      return handleAdminLogout();
     }
     if (url.pathname === '/admin') {
       return handleAdmin(request, env, url);
@@ -43,6 +48,10 @@ export default {
     const gazPdfMatch = url.pathname.match(/^\/gazette\/([^/]+)\/pdf$/);
     if (gazPdfMatch) {
       return handleGazettePdf(env, gazPdfMatch[1]);
+    }
+    const gazThumbMatch = url.pathname.match(/^\/gazette\/([^/]+)\/thumb$/);
+    if (gazThumbMatch) {
+      return handleGazetteThumb(env, gazThumbMatch[1]);
     }
     if (url.pathname === '/youtube-videos') {
       return handleYoutubeVideos(env);
@@ -99,6 +108,165 @@ function esc(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// ── Admin auth (username/password + signed session cookie) ─────────────────
+// Credentials live only in Worker secrets (ADMIN_USERNAME, ADMIN_PASSWORD_HASH,
+// SESSION_SECRET) — never in source, unlike the old query-string ADMIN_KEY.
+
+const SESSION_COOKIE = 'gta_admin_session';
+const SESSION_TTL_SECONDS = 60 * 60 * 24 * 14; // 14 days
+
+function b64urlEncode(bytes) {
+  let str = '';
+  for (const b of bytes) str += String.fromCharCode(b);
+  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function b64urlDecode(str) {
+  str = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (str.length % 4) str += '=';
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+async function hmacKey(secret) {
+  return crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+}
+
+async function signSession(exp, secret) {
+  const key = await hmacKey(secret);
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(String(exp)));
+  return exp + '.' + b64urlEncode(new Uint8Array(sig));
+}
+
+async function verifySessionToken(token, secret) {
+  if (!token || !secret) return false;
+  const parts = token.split('.');
+  if (parts.length !== 2) return false;
+  const exp = parseInt(parts[0], 10);
+  if (!exp || Math.floor(Date.now() / 1000) > exp) return false;
+  let sig;
+  try { sig = b64urlDecode(parts[1]); } catch { return false; }
+  const key = await hmacKey(secret);
+  return crypto.subtle.verify('HMAC', key, sig, new TextEncoder().encode(parts[0]));
+}
+
+function getCookie(request, name) {
+  const header = request.headers.get('Cookie') || '';
+  const match = header.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function isAuthed(request, env) {
+  return verifySessionToken(getCookie(request, SESSION_COOKIE), env.SESSION_SECRET);
+}
+
+async function pbkdf2Hash(password, saltBytes, iterations) {
+  const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: saltBytes, iterations, hash: 'SHA-256' }, keyMaterial, 256);
+  return new Uint8Array(bits);
+}
+
+async function verifyPassword(password, stored) {
+  // stored format: "<iterations>:<saltB64url>:<hashB64url>"
+  const parts = (stored || '').split(':');
+  if (parts.length !== 3) return false;
+  const iterations = parseInt(parts[0], 10);
+  let salt, expected;
+  try {
+    salt = b64urlDecode(parts[1]);
+    expected = b64urlDecode(parts[2]);
+  } catch { return false; }
+  const got = await pbkdf2Hash(password, salt, iterations);
+  if (got.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < got.length; i++) diff |= got[i] ^ expected[i];
+  return diff === 0;
+}
+
+function safeNext(n) {
+  if (typeof n !== 'string' || !n.startsWith('/') || n.startsWith('//')) return '/admin';
+  return n;
+}
+
+function loginRedirect(url) {
+  return new Response(null, { status: 302, headers: { Location: '/admin/login?next=' + encodeURIComponent(safeNext(url.pathname + url.search)) } });
+}
+
+function sessionCookieHeader(value, maxAgeSeconds) {
+  return SESSION_COOKIE + '=' + encodeURIComponent(value) + '; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=' + maxAgeSeconds;
+}
+
+function renderLoginPage(next, err) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Login — Greentree Acres</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f7;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
+  form{background:white;padding:32px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.08);width:100%;max-width:340px;box-sizing:border-box;}
+  h1{font-size:1.2rem;margin:0 0 20px;color:#1d1d1f;}
+  label{display:block;font-size:0.85rem;color:#6e6e73;margin:14px 0 6px;}
+  input{width:100%;padding:10px 12px;border:1px solid #d2d2d7;border-radius:8px;font-size:1rem;box-sizing:border-box;}
+  button{width:100%;margin-top:20px;padding:12px;background:#3a7d32;color:white;border:none;border-radius:8px;font-size:1rem;cursor:pointer;}
+  .err{color:#d33;font-size:0.85rem;margin-top:14px;text-align:center;}
+</style></head><body>
+<form method="POST" action="/admin/login">
+  <h1>Greentree Acres Admin</h1>
+  <input type="hidden" name="next" value="${esc(next)}" />
+  <label>Username</label>
+  <input name="username" type="text" autocomplete="username" required autofocus />
+  <label>Password</label>
+  <input name="password" type="password" autocomplete="current-password" required />
+  <button type="submit">Sign In</button>
+  ${err ? `<p class="err">${esc(err)}</p>` : ''}
+</form>
+</body></html>`;
+}
+
+async function handleAdminLogin(request, env, url) {
+  if (request.method === 'GET') {
+    return new Response(renderLoginPage(safeNext(url.searchParams.get('next') || '/admin'), url.searchParams.get('err')), {
+      headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+    });
+  }
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const fd = await request.formData();
+  const username = (fd.get('username') || '').toString();
+  const password = (fd.get('password') || '').toString();
+  const next = safeNext((fd.get('next') || '').toString());
+
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const rlKey = 'admin_login_fail_' + ip;
+  const failCount = parseInt((await env.ORDERS.get(rlKey)) || '0', 10);
+  if (failCount >= 8) {
+    return new Response(renderLoginPage(next, 'Too many attempts — try again in a few minutes.'), { status: 429, headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
+  }
+
+  const userOk = username && env.ADMIN_USERNAME && username === env.ADMIN_USERNAME;
+  const passOk = userOk && await verifyPassword(password, env.ADMIN_PASSWORD_HASH || '');
+
+  if (!userOk || !passOk) {
+    await env.ORDERS.put(rlKey, String(failCount + 1), { expirationTtl: 600 });
+    return new Response(renderLoginPage(next, 'Incorrect username or password.'), { status: 401, headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
+  }
+
+  await env.ORDERS.delete(rlKey);
+  const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
+  const token = await signSession(exp, env.SESSION_SECRET);
+  return new Response(null, {
+    status: 302,
+    headers: { Location: next, 'Set-Cookie': sessionCookieHeader(token, SESSION_TTL_SECONDS) },
+  });
+}
+
+function handleAdminLogout() {
+  return new Response(null, {
+    status: 302,
+    headers: { Location: '/admin/login', 'Set-Cookie': SESSION_COOKIE + '=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0' },
+  });
+}
+
 // ── Orders ─────────────────────────────────────────────────────────────────
 
 async function handleOrder(request, env, url) {
@@ -132,8 +300,7 @@ async function handleOrder(request, env, url) {
   }
 
   if (request.method === 'GET') {
-    const key = url.searchParams.get('key');
-    if (key !== ADMIN_KEY) {
+    if (!(await isAuthed(request, env))) {
       return new Response('Unauthorized', { status: 401 });
     }
 
@@ -256,8 +423,7 @@ async function handleGalleryData(env) {
 // ── Admin ───────────────────────────────────────────────────────────────────
 
 async function handleAdmin(request, env, url) {
-  const key = url.searchParams.get('key');
-  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (!(await isAuthed(request, env))) return loginRedirect(url);
 
   const list = await env.ORDERS.list({ prefix: 'mem_' });
   let memories = [];
@@ -322,7 +488,7 @@ async function handleAdmin(request, env, url) {
           <small style="color:#999;">${new Date(m.timestamp).toLocaleDateString()}</small>
         </div>
         <p style="font-size:0.875rem;color:#444;margin-bottom:10px;line-height:1.5;">${esc(m.caption)}</p>
-        <form method="POST" action="/admin/action?key=${key}" style="display:inline-flex;gap:8px;flex-wrap:wrap;">
+        <form method="POST" action="/admin/action" style="display:inline-flex;gap:8px;flex-wrap:wrap;">
           <input type="hidden" name="id" value="${m.id}" />
           ${m.status !== 'approved' ? `<button name="action" value="approve" style="padding:6px 14px;background:#3a7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">Approve</button>` : ''}
           ${m.status !== 'rejected' ? `<button name="action" value="reject" style="padding:6px 14px;background:#e53e3e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">Reject</button>` : ''}
@@ -360,18 +526,18 @@ async function handleAdmin(request, env, url) {
         <div class="sched-row-body">${esc(s.body)}</div>
       </div>
       <div class="sched-row-actions">
-        <a href="/admin?key=${key}&edit=${encodeURIComponent(s.id)}#notifications" class="btn-mini">Edit</a>
-        <form method="POST" action="/admin/schedule?key=${key}" style="display:inline;">
+        <a href="/admin?edit=${encodeURIComponent(s.id)}#notifications" class="btn-mini">Edit</a>
+        <form method="POST" action="/admin/schedule" style="display:inline;">
           <input type="hidden" name="action" value="toggle" />
           <input type="hidden" name="id" value="${esc(s.id)}" />
           <button class="btn-mini">${s.enabled ? 'Disable' : 'Enable'}</button>
         </form>
-        <form method="POST" action="/admin/schedule?key=${key}" style="display:inline;" onsubmit="return confirm('Send this now to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
+        <form method="POST" action="/admin/schedule" style="display:inline;" onsubmit="return confirm('Send this now to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
           <input type="hidden" name="action" value="fire" />
           <input type="hidden" name="id" value="${esc(s.id)}" />
           <button class="btn-mini btn-fire">Fire now</button>
         </form>
-        <form method="POST" action="/admin/schedule?key=${key}" style="display:inline;" onsubmit="return confirm('Delete schedule?')">
+        <form method="POST" action="/admin/schedule" style="display:inline;" onsubmit="return confirm('Delete schedule?')">
           <input type="hidden" name="action" value="delete" />
           <input type="hidden" name="id" value="${esc(s.id)}" />
           <button class="btn-mini btn-del">Delete</button>
@@ -483,7 +649,7 @@ async function handleAdmin(request, env, url) {
   <header class="admin-header">
     <div class="admin-header-inner">
       <h1>GTA Admin</h1>
-      <p class="subtitle">Orders export: <a href="/order?key=${key}">CSV</a></p>
+      <p class="subtitle">Orders export: <a href="/order">CSV</a> · <a href="/admin/logout">Log out</a></p>
       <nav class="tab-nav" role="tablist">
         <button data-tab="notifications" role="tab">🔔 Notifications</button>
         <button data-tab="gazette" role="tab">📰 Gazette <span class="pill">${gazettes.length}</span></button>
@@ -499,7 +665,7 @@ async function handleAdmin(request, env, url) {
       <h2>Send Notification Now</h2>
       <div class="panel">
         <p class="count" style="margin-bottom:14px;">${liveLabel}</p>
-        <form method="POST" action="/admin/notify?key=${key}" onsubmit="return confirm('Send to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
+        <form method="POST" action="/admin/notify" onsubmit="return confirm('Send to ${subCount} subscriber${subCount === 1 ? '' : 's'}?')">
           <label for="ntitle">Title</label>
           <input id="ntitle" name="title" type="text" required maxlength="80" placeholder="e.g. Pool closed today" />
           <label for="nbody">Message</label>
@@ -520,7 +686,7 @@ async function handleAdmin(request, env, url) {
       <a id="sched-form"></a>
       <h2>${editing ? 'Edit Schedule' : 'Add New Schedule'}</h2>
       <div class="panel">
-        <form method="POST" action="/admin/schedule?key=${key}">
+        <form method="POST" action="/admin/schedule">
           <input type="hidden" name="action" value="save" />
           <input type="hidden" name="id" value="${esc(formId)}" />
 
@@ -564,7 +730,7 @@ async function handleAdmin(request, env, url) {
 
           <div style="margin-top:14px;display:flex;gap:8px;">
             <button type="submit">${editing ? 'Save Changes' : 'Add Schedule'}</button>
-            ${editing ? `<a href="/admin?key=${key}#notifications" class="btn-mini" style="padding:10px 18px;">Cancel</a>` : ''}
+            ${editing ? `<a href="/admin#notifications" class="btn-mini" style="padding:10px 18px;">Cancel</a>` : ''}
           </div>
           <p style="margin-top:10px;font-size:0.75rem;color:#999;">Cron tick runs every 15 min. Schedule fires within 15 min of selected time.</p>
         </form>
@@ -575,7 +741,7 @@ async function handleAdmin(request, env, url) {
     <section class="tab-panel" data-panel="gazette" role="tabpanel">
       <h2>Upload New Issue</h2>
       <div class="panel">
-        <form method="POST" action="/admin/gazette?key=${key}" enctype="multipart/form-data">
+        <form method="POST" action="/admin/gazette" enctype="multipart/form-data" id="gazetteUploadForm">
           <input type="hidden" name="action" value="upload" />
           <label>Title (optional, auto-generated from parsha if blank)</label>
           <input name="title" type="text" maxlength="120" placeholder="e.g. GTA Gazette — Welcome Back Edition" />
@@ -584,8 +750,9 @@ async function handleAdmin(request, env, url) {
           <label>Issue Date</label>
           <input name="issueDate" type="date" required value="${new Date().toISOString().slice(0,10)}" />
           <label>PDF File</label>
-          <input name="pdf" type="file" accept="application/pdf,.pdf" required />
-          <button type="submit">Upload Issue</button>
+          <input name="pdf" type="file" accept="application/pdf,.pdf" required id="gazettePdfInput" />
+          <button type="submit" id="gazetteSubmitBtn">Upload Issue</button>
+          <p id="gazetteThumbStatus" style="margin-top:8px;font-size:0.8rem;color:#999;"></p>
         </form>
       </div>
 
@@ -601,7 +768,7 @@ async function handleAdmin(request, env, url) {
             </div>
             <div class="sched-row-actions">
               <a href="/gazette/${esc(g.id)}/pdf" target="_blank" rel="noopener" class="btn-mini">View PDF</a>
-              <form method="POST" action="/admin/gazette?key=${key}" style="display:inline;" onsubmit="return confirm('Delete this issue?')">
+              <form method="POST" action="/admin/gazette" style="display:inline;" onsubmit="return confirm('Delete this issue?')">
                 <input type="hidden" name="action" value="delete" />
                 <input type="hidden" name="id" value="${esc(g.id)}" />
                 <button class="btn-mini btn-del">Delete</button>
@@ -714,6 +881,76 @@ async function handleAdmin(request, env, url) {
       ${editing ? "setTimeout(function () { var el = document.getElementById('sched-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);" : ''}
     })();
   </script>
+
+  <!-- Gazette cover thumbnail: rendered client-side from page 1 of the PDF -->
+  <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script>
+    (function () {
+      var form = document.getElementById('gazetteUploadForm');
+      var pdfInput = document.getElementById('gazettePdfInput');
+      var submitBtn = document.getElementById('gazetteSubmitBtn');
+      var statusEl = document.getElementById('gazetteThumbStatus');
+      if (!form) return;
+
+      if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      }
+
+      function renderThumbnail(file) {
+        if (typeof pdfjsLib === 'undefined') return Promise.reject(new Error('pdf.js unavailable'));
+        return file.arrayBuffer().then(function (buf) {
+          return pdfjsLib.getDocument({ data: buf }).promise;
+        }).then(function (pdf) {
+          return pdf.getPage(1);
+        }).then(function (page) {
+          var targetWidth = 500;
+          var baseViewport = page.getViewport({ scale: 1 });
+          var scale = targetWidth / baseViewport.width;
+          var viewport = page.getViewport({ scale: scale });
+          var canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          var ctx = canvas.getContext('2d');
+          return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
+            return new Promise(function (resolve) {
+              canvas.toBlob(function (blob) { resolve(blob); }, 'image/jpeg', 0.78);
+            });
+          });
+        });
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var file = pdfInput.files[0];
+        submitBtn.disabled = true;
+
+        function submitForm(thumbBlob) {
+          statusEl.textContent = 'Uploading…';
+          var fd = new FormData(form);
+          if (thumbBlob) fd.append('thumbnail', thumbBlob, 'thumb.jpg');
+          fetch('/admin/gazette', { method: 'POST', body: fd }).then(function (res) {
+            if (!res.ok) {
+              return res.text().then(function (t) {
+                throw new Error(t || ('Upload failed (' + res.status + ')'));
+              });
+            }
+            window.location.href = '/admin#gazette';
+          }).catch(function (err) {
+            statusEl.textContent = err.message || 'Upload failed — please try again.';
+            submitBtn.disabled = false;
+          });
+        }
+
+        if (!file) { submitForm(null); return; }
+
+        statusEl.textContent = 'Generating cover thumbnail…';
+        renderThumbnail(file).then(submitForm).catch(function () {
+          statusEl.textContent = 'Could not generate a cover — uploading anyway…';
+          submitForm(null);
+        });
+      });
+    })();
+  </script>
 </body>
 </html>`;
 
@@ -723,8 +960,7 @@ async function handleAdmin(request, env, url) {
 }
 
 async function handleAdminAction(request, env, url) {
-  const key = url.searchParams.get('key');
-  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
 
   let formData;
   try {
@@ -760,8 +996,7 @@ async function handleAdminAction(request, env, url) {
 }
 
 async function handleAdminNotify(request, env, url) {
-  const key = url.searchParams.get('key');
-  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
   const fd = await request.formData();
@@ -773,14 +1008,13 @@ async function handleAdminNotify(request, env, url) {
   const result = await sendPushToAll(env, { title, body, url: link });
 
   return new Response(
-    `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="2;url=/admin?key=${key}"><style>body{font-family:-apple-system,sans-serif;max-width:520px;margin:48px auto;padding:24px;text-align:center;background:#f5f5f7}h1{color:#3a7d32}p{color:#6e6e73}</style></head><body><h1>Sent</h1><p>Delivered ${result.sent} / ${result.total}. ${result.failed ? result.failed + ' failed.' : ''}</p><p><a href="/admin?key=${key}">Back to admin</a></p></body></html>`,
+    `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="2;url=/admin"><style>body{font-family:-apple-system,sans-serif;max-width:520px;margin:48px auto;padding:24px;text-align:center;background:#f5f5f7}h1{color:#3a7d32}p{color:#6e6e73}</style></head><body><h1>Sent</h1><p>Delivered ${result.sent} / ${result.total}. ${result.failed ? result.failed + ' failed.' : ''}</p><p><a href="/admin">Back to admin</a></p></body></html>`,
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   );
 }
 
 async function handleAdminSchedule(request, env, url) {
-  const key = url.searchParams.get('key');
-  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
   const fd = await request.formData();
@@ -877,8 +1111,7 @@ async function handleAdminSchedule(request, env, url) {
 const MAX_GAZETTE_BYTES = 80 * 1024 * 1024;
 
 async function handleAdminGazette(request, env, url) {
-  const key = url.searchParams.get('key');
-  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
   const fd = await request.formData();
@@ -888,6 +1121,7 @@ async function handleAdminGazette(request, env, url) {
     const id = fd.get('id');
     if (id) {
       await env.MEMORIES.delete('gazette/' + id + '.pdf');
+      await env.MEMORIES.delete('gazette/' + id + '.jpg');
       await env.ORDERS.delete('gazette_' + id);
     }
     return new Response(null, { status: 302, headers: { Location: '/admin?key=' + key + '#gazette' } });
@@ -898,6 +1132,7 @@ async function handleAdminGazette(request, env, url) {
   const parsha = (fd.get('parsha') || '').trim();
   const issue  = (fd.get('issueDate') || '').trim(); // YYYY-MM-DD
   const file   = fd.get('pdf');
+  const thumb  = fd.get('thumbnail');
 
   if (!file || typeof file === 'string' || file.size === 0) {
     return new Response('PDF file required', { status: 400 });
@@ -918,6 +1153,15 @@ async function handleAdminGazette(request, env, url) {
   await env.MEMORIES.put('gazette/' + id + '.pdf', buf, {
     httpMetadata: { contentType: 'application/pdf', contentDisposition: 'inline; filename="' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_') + '"' },
   });
+
+  // Cover thumbnail is rendered client-side (page 1 of the PDF, via pdf.js) and
+  // submitted alongside the file — best effort, the archive falls back to a
+  // plain card if it's missing so a render failure never blocks the upload.
+  if (thumb && typeof thumb !== 'string' && thumb.size > 0) {
+    await env.MEMORIES.put('gazette/' + id + '.jpg', await thumb.arrayBuffer(), {
+      httpMetadata: { contentType: 'image/jpeg' },
+    });
+  }
 
   await env.ORDERS.put('gazette_' + id, JSON.stringify({
     id,
@@ -942,6 +1186,17 @@ async function handleGazettePdf(env, id) {
       'Content-Type': 'application/pdf',
       'Cache-Control': 'public, max-age=86400',
       'Content-Disposition': obj.httpMetadata?.contentDisposition || 'inline',
+    },
+  });
+}
+
+async function handleGazetteThumb(env, id) {
+  const obj = await env.MEMORIES.get('gazette/' + id + '.jpg');
+  if (!obj) return new Response('Not found', { status: 404 });
+  return new Response(obj.body, {
+    headers: {
+      'Content-Type': 'image/jpeg',
+      'Cache-Control': 'public, max-age=31536000, immutable',
     },
   });
 }
@@ -975,8 +1230,7 @@ function endpointToKey(endpoint) {
 }
 
 async function handleAdminPushVerify(request, env, url) {
-  const key = url.searchParams.get('key');
-  if (key !== ADMIN_KEY) return new Response('Unauthorized', { status: 401 });
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
   const result = await sendPushToAll(env, {
     title: '✅ Notifications working',
@@ -984,7 +1238,7 @@ async function handleAdminPushVerify(request, env, url) {
     url: '/local.html',
   });
   return new Response(
-    `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="3;url=/admin?key=${key}"><style>body{font-family:-apple-system,sans-serif;max-width:520px;margin:48px auto;padding:24px;text-align:center;background:#f5f5f7}h1{color:#3a7d32}p{color:#6e6e73}strong{color:#1d1d1f}</style></head><body><h1>Verified</h1><p><strong>${result.sent} live</strong> subscriber${result.sent === 1 ? '' : 's'} pinged.</p><p>Removed <strong>${result.failed} dead</strong> subscription${result.failed === 1 ? '' : 's'}.</p><p>Accurate count: <strong>${result.sent}</strong></p><p><a href="/admin?key=${key}">Back to admin</a></p></body></html>`,
+    `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="3;url=/admin"><style>body{font-family:-apple-system,sans-serif;max-width:520px;margin:48px auto;padding:24px;text-align:center;background:#f5f5f7}h1{color:#3a7d32}p{color:#6e6e73}strong{color:#1d1d1f}</style></head><body><h1>Verified</h1><p><strong>${result.sent} live</strong> subscriber${result.sent === 1 ? '' : 's'} pinged.</p><p>Removed <strong>${result.failed} dead</strong> subscription${result.failed === 1 ? '' : 's'}.</p><p>Accurate count: <strong>${result.sent}</strong></p><p><a href="/admin">Back to admin</a></p></body></html>`,
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   );
 }

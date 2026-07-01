@@ -1,6 +1,10 @@
 .git
 .wrangler
 .claude
+worker.js
+wrangler.toml
+business listings/
+business listings.zip
 *.HEIC
 *.MP4
 img/IMG_*.jpg
