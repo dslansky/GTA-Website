@@ -1318,8 +1318,10 @@ async function handleUpdates(request, env, url) {
     return json({ success: false, error: 'Invalid form data' }, 400);
   }
 
-  const text  = (formData.get('text') || '').toString().trim();
-  const media = formData.get('media');
+  // iOS Shortcuts auto-capitalizes the first letter of a Form field's key
+  // when you type it in — accept both casings rather than fight that.
+  const text  = (formData.get('text') || formData.get('Text') || '').toString().trim();
+  const media = formData.get('media') || formData.get('Media');
   const hasMedia = media && typeof media !== 'string' && media.size > 0;
 
   if (!text && !hasMedia) {
