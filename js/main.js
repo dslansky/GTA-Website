@@ -32,15 +32,10 @@ document.querySelectorAll('.nav-links a').forEach(link => {
   link.addEventListener('click', () => nav.classList.remove('nav-open'));
 });
 
-// ── Nav dropdown tap-toggle (mobile; desktop uses hover/focus-within) ──
-document.querySelectorAll('.nav-dropdown-toggle').forEach(toggle => {
-  toggle.addEventListener('click', (e) => {
-    e.preventDefault();
-    const dropdown = toggle.closest('.nav-dropdown');
-    const wasOpen = dropdown.classList.contains('open');
-    document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
-    if (!wasOpen) dropdown.classList.add('open');
-  });
+document.addEventListener('click', (e) => {
+  if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
+    nav.classList.remove('nav-open');
+  }
 });
 
 // ── Scroll reveal ──

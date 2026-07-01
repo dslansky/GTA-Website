@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v29-2026-06-30';
+const CACHE_VERSION = 'gta-v30-2026-06-30';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 
@@ -16,6 +16,7 @@ const SHELL_URLS = [
   '/js/main.js',
   '/js/weather.js',
   '/js/pool.js',
+  '/js/zmanim-widget.js',
   '/js/sullivan_directory_FULL.json',
   '/img/logo.png',
   '/img/icons/icon-192.png',
