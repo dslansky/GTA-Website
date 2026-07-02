@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Country Vues — Greentree Acres</title>
-  <meta name="description" content="The latest issue of Country Vues, the Catskills' weekly community magazine. Auto-updates every week." />
+  <title>Magazines — Greentree Acres</title>
+  <meta name="description" content="Country Vues and Viderkol — the latest issue of each, updated weekly." />
 
   <!-- Open Graph / social preview (WhatsApp, Facebook, iMessage, etc.) -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Greentree Acres" />
-  <meta property="og:title" content="Country Vues — Greentree Acres" />
-  <meta property="og:description" content="The latest issue of Country Vues, the Catskills' weekly community magazine. Auto-updates every week." />
+  <meta property="og:title" content="Magazines — Greentree Acres" />
+  <meta property="og:description" content="Country Vues and Viderkol — the latest issue of each, updated weekly." />
   <meta property="og:url" content="https://greentreebungalows.com/vues.html" />
   <meta property="og:image" content="https://greentreebungalows.com/img/hero.jpg" />
   <meta property="og:image:width" content="1920" />
   <meta property="og:image:height" content="1440" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Country Vues — Greentree Acres" />
-  <meta name="twitter:description" content="The latest issue of Country Vues, the Catskills' weekly community magazine. Auto-updates every week." />
+  <meta name="twitter:title" content="Magazines — Greentree Acres" />
+  <meta name="twitter:description" content="Country Vues and Viderkol — the latest issue of each, updated weekly." />
   <meta name="twitter:image" content="https://greentreebungalows.com/img/hero.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,33 +35,83 @@
   <meta name="apple-mobile-web-app-title" content="Greentree" />
 
   <style>
-    .vues-actions {
+    .mag-tabs {
       display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .mag-tab-btn {
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--color-border);
+      background: white;
+      color: var(--color-dark);
+      transition: border-color var(--transition), color var(--transition), background var(--transition);
+    }
+    .mag-tab-btn:hover { border-color: var(--color-green); color: var(--color-green); }
+    .mag-tab-btn.active { background: var(--color-green); color: white; border-color: var(--color-green); }
+
+    .mag-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      margin: 24px 0 16px;
+      margin-bottom: 16px;
     }
-    .vues-wrap {
+    .mag-meta { font-size: 0.82rem; color: var(--color-secondary); }
+    .mag-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mag-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--color-border);
+      background: white;
+      color: var(--color-dark);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .mag-btn:hover { border-color: var(--color-green); color: var(--color-green); }
+
+    .mag-wrap {
       border: 1px solid var(--color-border);
       border-radius: var(--radius);
       overflow: hidden;
       background: var(--color-surface);
     }
-    .vues-wrap iframe {
+    .mag-wrap iframe {
       display: block;
       width: 100%;
       height: min(90vh, 1000px);
       border: 0;
+      background: #525659;
     }
     @media (max-width: 700px) {
-      .vues-wrap iframe { height: 80vh; }
+      .mag-wrap iframe { height: 80vh; }
     }
-    .vues-fallback {
+    .mag-fallback {
       padding: 10px 16px;
       text-align: center;
       font-size: 0.8rem;
       color: var(--color-secondary);
       background: var(--color-surface);
+    }
+    .mag-empty {
+      padding: 60px 16px;
+      text-align: center;
+      color: var(--color-secondary);
+      font-size: 0.95rem;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
     }
   </style>
 </head>
@@ -85,7 +135,7 @@
         <li><a href="zmanim.html">Zmanim</a></li>
         <li><a href="local.html">Local Info</a></li>
         <li><a href="gazette.html">Gazette</a></li>
-        <li><a href="vues.html">Country Vues</a></li>
+        <li><a href="vues.html">Magazines</a></li>
         <li><a href="shop.html">Shop</a></li>
         <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
       </ul>
@@ -104,31 +154,40 @@
   <section class="page-header">
     <div class="container page-header-content">
       <p class="eyebrow">Catskills · Weekly</p>
-      <h1>Country Vues</h1>
-      <p>The latest issue of Country Vues, the Catskills' weekly community magazine. Updates automatically each week.</p>
+      <h1>Magazines</h1>
+      <p>Country Vues and Viderkol — the latest issue of each, updated weekly.</p>
     </div>
   </section>
 
   <!-- ══════════════════════════════════════
-       FLIPBOOK
+       MAGAZINES
   ══════════════════════════════════════ -->
-  <section class="section" id="vues">
+  <section class="section" id="magazines">
     <div class="container">
-      <div class="vues-actions reveal">
-        <a href="https://view.flipdocs.com/?PID=1000204" target="_blank" rel="noopener noreferrer" class="btn-open">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Open in new tab
-        </a>
+      <div class="mag-tabs reveal" id="mag-tabs">
+        <button type="button" class="mag-tab-btn" data-slug="vues">Country Vues</button>
+        <button type="button" class="mag-tab-btn" data-slug="viderkol">Viderkol</button>
       </div>
 
-      <div class="vues-wrap reveal reveal-delay-1">
-        <iframe
-          src="https://view.flipdocs.com/?PID=1000204"
-          loading="lazy"
-          title="Country Vues — current issue"
-        ></iframe>
-        <p class="vues-fallback">Not loading? <a href="https://view.flipdocs.com/?PID=1000204" target="_blank" rel="noopener noreferrer">Open Country Vues in a new tab</a>.</p>
+      <div class="mag-actions reveal reveal-delay-1">
+        <p class="mag-meta" id="mag-meta">Loading…</p>
+        <div class="mag-btns" id="mag-btns" style="display:none;">
+          <a id="mag-download" href="#" download class="mag-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>
+          <a id="mag-open" href="#" target="_blank" rel="noopener noreferrer" class="mag-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open in new tab
+          </a>
+        </div>
       </div>
+
+      <div class="mag-wrap reveal reveal-delay-1" id="mag-wrap">
+        <iframe id="mag-embed" loading="lazy" title="Magazine PDF"></iframe>
+        <p class="mag-fallback">Not loading? Use <strong>Open in new tab</strong> above.</p>
+      </div>
+      <div class="mag-empty" id="mag-empty" style="display:none;"></div>
     </div>
   </section>
 
@@ -153,5 +212,65 @@
   <script src="js/main.js"></script>
   <script src="js/weather.js" defer></script>
   <script src="js/pool.js" defer></script>
+  <script>
+    (function () {
+      var TITLES = { vues: 'Country Vues', viderkol: 'Viderkol' };
+      var state = { magazines: {}, active: 'vues' };
+
+      function formatDate(iso) {
+        if (!iso) return '';
+        return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      }
+
+      function render() {
+        document.querySelectorAll('.mag-tab-btn').forEach(function (b) {
+          b.classList.toggle('active', b.dataset.slug === state.active);
+        });
+
+        var m = state.magazines[state.active] || {};
+        var pdfUrl = '/magazine/' + state.active + '/pdf';
+        var metaEl = document.getElementById('mag-meta');
+        var btnsEl = document.getElementById('mag-btns');
+        var wrapEl = document.getElementById('mag-wrap');
+        var emptyEl = document.getElementById('mag-empty');
+
+        if (!m.filename) {
+          metaEl.textContent = TITLES[state.active] + ' — no issue uploaded yet';
+          btnsEl.style.display = 'none';
+          wrapEl.style.display = 'none';
+          emptyEl.style.display = 'block';
+          emptyEl.textContent = 'No ' + TITLES[state.active] + ' issue uploaded yet. Check back soon.';
+          return;
+        }
+
+        metaEl.textContent = TITLES[state.active] + ' — updated ' + formatDate(m.uploadedAt);
+        btnsEl.style.display = '';
+        wrapEl.style.display = '';
+        emptyEl.style.display = 'none';
+        document.getElementById('mag-download').href = pdfUrl;
+        document.getElementById('mag-open').href = pdfUrl;
+        document.getElementById('mag-embed').src = pdfUrl;
+      }
+
+      document.getElementById('mag-tabs').addEventListener('click', function (e) {
+        var btn = e.target.closest('.mag-tab-btn');
+        if (!btn) return;
+        state.active = btn.dataset.slug;
+        render();
+      });
+
+      render();
+
+      fetch('/magazines-data')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          (data.magazines || []).forEach(function (m) { state.magazines[m.slug] = m; });
+          render();
+        })
+        .catch(function () {
+          document.getElementById('mag-meta').textContent = 'Could not load magazines.';
+        });
+    })();
+  </script>
 </body>
 </html>

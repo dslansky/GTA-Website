@@ -45,6 +45,16 @@ export default {
     if (url.pathname === '/admin/gazette') {
       return handleAdminGazette(request, env, url);
     }
+    if (url.pathname === '/admin/magazines') {
+      return handleAdminMagazines(request, env, url);
+    }
+    if (url.pathname === '/magazines-data') {
+      return handleMagazinesData(env);
+    }
+    const magPdfMatch = url.pathname.match(/^\/magazine\/([^/]+)\/pdf$/);
+    if (magPdfMatch) {
+      return handleMagazinePdf(env, magPdfMatch[1]);
+    }
     if (url.pathname === '/admin/push/verify') {
       return handleAdminPushVerify(request, env, url);
     }
@@ -314,7 +324,7 @@ async function handleOrder(request, env, url) {
     }
 
     const list = await env.ORDERS.list();
-    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_') && !k.name.startsWith('sched_') && !k.name.startsWith('gazette_') && !k.name.startsWith('cv_') && !k.name.startsWith('cs_') && !k.name.startsWith('youtube_') && !k.name.startsWith('push_meta'));
+    const orderKeys = list.keys.filter(k => !k.name.startsWith('mem_') && !k.name.startsWith('push_sub_') && !k.name.startsWith('sched_') && !k.name.startsWith('gazette_') && !k.name.startsWith('magazine_') && !k.name.startsWith('update_') && !k.name.startsWith('cv_') && !k.name.startsWith('cs_') && !k.name.startsWith('youtube_') && !k.name.startsWith('push_meta'));
     if (!orderKeys.length) {
       return csv('id,timestamp,name,email,items,total\n');
     }
@@ -478,6 +488,7 @@ async function handleAdmin(request, env, url) {
   const editing = editId ? schedules.find(s => s.id === editId) : null;
 
   const gazettes = await listGazettes(env);
+  const magazines = await listMagazines(env);
   const updates = await listUpdates(env);
 
   const contactViews = await listContactViews(env, 50);
@@ -689,6 +700,7 @@ async function handleAdmin(request, env, url) {
       <nav class="tab-nav" role="tablist">
         <button data-tab="notifications" role="tab">🔔 Notifications</button>
         <button data-tab="gazette" role="tab">📰 Gazette <span class="pill">${gazettes.length}</span></button>
+        <button data-tab="magazines" role="tab">📚 Magazines</button>
         <button data-tab="memories" role="tab">💭 Memories${pending.length ? ` <span class="pill">${pending.length}</span>` : ''}</button>
         <button data-tab="updates" role="tab">📣 Updates <span class="pill">${updates.length}</span></button>
         <button data-tab="analytics" role="tab">📊 Analytics</button>
@@ -816,6 +828,38 @@ async function handleAdmin(request, env, url) {
       </div>
     </section>
 
+    <!-- ── MAGAZINES ── -->
+    <section class="tab-panel" data-panel="magazines" role="tabpanel">
+      <h2>Country Vues &amp; Viderkol</h2>
+      <p style="font-size:0.85rem;color:#6e6e73;margin:-6px 0 16px;">Each upload replaces the current issue — no archive, matching how the old auto-updating embeds worked. Upload the new PDF here each week.</p>
+      ${Object.keys(MAGAZINES).map(slug => {
+        const m = magazines.find(x => x.slug === slug) || {};
+        return `<div class="panel" style="margin-bottom:16px;">
+          <div class="sched-row" style="border:none;padding:0 0 14px;">
+            <div class="sched-row-main">
+              <div class="sched-row-top"><strong>${esc(MAGAZINES[slug].title)}</strong></div>
+              <div class="sched-row-meta">${m.filename ? esc(m.filename) + ' · uploaded ' + new Date(m.uploadedAt).toLocaleDateString() : 'No issue uploaded yet'}</div>
+            </div>
+            <div class="sched-row-actions">
+              ${m.filename ? `<a href="/magazine/${esc(slug)}/pdf" target="_blank" rel="noopener" class="btn-mini">View PDF</a>
+              <form method="POST" action="/admin/magazines" style="display:inline;" onsubmit="return confirm('Remove the current ${esc(MAGAZINES[slug].title)} issue?')">
+                <input type="hidden" name="slug" value="${esc(slug)}" />
+                <input type="hidden" name="action" value="delete" />
+                <button class="btn-mini btn-del">Remove</button>
+              </form>` : ''}
+            </div>
+          </div>
+          <form method="POST" action="/admin/magazines" enctype="multipart/form-data">
+            <input type="hidden" name="slug" value="${esc(slug)}" />
+            <input type="hidden" name="action" value="upload" />
+            <label>${m.filename ? 'Replace with new issue' : 'Upload PDF'}</label>
+            <input name="pdf" type="file" accept="application/pdf,.pdf" required />
+            <button type="submit">${m.filename ? 'Replace Issue' : 'Upload Issue'}</button>
+          </form>
+        </div>`;
+      }).join('')}
+    </section>
+
     <!-- ── MEMORIES ── -->
     <section class="tab-panel" data-panel="memories" role="tabpanel">
       <h2>Pending (${pending.length})</h2>
@@ -897,7 +941,7 @@ async function handleAdmin(request, env, url) {
     }
 
     (function () {
-      var TABS = ['notifications', 'gazette', 'memories', 'updates', 'analytics'];
+      var TABS = ['notifications', 'gazette', 'magazines', 'memories', 'updates', 'analytics'];
       var DEFAULT_TAB = 'notifications';
       var initial = (location.hash || '').replace('#', '').split('-')[0];
       if (TABS.indexOf(initial) === -1) initial = DEFAULT_TAB;
@@ -1262,6 +1306,86 @@ async function listGazettes(env) {
   );
   all.sort((a, b) => (b.issueDate || '').localeCompare(a.issueDate || ''));
   return all;
+}
+
+// ── Magazines (Country Vues, Viderkol — self-hosted PDFs) ────────────────────
+// Unlike the Gazette, no archive: each slug holds exactly one "current issue"
+// PDF that the admin replaces weekly, matching how the old flipdocs/FlippingBook
+// embeds always just showed whatever was most recently published.
+
+const MAGAZINES = {
+  vues: { title: 'Country Vues' },
+  viderkol: { title: 'Viderkol' },
+};
+
+async function handleAdminMagazines(request, env, url) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const fd = await request.formData();
+  const slug = (fd.get('slug') || '').trim();
+  if (!MAGAZINES[slug]) return new Response('Unknown magazine', { status: 400 });
+
+  const action = fd.get('action') || 'upload';
+
+  if (action === 'delete') {
+    await env.MEMORIES.delete('magazine/' + slug + '.pdf');
+    await env.ORDERS.delete('magazine_' + slug);
+    return new Response(null, { status: 302, headers: { Location: '/admin#magazines' } });
+  }
+
+  const file = fd.get('pdf');
+  if (!file || typeof file === 'string' || file.size === 0) {
+    return new Response('PDF file required', { status: 400 });
+  }
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+    return new Response('Must be a PDF', { status: 400 });
+  }
+  if (file.size > MAX_GAZETTE_BYTES) {
+    return new Response('PDF must be under 80MB', { status: 400 });
+  }
+
+  const buf = await file.arrayBuffer();
+  await env.MEMORIES.put('magazine/' + slug + '.pdf', buf, {
+    httpMetadata: {
+      contentType: 'application/pdf',
+      contentDisposition: 'inline; filename="' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_') + '"',
+    },
+  });
+
+  await env.ORDERS.put('magazine_' + slug, JSON.stringify({
+    slug,
+    filename: file.name,
+    uploadedAt: new Date().toISOString(),
+  }));
+
+  return new Response(null, { status: 302, headers: { Location: '/admin#magazines' } });
+}
+
+async function handleMagazinePdf(env, slug) {
+  if (!MAGAZINES[slug]) return new Response('Not found', { status: 404 });
+  const obj = await env.MEMORIES.get('magazine/' + slug + '.pdf');
+  if (!obj) return new Response('Not found', { status: 404 });
+  return new Response(obj.body, {
+    headers: {
+      'Content-Type': 'application/pdf',
+      // Short-lived — this URL is stable but its content is replaced weekly.
+      'Cache-Control': 'public, max-age=300',
+      'Content-Disposition': obj.httpMetadata?.contentDisposition || 'inline',
+    },
+  });
+}
+
+async function listMagazines(env) {
+  const slugs = Object.keys(MAGAZINES);
+  return Promise.all(slugs.map(async slug => {
+    const raw = await env.ORDERS.get('magazine_' + slug);
+    return raw ? JSON.parse(raw) : { slug, filename: null, uploadedAt: null };
+  }));
+}
+
+async function handleMagazinesData(env) {
+  return json({ magazines: await listMagazines(env) });
 }
 
 // ── Colony Updates (WhatsApp forwards via iOS Shortcut) ─────────────────────
