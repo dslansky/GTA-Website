@@ -1018,8 +1018,14 @@ async function handleAdmin(request, env, url) {
           if (thumbBlob) fd.append('thumbnail', thumbBlob, 'thumb.jpg');
           fetch('/admin/gazette', { method: 'POST', body: fd }).then(function (res) {
             if (!res.ok) {
+              if (res.status === 413) {
+                throw new Error('File too large for upload (limit ~95MB) — try compressing the PDF first.');
+              }
               return res.text().then(function (t) {
-                throw new Error(t || ('Upload failed (' + res.status + ')'));
+                // Non-Worker error pages (e.g. Cloudflare's own 5xx pages) are full HTML
+                // documents — don't dump raw markup into the status line.
+                var isHtml = /^\s*<(!doctype|html)/i.test(t || '');
+                throw new Error((!isHtml && t) || ('Upload failed (' + res.status + ')'));
               });
             }
             // Assigning the same hash the tab JS already set via replaceState is a
@@ -1072,8 +1078,14 @@ async function handleAdmin(request, env, url) {
               // already set this hash via replaceState — force a real reload.
               window.location.hash = 'magazines';
               window.location.reload();
+            } else if (xhr.status === 413) {
+              statusEl.textContent = 'File too large for upload (limit ~95MB) — try compressing the PDF first.';
+              btn.disabled = false;
             } else {
-              statusEl.textContent = xhr.responseText || ('Upload failed (' + xhr.status + ')');
+              // Non-Worker error pages (e.g. Cloudflare's own 5xx pages) are full HTML documents —
+              // don't dump raw markup into the status line.
+              var isHtml = /^\s*<(!doctype|html)/i.test(xhr.responseText || '');
+              statusEl.textContent = (!isHtml && xhr.responseText) || ('Upload failed (' + xhr.status + ')');
               btn.disabled = false;
             }
           };
@@ -1243,7 +1255,10 @@ async function handleAdminSchedule(request, env, url) {
 
 // ── Gazette ─────────────────────────────────────────────────────────────────
 
-const MAX_GAZETTE_BYTES = 80 * 1024 * 1024;
+// Cloudflare's edge rejects request bodies over ~100MB (413, before the Worker
+// even runs) on this plan — stay comfortably under that rather than adding a
+// second, tighter, and confusing ceiling of our own.
+const MAX_GAZETTE_BYTES = 95 * 1024 * 1024;
 
 async function handleAdminGazette(request, env, url) {
   if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
@@ -1276,7 +1291,7 @@ async function handleAdminGazette(request, env, url) {
     return new Response('Must be a PDF', { status: 400 });
   }
   if (file.size > MAX_GAZETTE_BYTES) {
-    return new Response('PDF must be under 30MB', { status: 400 });
+    return new Response('PDF must be under 95MB', { status: 400 });
   }
   if (!issue) {
     return new Response('Issue date required', { status: 400 });
@@ -1390,7 +1405,7 @@ async function handleAdminMagazines(request, env, url) {
     return new Response('Must be a PDF', { status: 400 });
   }
   if (file.size > MAX_GAZETTE_BYTES) {
-    return new Response('PDF must be under 80MB', { status: 400 });
+    return new Response('PDF must be under 95MB', { status: 400 });
   }
 
   const buf = await file.arrayBuffer();
