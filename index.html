@@ -307,6 +307,7 @@
     <button id="lightbox-close" aria-label="Close">✕</button>
     <button id="lightbox-prev" aria-label="Previous photo">&#8592;</button>
     <img id="lightboxImg" src="" alt="" />
+    <video id="lightboxVideo" controls playsinline></video>
     <button id="lightbox-next" aria-label="Next photo">&#8594;</button>
   </div>
 
@@ -518,9 +519,11 @@
       listEl.innerHTML = items.map(u => {
         let media = '';
         if (u.mediaType === 'image') {
-          media = '<div class="update-card-media"><img src="/updates/' + encodeURIComponent(u.id) + '/media" loading="lazy" alt=""></div>';
+          const src = '/updates/' + encodeURIComponent(u.id) + '/media';
+          media = '<div class="update-card-media" data-media-type="image" data-src="' + src + '"><img src="' + src + '" loading="lazy" alt=""></div>';
         } else if (u.mediaType === 'video') {
-          media = '<div class="update-card-media"><video src="/updates/' + encodeURIComponent(u.id) + '/media" controls playsinline preload="metadata"></video></div>';
+          const src = '/updates/' + encodeURIComponent(u.id) + '/media';
+          media = '<div class="update-card-media" data-media-type="video" data-src="' + src + '"><video src="' + src + '" muted playsinline preload="metadata"></video><div class="update-card-play" aria-hidden="true">&#9654;</div></div>';
         }
         const cardClass = 'update-card' + (u.mediaType === 'none' ? ' update-card--none' : '');
         const text = u.text ? '<p class="update-card-text">' + escToday(u.text) + '</p>' : '';
@@ -533,6 +536,11 @@
         '</div>';
       }).join('');
       document.getElementById('updates').style.display = '';
+      listEl.querySelectorAll('.update-card-media[data-src]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          if (window.openMediaLightbox) window.openMediaLightbox(el.dataset.mediaType, el.dataset.src);
+        });
+      });
     }).catch(() => {});
 
     // Contact form submit tracking — mirror to our admin

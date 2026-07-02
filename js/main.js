@@ -88,21 +88,50 @@ document.addEventListener('keydown', e => {
 // ── Lightbox ──
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightboxImg');
+const lightboxVideo = document.getElementById('lightboxVideo');
 const galleryItems = Array.from(document.querySelectorAll('.gallery-item[data-src]'));
 let currentIndex = 0;
 
 function openLightbox(index) {
   if (!galleryItems[index]) return;
   currentIndex = index;
+  lightbox.classList.remove('single-media');
+  lightboxVideo.pause();
+  lightboxVideo.removeAttribute('src');
+  lightboxVideo.style.display = 'none';
+  lightboxImg.style.display = '';
   lightboxImg.src = galleryItems[index].dataset.src;
   lightboxImg.alt = galleryItems[index].dataset.alt || '';
   lightbox.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
+// Opens the lightbox for a single image/video not part of the gallery loop (e.g. Colony Updates).
+function openMediaLightbox(type, src) {
+  lightbox.classList.add('single-media');
+  if (type === 'video') {
+    lightboxImg.style.display = 'none';
+    lightboxVideo.style.display = 'block';
+    lightboxVideo.src = src;
+    lightboxVideo.currentTime = 0;
+    lightboxVideo.play().catch(() => {});
+  } else {
+    lightboxVideo.pause();
+    lightboxVideo.removeAttribute('src');
+    lightboxVideo.style.display = 'none';
+    lightboxImg.style.display = '';
+    lightboxImg.src = src;
+    lightboxImg.alt = '';
+  }
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+window.openMediaLightbox = openMediaLightbox;
+
 function closeLightbox() {
   lightbox.classList.remove('open');
   document.body.style.overflow = '';
+  lightboxVideo.pause();
 }
 
 function prevImage() {
