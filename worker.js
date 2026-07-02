@@ -48,6 +48,18 @@ export default {
     if (url.pathname === '/admin/magazines') {
       return handleAdminMagazines(request, env, url);
     }
+    if (url.pathname === '/admin/magazines/mpu/start') {
+      return handleMagazineMpuStart(request, env);
+    }
+    if (url.pathname === '/admin/magazines/mpu/part') {
+      return handleMagazineMpuPart(request, env, url);
+    }
+    if (url.pathname === '/admin/magazines/mpu/complete') {
+      return handleMagazineMpuComplete(request, env);
+    }
+    if (url.pathname === '/admin/magazines/mpu/abort') {
+      return handleMagazineMpuAbort(request, env);
+    }
     if (url.pathname === '/magazines-data') {
       return handleMagazinesData(env);
     }
@@ -1049,51 +1061,98 @@ async function handleAdmin(request, env, url) {
     })();
   </script>
 
-  <!-- Magazines: XHR upload with real progress — PDFs here can be 20MB+, and a
-       plain form POST gives no feedback for a slow upload, which looks hung. -->
+  <!-- Magazines: chunked multipart upload — magazine issues routinely exceed
+       Cloudflare's ~100MB edge request-size limit (a 413 there happens before
+       the Worker even runs), so the file is sliced client-side into chunks
+       well under that limit and reassembled on R2's side via its multipart
+       upload API. Real per-chunk progress replaces the old plain-POST flow,
+       which gave zero feedback and looked exactly like a hang on a large file. -->
   <script>
     (function () {
+      var CHUNK_SIZE = 8 * 1024 * 1024; // comfortably > R2's 5MB minimum part size, well under any edge request cap
+
+      function xhrRequest(method, url, body, headers, onProgress) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open(method, url);
+          if (headers) Object.keys(headers).forEach(function (k) { xhr.setRequestHeader(k, headers[k]); });
+          if (onProgress) xhr.upload.addEventListener('progress', onProgress);
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(xhr.responseText ? JSON.parse(xhr.responseText) : null);
+              return;
+            }
+            if (xhr.status === 413) {
+              reject(new Error('That chunk was rejected as too large — please try again.'));
+              return;
+            }
+            // Non-Worker error pages (e.g. Cloudflare's own 5xx pages) are full HTML
+            // documents — don't dump raw markup into the status line.
+            var isHtml = /^\s*<(!doctype|html)/i.test(xhr.responseText || '');
+            reject(new Error((!isHtml && xhr.responseText) || ('Request failed (' + xhr.status + ')')));
+          };
+          xhr.onerror = function () { reject(new Error('Upload failed — check your connection and try again.')); };
+          xhr.send(body);
+        });
+      }
+
       document.querySelectorAll('.magazine-upload-form').forEach(function (form) {
         var input = form.querySelector('.magazine-pdf-input');
         var btn = form.querySelector('.magazine-submit-btn');
         var statusEl = form.querySelector('.magazine-upload-status');
+        var slug = form.dataset.slug;
 
         form.addEventListener('submit', function (e) {
           e.preventDefault();
           var file = input.files[0];
           if (!file) return;
           btn.disabled = true;
-          statusEl.textContent = 'Uploading 0%…';
+          statusEl.textContent = 'Starting upload…';
 
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST', '/admin/magazines');
-          xhr.upload.addEventListener('progress', function (ev) {
-            if (!ev.lengthComputable) return;
-            statusEl.textContent = 'Uploading ' + Math.round((ev.loaded / ev.total) * 100) + '%…';
-          });
-          xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 400) {
-              statusEl.textContent = 'Uploaded — refreshing…';
-              // Same-hash href assignment is a no-op (no reload) when the tab JS
-              // already set this hash via replaceState — force a real reload.
-              window.location.hash = 'magazines';
-              window.location.reload();
-            } else if (xhr.status === 413) {
-              statusEl.textContent = 'File too large for upload (limit ~95MB) — try compressing the PDF first.';
-              btn.disabled = false;
-            } else {
-              // Non-Worker error pages (e.g. Cloudflare's own 5xx pages) are full HTML documents —
-              // don't dump raw markup into the status line.
-              var isHtml = /^\s*<(!doctype|html)/i.test(xhr.responseText || '');
-              statusEl.textContent = (!isHtml && xhr.responseText) || ('Upload failed (' + xhr.status + ')');
-              btn.disabled = false;
-            }
-          };
-          xhr.onerror = function () {
-            statusEl.textContent = 'Upload failed — check your connection and try again.';
+          var uploadId = null;
+          var parts = [];
+          var uploadedBytes = 0;
+          var totalParts = Math.ceil(file.size / CHUNK_SIZE);
+
+          function uploadPart(partNumber) {
+            if (partNumber > totalParts) return Promise.resolve();
+            var start = (partNumber - 1) * CHUNK_SIZE;
+            var chunk = file.slice(start, Math.min(start + CHUNK_SIZE, file.size));
+            var qs = '?slug=' + encodeURIComponent(slug) + '&uploadId=' + encodeURIComponent(uploadId) + '&partNumber=' + partNumber;
+            return xhrRequest('POST', '/admin/magazines/mpu/part' + qs, chunk, null, function (ev) {
+              if (!ev.lengthComputable) return;
+              var pct = Math.round(((uploadedBytes + ev.loaded) / file.size) * 100);
+              statusEl.textContent = 'Uploading ' + pct + '% (part ' + partNumber + '/' + totalParts + ')…';
+            }).then(function (res) {
+              uploadedBytes += chunk.size;
+              parts.push({ partNumber: res.partNumber, etag: res.etag });
+              return uploadPart(partNumber + 1);
+            });
+          }
+
+          xhrRequest('POST', '/admin/magazines/mpu/start', JSON.stringify({
+            slug: slug, filename: file.name, fileSize: file.size,
+          }), { 'Content-Type': 'application/json' }).then(function (res) {
+            uploadId = res.uploadId;
+            return uploadPart(1);
+          }).then(function () {
+            statusEl.textContent = 'Finalizing…';
+            return xhrRequest('POST', '/admin/magazines/mpu/complete', JSON.stringify({
+              slug: slug, uploadId: uploadId, parts: parts, filename: file.name,
+            }), { 'Content-Type': 'application/json' });
+          }).then(function () {
+            statusEl.textContent = 'Uploaded — refreshing…';
+            // Same-hash href assignment is a no-op (no reload) when the tab JS
+            // already set this hash via replaceState — force a real reload.
+            window.location.hash = 'magazines';
+            window.location.reload();
+          }).catch(function (err) {
+            statusEl.textContent = err.message || 'Upload failed — please try again.';
             btn.disabled = false;
-          };
-          xhr.send(new FormData(form));
+            if (uploadId) {
+              xhrRequest('POST', '/admin/magazines/mpu/abort', JSON.stringify({ slug: slug, uploadId: uploadId }), { 'Content-Type': 'application/json' }).catch(function () {});
+            }
+          });
         });
       });
     })();
@@ -1375,11 +1434,24 @@ async function listGazettes(env) {
 // Unlike the Gazette, no archive: each slug holds exactly one "current issue"
 // PDF that the admin replaces weekly, matching how the old flipdocs/FlippingBook
 // embeds always just showed whatever was most recently published.
+//
+// Uploads go through R2's multipart upload API (not a single PUT/POST body) —
+// magazine issues routinely exceed Cloudflare's ~100MB edge request-size limit
+// (a 413 there happens before the Worker even runs, so no amount of code here
+// can raise it). The browser slices the file into chunks well under that limit
+// and this Worker relays each chunk to R2 as a part; no S3 API credentials are
+// needed since R2's multipart API is exposed directly on the bucket binding.
 
 const MAGAZINES = {
   vues: { title: 'Country Vues' },
   viderkol: { title: 'Viderkol' },
 };
+
+const MAX_MAGAZINE_BYTES = 500 * 1024 * 1024;
+
+function magazineKey(slug) {
+  return 'magazine/' + slug + '.pdf';
+}
 
 async function handleAdminMagazines(request, env, url) {
   if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
@@ -1389,45 +1461,107 @@ async function handleAdminMagazines(request, env, url) {
   const slug = (fd.get('slug') || '').trim();
   if (!MAGAZINES[slug]) return new Response('Unknown magazine', { status: 400 });
 
-  const action = fd.get('action') || 'upload';
+  const action = fd.get('action') || 'delete';
+  if (action !== 'delete') return new Response('Unsupported action', { status: 400 });
 
-  if (action === 'delete') {
-    await env.MEMORIES.delete('magazine/' + slug + '.pdf');
-    await env.ORDERS.delete('magazine_' + slug);
-    return new Response(null, { status: 302, headers: { Location: '/admin#magazines' } });
-  }
+  await env.MEMORIES.delete(magazineKey(slug));
+  await env.ORDERS.delete('magazine_' + slug);
+  return new Response(null, { status: 302, headers: { Location: '/admin#magazines' } });
+}
 
-  const file = fd.get('pdf');
-  if (!file || typeof file === 'string' || file.size === 0) {
-    return new Response('PDF file required', { status: 400 });
-  }
-  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-    return new Response('Must be a PDF', { status: 400 });
-  }
-  if (file.size > MAX_GAZETTE_BYTES) {
-    return new Response('PDF must be under 95MB', { status: 400 });
-  }
+async function handleMagazineMpuStart(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
-  const buf = await file.arrayBuffer();
-  await env.MEMORIES.put('magazine/' + slug + '.pdf', buf, {
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const slug = (body.slug || '').toString().trim();
+  if (!MAGAZINES[slug]) return new Response('Unknown magazine', { status: 400 });
+  const filename = (body.filename || 'issue.pdf').toString();
+  const fileSize = Number(body.fileSize) || 0;
+
+  if (!filename.toLowerCase().endsWith('.pdf')) return new Response('Must be a PDF', { status: 400 });
+  if (fileSize <= 0) return new Response('Empty file', { status: 400 });
+  if (fileSize > MAX_MAGAZINE_BYTES) return new Response('PDF must be under 500MB', { status: 400 });
+
+  const upload = await env.MEMORIES.createMultipartUpload(magazineKey(slug), {
     httpMetadata: {
       contentType: 'application/pdf',
-      contentDisposition: 'inline; filename="' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_') + '"',
+      contentDisposition: 'inline; filename="' + filename.replace(/[^a-zA-Z0-9._-]/g, '_') + '"',
     },
   });
 
+  return json({ uploadId: upload.uploadId });
+}
+
+async function handleMagazineMpuPart(request, env, url) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const slug = url.searchParams.get('slug') || '';
+  const uploadId = url.searchParams.get('uploadId') || '';
+  const partNumber = parseInt(url.searchParams.get('partNumber') || '0', 10);
+  if (!MAGAZINES[slug] || !uploadId || !partNumber) return new Response('Bad request', { status: 400 });
+
+  const buf = await request.arrayBuffer();
+  if (!buf.byteLength) return new Response('Empty part', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(magazineKey(slug), uploadId);
+  try {
+    const part = await upload.uploadPart(partNumber, buf);
+    return json({ partNumber: part.partNumber, etag: part.etag });
+  } catch (err) {
+    return new Response('Part upload failed: ' + (err && err.message || err), { status: 500 });
+  }
+}
+
+async function handleMagazineMpuComplete(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const slug = (body.slug || '').toString().trim();
+  const uploadId = (body.uploadId || '').toString().trim();
+  const parts = Array.isArray(body.parts) ? body.parts : [];
+  const filename = (body.filename || 'issue.pdf').toString();
+  if (!MAGAZINES[slug] || !uploadId || !parts.length) return new Response('Bad request', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(magazineKey(slug), uploadId);
+  try {
+    await upload.complete(parts.map(p => ({ partNumber: p.partNumber, etag: p.etag })));
+  } catch (err) {
+    return new Response('Could not finalize upload: ' + (err && err.message || err), { status: 500 });
+  }
+
   await env.ORDERS.put('magazine_' + slug, JSON.stringify({
     slug,
-    filename: file.name,
+    filename,
     uploadedAt: new Date().toISOString(),
   }));
 
-  return new Response(null, { status: 302, headers: { Location: '/admin#magazines' } });
+  return json({ success: true });
+}
+
+async function handleMagazineMpuAbort(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const slug = (body.slug || '').toString().trim();
+  const uploadId = (body.uploadId || '').toString().trim();
+  if (!MAGAZINES[slug] || !uploadId) return new Response('Bad request', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(magazineKey(slug), uploadId);
+  try { await upload.abort(); } catch { /* best effort — an already-completed or unknown upload is fine to ignore */ }
+
+  return json({ success: true });
 }
 
 async function handleMagazinePdf(env, slug) {
   if (!MAGAZINES[slug]) return new Response('Not found', { status: 404 });
-  const obj = await env.MEMORIES.get('magazine/' + slug + '.pdf');
+  const obj = await env.MEMORIES.get(magazineKey(slug));
   if (!obj) return new Response('Not found', { status: 404 });
   return new Response(obj.body, {
     headers: {
