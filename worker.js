@@ -6,6 +6,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // vues.html was renamed to magazines.html when Viderkol was added — keep the
+    // old URL alive for anyone who bookmarked/shared it before the rename.
+    if (url.pathname === '/vues.html' || url.pathname === '/vues') {
+      return new Response(null, { status: 301, headers: { Location: '/magazines' + url.search } });
+    }
+
     if (url.pathname === '/order') {
       return handleOrder(request, env, url);
     }
