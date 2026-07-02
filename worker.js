@@ -849,12 +849,13 @@ async function handleAdmin(request, env, url) {
               </form>` : ''}
             </div>
           </div>
-          <form method="POST" action="/admin/magazines" enctype="multipart/form-data">
+          <form method="POST" action="/admin/magazines" enctype="multipart/form-data" class="magazine-upload-form" data-slug="${esc(slug)}">
             <input type="hidden" name="slug" value="${esc(slug)}" />
             <input type="hidden" name="action" value="upload" />
             <label>${m.filename ? 'Replace with new issue' : 'Upload PDF'}</label>
-            <input name="pdf" type="file" accept="application/pdf,.pdf" required />
-            <button type="submit">${m.filename ? 'Replace Issue' : 'Upload Issue'}</button>
+            <input name="pdf" type="file" accept="application/pdf,.pdf" required class="magazine-pdf-input" />
+            <button type="submit" class="magazine-submit-btn">${m.filename ? 'Replace Issue' : 'Upload Issue'}</button>
+            <p class="magazine-upload-status" style="margin-top:8px;font-size:0.8rem;color:#999;"></p>
           </form>
         </div>`;
       }).join('')}
@@ -1021,7 +1022,10 @@ async function handleAdmin(request, env, url) {
                 throw new Error(t || ('Upload failed (' + res.status + ')'));
               });
             }
-            window.location.href = '/admin#gazette';
+            // Assigning the same hash the tab JS already set via replaceState is a
+            // no-op (no reload) — force one so the new issue actually shows up.
+            window.location.hash = 'gazette';
+            window.location.reload();
           }).catch(function (err) {
             statusEl.textContent = err.message || 'Upload failed — please try again.';
             submitBtn.disabled = false;
@@ -1034,6 +1038,50 @@ async function handleAdmin(request, env, url) {
         renderThumbnail(file).then(submitForm).catch(function () {
           statusEl.textContent = 'Could not generate a cover — uploading anyway…';
           submitForm(null);
+        });
+      });
+    })();
+  </script>
+
+  <!-- Magazines: XHR upload with real progress — PDFs here can be 20MB+, and a
+       plain form POST gives no feedback for a slow upload, which looks hung. -->
+  <script>
+    (function () {
+      document.querySelectorAll('.magazine-upload-form').forEach(function (form) {
+        var input = form.querySelector('.magazine-pdf-input');
+        var btn = form.querySelector('.magazine-submit-btn');
+        var statusEl = form.querySelector('.magazine-upload-status');
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var file = input.files[0];
+          if (!file) return;
+          btn.disabled = true;
+          statusEl.textContent = 'Uploading 0%…';
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/admin/magazines');
+          xhr.upload.addEventListener('progress', function (ev) {
+            if (!ev.lengthComputable) return;
+            statusEl.textContent = 'Uploading ' + Math.round((ev.loaded / ev.total) * 100) + '%…';
+          });
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 400) {
+              statusEl.textContent = 'Uploaded — refreshing…';
+              // Same-hash href assignment is a no-op (no reload) when the tab JS
+              // already set this hash via replaceState — force a real reload.
+              window.location.hash = 'magazines';
+              window.location.reload();
+            } else {
+              statusEl.textContent = xhr.responseText || ('Upload failed (' + xhr.status + ')');
+              btn.disabled = false;
+            }
+          };
+          xhr.onerror = function () {
+            statusEl.textContent = 'Upload failed — check your connection and try again.';
+            btn.disabled = false;
+          };
+          xhr.send(new FormData(form));
         });
       });
     })();
