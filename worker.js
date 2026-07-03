@@ -51,6 +51,21 @@ export default {
     if (url.pathname === '/admin/gazette') {
       return handleAdminGazette(request, env, url);
     }
+    if (url.pathname === '/admin/gazette/mpu/start') {
+      return handleGazetteMpuStart(request, env);
+    }
+    if (url.pathname === '/admin/gazette/mpu/part') {
+      return handleGazetteMpuPart(request, env, url);
+    }
+    if (url.pathname === '/admin/gazette/mpu/complete') {
+      return handleGazetteMpuComplete(request, env);
+    }
+    if (url.pathname === '/admin/gazette/mpu/abort') {
+      return handleGazetteMpuAbort(request, env);
+    }
+    if (url.pathname === '/admin/gazette/thumbnail') {
+      return handleGazetteThumbnailUpload(request, env, url);
+    }
     if (url.pathname === '/admin/magazines') {
       return handleAdminMagazines(request, env, url);
     }
@@ -1025,27 +1040,78 @@ async function handleAdmin(request, env, url) {
         });
       }
 
+      var CHUNK_SIZE = 8 * 1024 * 1024; // comfortably > R2's 5MB minimum part size, well under any edge request cap
+
+      function xhrRequest(method, url, body, headers, onProgress) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open(method, url);
+          if (headers) Object.keys(headers).forEach(function (k) { xhr.setRequestHeader(k, headers[k]); });
+          if (onProgress) xhr.upload.addEventListener('progress', onProgress);
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(xhr.responseText ? JSON.parse(xhr.responseText) : null);
+              return;
+            }
+            // Non-Worker error pages (e.g. Cloudflare's own 5xx pages) are full HTML
+            // documents — don't dump raw markup into the status line.
+            var isHtml = /^\s*<(!doctype|html)/i.test(xhr.responseText || '');
+            reject(new Error((!isHtml && xhr.responseText) || ('Request failed (' + xhr.status + ')')));
+          };
+          xhr.onerror = function () { reject(new Error('Upload failed — check your connection and try again.')); };
+          xhr.send(body);
+        });
+      }
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var file = pdfInput.files[0];
+        if (!file) return;
         submitBtn.disabled = true;
 
-        function submitForm(thumbBlob) {
-          statusEl.textContent = 'Uploading…';
-          var fd = new FormData(form);
-          if (thumbBlob) fd.append('thumbnail', thumbBlob, 'thumb.jpg');
-          fetch('/admin/gazette', { method: 'POST', body: fd }).then(function (res) {
-            if (!res.ok) {
-              if (res.status === 413) {
-                throw new Error('File too large for upload (limit ~95MB) — try compressing the PDF first.');
-              }
-              return res.text().then(function (t) {
-                // Non-Worker error pages (e.g. Cloudflare's own 5xx pages) are full HTML
-                // documents — don't dump raw markup into the status line.
-                var isHtml = /^\s*<(!doctype|html)/i.test(t || '');
-                throw new Error((!isHtml && t) || ('Upload failed (' + res.status + ')'));
-              });
-            }
+        var titleVal = form.querySelector('[name="title"]').value.trim();
+        var parshaVal = form.querySelector('[name="parsha"]').value.trim();
+        var issueVal = form.querySelector('[name="issueDate"]').value;
+
+        function uploadPdf(thumbBlob) {
+          var uploadId = null, id = null, parts = [], uploadedBytes = 0;
+          var totalParts = Math.ceil(file.size / CHUNK_SIZE);
+
+          function uploadPart(partNumber) {
+            if (partNumber > totalParts) return Promise.resolve();
+            var start = (partNumber - 1) * CHUNK_SIZE;
+            var chunk = file.slice(start, Math.min(start + CHUNK_SIZE, file.size));
+            var qs = '?id=' + encodeURIComponent(id) + '&uploadId=' + encodeURIComponent(uploadId) + '&partNumber=' + partNumber;
+            return xhrRequest('POST', '/admin/gazette/mpu/part' + qs, chunk, null, function (ev) {
+              if (!ev.lengthComputable) return;
+              var pct = Math.round(((uploadedBytes + ev.loaded) / file.size) * 100);
+              statusEl.textContent = 'Uploading ' + pct + '% (part ' + partNumber + '/' + totalParts + ')…';
+            }).then(function (res) {
+              uploadedBytes += chunk.size;
+              parts.push({ partNumber: res.partNumber, etag: res.etag });
+              return uploadPart(partNumber + 1);
+            });
+          }
+
+          statusEl.textContent = 'Starting upload…';
+          return xhrRequest('POST', '/admin/gazette/mpu/start', JSON.stringify({
+            filename: file.name, fileSize: file.size, issueDate: issueVal,
+          }), { 'Content-Type': 'application/json' }).then(function (res) {
+            uploadId = res.uploadId;
+            id = res.id;
+            return uploadPart(1);
+          }).then(function () {
+            statusEl.textContent = 'Finalizing…';
+            return xhrRequest('POST', '/admin/gazette/mpu/complete', JSON.stringify({
+              id: id, uploadId: uploadId, parts: parts, filename: file.name,
+              title: titleVal, parsha: parshaVal, issueDate: issueVal,
+            }), { 'Content-Type': 'application/json' });
+          }).then(function () {
+            if (!thumbBlob) return Promise.resolve();
+            // Best effort — a thumbnail failure should never block the upload itself.
+            return xhrRequest('POST', '/admin/gazette/thumbnail?id=' + encodeURIComponent(id), thumbBlob).catch(function () {});
+          }).then(function () {
+            statusEl.textContent = 'Uploaded — refreshing…';
             // Assigning the same hash the tab JS already set via replaceState is a
             // no-op (no reload) — force one so the new issue actually shows up.
             window.location.hash = 'gazette';
@@ -1053,15 +1119,16 @@ async function handleAdmin(request, env, url) {
           }).catch(function (err) {
             statusEl.textContent = err.message || 'Upload failed — please try again.';
             submitBtn.disabled = false;
+            if (uploadId) {
+              xhrRequest('POST', '/admin/gazette/mpu/abort', JSON.stringify({ id: id, uploadId: uploadId }), { 'Content-Type': 'application/json' }).catch(function () {});
+            }
           });
         }
 
-        if (!file) { submitForm(null); return; }
-
         statusEl.textContent = 'Generating cover thumbnail…';
-        renderThumbnail(file).then(submitForm).catch(function () {
+        renderThumbnail(file).then(uploadPdf).catch(function () {
           statusEl.textContent = 'Could not generate a cover — uploading anyway…';
-          submitForm(null);
+          uploadPdf(null);
         });
       });
     })();
@@ -1319,63 +1386,104 @@ async function handleAdminSchedule(request, env, url) {
 }
 
 // ── Gazette ─────────────────────────────────────────────────────────────────
+// Uploads go through R2's multipart upload API, same as Magazines (see that
+// section for why) — Gazette issues routinely exceed Cloudflare's ~100MB edge
+// request-size limit too (hit with a real 110MB issue), so this is no longer
+// a single request body at all.
 
-// Cloudflare's edge rejects request bodies over ~100MB (413, before the Worker
-// even runs) on this plan — stay comfortably under that rather than adding a
-// second, tighter, and confusing ceiling of our own.
-const MAX_GAZETTE_BYTES = 95 * 1024 * 1024;
+// Sanity ceiling only — R2 multipart supports far more than this. Not a
+// platform limit like the old single-shot cap was.
+const MAX_GAZETTE_BYTES = 500 * 1024 * 1024;
+
+function gazetteKey(id) {
+  return 'gazette/' + id + '.pdf';
+}
 
 async function handleAdminGazette(request, env, url) {
   if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
   const fd = await request.formData();
-  const action = fd.get('action') || 'upload';
+  const action = fd.get('action') || 'delete';
+  if (action !== 'delete') return new Response('Unsupported action', { status: 400 });
 
-  if (action === 'delete') {
-    const id = fd.get('id');
-    if (id) {
-      await env.MEMORIES.delete('gazette/' + id + '.pdf');
-      await env.MEMORIES.delete('gazette/' + id + '.jpg');
-      await env.ORDERS.delete('gazette_' + id);
-    }
-    return new Response(null, { status: 302, headers: { Location: '/admin#gazette' } });
+  const id = fd.get('id');
+  if (id) {
+    await env.MEMORIES.delete(gazetteKey(id));
+    await env.MEMORIES.delete('gazette/' + id + '.jpg');
+    await env.ORDERS.delete('gazette_' + id);
   }
+  return new Response(null, { status: 302, headers: { Location: '/admin#gazette' } });
+}
 
-  // upload
-  const title  = (fd.get('title')  || '').trim();
-  const parsha = (fd.get('parsha') || '').trim();
-  const issue  = (fd.get('issueDate') || '').trim(); // YYYY-MM-DD
-  const file   = fd.get('pdf');
-  const thumb  = fd.get('thumbnail');
+async function handleGazetteMpuStart(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
-  if (!file || typeof file === 'string' || file.size === 0) {
-    return new Response('PDF file required', { status: 400 });
-  }
-  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-    return new Response('Must be a PDF', { status: 400 });
-  }
-  if (file.size > MAX_GAZETTE_BYTES) {
-    return new Response('PDF must be under 95MB', { status: 400 });
-  }
-  if (!issue) {
-    return new Response('Issue date required', { status: 400 });
-  }
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const filename = (body.filename || 'issue.pdf').toString();
+  const fileSize = Number(body.fileSize) || 0;
+  const issue = (body.issueDate || '').toString().trim();
+
+  if (!filename.toLowerCase().endsWith('.pdf')) return new Response('Must be a PDF', { status: 400 });
+  if (fileSize <= 0) return new Response('Empty file', { status: 400 });
+  if (fileSize > MAX_GAZETTE_BYTES) return new Response('PDF must be under 500MB', { status: 400 });
+  if (!issue) return new Response('Issue date required', { status: 400 });
 
   const id = issue.replace(/-/g, '') + '_' + Math.random().toString(36).slice(2, 6);
-  const buf = await file.arrayBuffer();
 
-  await env.MEMORIES.put('gazette/' + id + '.pdf', buf, {
-    httpMetadata: { contentType: 'application/pdf', contentDisposition: 'inline; filename="' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_') + '"' },
+  const upload = await env.MEMORIES.createMultipartUpload(gazetteKey(id), {
+    httpMetadata: {
+      contentType: 'application/pdf',
+      contentDisposition: 'inline; filename="' + filename.replace(/[^a-zA-Z0-9._-]/g, '_') + '"',
+    },
   });
 
-  // Cover thumbnail is rendered client-side (page 1 of the PDF, via pdf.js) and
-  // submitted alongside the file — best effort, the archive falls back to a
-  // plain card if it's missing so a render failure never blocks the upload.
-  if (thumb && typeof thumb !== 'string' && thumb.size > 0) {
-    await env.MEMORIES.put('gazette/' + id + '.jpg', await thumb.arrayBuffer(), {
-      httpMetadata: { contentType: 'image/jpeg' },
-    });
+  return json({ uploadId: upload.uploadId, id });
+}
+
+async function handleGazetteMpuPart(request, env, url) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const id = url.searchParams.get('id') || '';
+  const uploadId = url.searchParams.get('uploadId') || '';
+  const partNumber = parseInt(url.searchParams.get('partNumber') || '0', 10);
+  if (!id || !uploadId || !partNumber) return new Response('Bad request', { status: 400 });
+
+  const buf = await request.arrayBuffer();
+  if (!buf.byteLength) return new Response('Empty part', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(gazetteKey(id), uploadId);
+  try {
+    const part = await upload.uploadPart(partNumber, buf);
+    return json({ partNumber: part.partNumber, etag: part.etag });
+  } catch (err) {
+    return new Response('Part upload failed: ' + (err && err.message || err), { status: 500 });
+  }
+}
+
+async function handleGazetteMpuComplete(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const id = (body.id || '').toString().trim();
+  const uploadId = (body.uploadId || '').toString().trim();
+  const parts = Array.isArray(body.parts) ? body.parts : [];
+  const filename = (body.filename || 'issue.pdf').toString();
+  const title = (body.title || '').toString().trim();
+  const parsha = (body.parsha || '').toString().trim();
+  const issue = (body.issueDate || '').toString().trim();
+  if (!id || !uploadId || !parts.length || !issue) return new Response('Bad request', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(gazetteKey(id), uploadId);
+  try {
+    await upload.complete(parts.map(p => ({ partNumber: p.partNumber, etag: p.etag })));
+  } catch (err) {
+    return new Response('Could not finalize upload: ' + (err && err.message || err), { status: 500 });
   }
 
   await env.ORDERS.put('gazette_' + id, JSON.stringify({
@@ -1383,18 +1491,52 @@ async function handleAdminGazette(request, env, url) {
     title: title || ('GTA Gazette' + (parsha ? ' — ' + parsha : '')),
     parsha,
     issueDate: issue,
-    filename: file.name,
+    filename,
     uploadedAt: new Date().toISOString(),
   }));
 
-  return new Response(null, {
-    status: 302,
-    headers: { Location: '/admin#gazette' },
-  });
+  return json({ success: true, id });
+}
+
+async function handleGazetteMpuAbort(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const id = (body.id || '').toString().trim();
+  const uploadId = (body.uploadId || '').toString().trim();
+  if (!id || !uploadId) return new Response('Bad request', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(gazetteKey(id), uploadId);
+  try { await upload.abort(); } catch { /* best effort — unknown/already-completed upload is fine to ignore */ }
+
+  return json({ success: true });
+}
+
+// Cover thumbnail is rendered client-side (page 1 of the PDF, via pdf.js) and
+// uploaded separately from the (now chunked) PDF itself — it's always small,
+// so a single plain request is fine; best effort, the archive falls back to a
+// plain card if it's missing so a render failure never blocks the upload.
+async function handleGazetteThumbnailUpload(request, env, url) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const id = url.searchParams.get('id') || '';
+  if (!id) return new Response('Bad request', { status: 400 });
+
+  const buf = await request.arrayBuffer();
+  if (buf.byteLength) {
+    await env.MEMORIES.put('gazette/' + id + '.jpg', buf, {
+      httpMetadata: { contentType: 'image/jpeg' },
+    });
+  }
+
+  return json({ success: true });
 }
 
 async function handleGazettePdf(env, id) {
-  const obj = await env.MEMORIES.get('gazette/' + id + '.pdf');
+  const obj = await env.MEMORIES.get(gazetteKey(id));
   if (!obj) return new Response('Not found', { status: 404 });
   return new Response(obj.body, {
     headers: {
