@@ -388,6 +388,16 @@ async function handleOrder(request, env, url) {
 const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/heic', 'image/heif', 'image/webp'];
 const MAX_PHOTO_BYTES = 20 * 1024 * 1024;
 
+// Public visitors submit these, so unlike Gazette/Magazines' admin-authed
+// chunked uploads this needs its own abuse guards: a per-IP rate limit on
+// starting an upload, and a size ceiling generous enough for a real phone
+// video (a 10-minute 4K iPhone clip can run ~2GB) without being unbounded.
+const MAX_MEMORY_VIDEO_BYTES = 2 * 1024 * 1024 * 1024;
+
+function memoryVideoKey(id) {
+  return 'video_' + id;
+}
+
 async function handleMemory(request, env, url) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: CORS });
@@ -404,6 +414,116 @@ async function handleMemory(request, env, url) {
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     });
+  }
+
+  const videoMatch = url.pathname.match(/^\/memory\/([^/]+)\/video$/);
+  if (request.method === 'GET' && videoMatch) {
+    const id = videoMatch[1];
+    const obj = await env.MEMORIES.get(memoryVideoKey(id));
+    if (!obj) return new Response('Not found', { status: 404 });
+    return new Response(obj.body, {
+      headers: {
+        'Content-Type': obj.httpMetadata?.contentType || 'video/mp4',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
+  }
+
+  if (request.method === 'POST' && url.pathname === '/memory/mpu/start') {
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const rlKey = 'mem_video_start_' + ip;
+    const startCount = parseInt((await env.ORDERS.get(rlKey)) || '0', 10);
+    if (startCount >= 8) {
+      return json({ success: false, error: 'Too many video uploads from this connection — try again in an hour.' }, 429);
+    }
+
+    let body;
+    try { body = await request.json(); } catch { return json({ success: false, error: 'Invalid JSON' }, 400); }
+    const filename = (body.filename || 'video.mp4').toString();
+    const fileType = (body.fileType || '').toString();
+    const fileSize = Number(body.fileSize) || 0;
+
+    if (!ALLOWED_VIDEO_TYPES.includes(fileType)) {
+      return json({ success: false, error: 'Unsupported video type — use mp4 or mov.' }, 400);
+    }
+    if (fileSize <= 0) return json({ success: false, error: 'Empty file' }, 400);
+    if (fileSize > MAX_MEMORY_VIDEO_BYTES) {
+      return json({ success: false, error: 'Video must be under 2GB.' }, 400);
+    }
+
+    await env.ORDERS.put(rlKey, String(startCount + 1), { expirationTtl: 3600 });
+
+    const id = Date.now().toString() + Math.random().toString(36).slice(2, 6);
+    const upload = await env.MEMORIES.createMultipartUpload(memoryVideoKey(id), {
+      httpMetadata: { contentType: fileType },
+    });
+
+    return json({ success: true, id, uploadId: upload.uploadId });
+  }
+
+  if (request.method === 'POST' && url.pathname === '/memory/mpu/part') {
+    const id = url.searchParams.get('id') || '';
+    const uploadId = url.searchParams.get('uploadId') || '';
+    const partNumber = parseInt(url.searchParams.get('partNumber') || '0', 10);
+    if (!id || !uploadId || !partNumber) return json({ success: false, error: 'Bad request' }, 400);
+
+    const buf = await request.arrayBuffer();
+    if (!buf.byteLength) return json({ success: false, error: 'Empty part' }, 400);
+
+    const upload = env.MEMORIES.resumeMultipartUpload(memoryVideoKey(id), uploadId);
+    try {
+      const part = await upload.uploadPart(partNumber, buf);
+      return json({ success: true, partNumber: part.partNumber, etag: part.etag });
+    } catch (err) {
+      return json({ success: false, error: 'Part upload failed: ' + (err && err.message || err) }, 500);
+    }
+  }
+
+  if (request.method === 'POST' && url.pathname === '/memory/mpu/complete') {
+    let body;
+    try { body = await request.json(); } catch { return json({ success: false, error: 'Invalid JSON' }, 400); }
+    const id = (body.id || '').toString().trim();
+    const uploadId = (body.uploadId || '').toString().trim();
+    const parts = Array.isArray(body.parts) ? body.parts : [];
+    const name    = (body.name    || '').toString().trim();
+    const era     = (body.era     || '').toString().trim();
+    const caption = (body.caption || '').toString().trim();
+
+    if (!id || !uploadId || !parts.length) return json({ success: false, error: 'Bad request' }, 400);
+    if (!name || !era || !caption) return json({ success: false, error: 'Name, era, and memory are required' }, 400);
+
+    const upload = env.MEMORIES.resumeMultipartUpload(memoryVideoKey(id), uploadId);
+    try {
+      await upload.complete(parts.map(p => ({ partNumber: p.partNumber, etag: p.etag })));
+    } catch (err) {
+      return json({ success: false, error: 'Could not finalize upload: ' + (err && err.message || err) }, 500);
+    }
+
+    await env.ORDERS.put('mem_' + id, JSON.stringify({
+      id,
+      name,
+      era,
+      caption,
+      hasPhoto: false,
+      hasVideo: true,
+      timestamp: new Date().toISOString(),
+      status: 'pending',
+    }));
+
+    return json({ success: true });
+  }
+
+  if (request.method === 'POST' && url.pathname === '/memory/mpu/abort') {
+    let body;
+    try { body = await request.json(); } catch { return json({ success: false, error: 'Invalid JSON' }, 400); }
+    const id = (body.id || '').toString().trim();
+    const uploadId = (body.uploadId || '').toString().trim();
+    if (!id || !uploadId) return json({ success: false, error: 'Bad request' }, 400);
+
+    const upload = env.MEMORIES.resumeMultipartUpload(memoryVideoKey(id), uploadId);
+    try { await upload.abort(); } catch { /* best effort */ }
+
+    return json({ success: true });
   }
 
   if (request.method === 'POST' && url.pathname === '/memory') {
@@ -530,6 +650,8 @@ async function handleAdmin(request, env, url) {
   const renderItem = (m) => {
     const thumb = m.hasPhoto
       ? `<img src="/memory/${m.id}/photo" style="width:110px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;" />`
+      : m.hasVideo
+      ? `<video src="/memory/${m.id}/video" muted style="width:110px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;background:#000;"></video>`
       : `<div style="width:110px;height:80px;background:#e8f2e6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3a7d32;font-size:2.5rem;flex-shrink:0;">&ldquo;</div>`;
     const badge = { pending: '#f59e0b', approved: '#3a7d32', rejected: '#e53e3e' }[m.status] || '#999';
     return `<div style="display:flex;gap:14px;padding:16px;border:1px solid #d2d2d7;border-radius:12px;margin-bottom:10px;background:#fff;">
@@ -1262,6 +1384,7 @@ async function handleAdminAction(request, env, url) {
     const m = JSON.parse(raw);
     await env.ORDERS.delete('mem_' + id);
     if (m.hasPhoto) await env.MEMORIES.delete('photo_' + id);
+    if (m.hasVideo) await env.MEMORIES.delete(memoryVideoKey(id));
   } else {
     const m = JSON.parse(raw);
     m.status = action === 'approve' ? 'approved' : 'rejected';

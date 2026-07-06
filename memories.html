@@ -81,6 +81,29 @@
       object-fit: cover;
       display: block;
     }
+    .memory-card--video .memory-card-media {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #000;
+      cursor: zoom-in;
+    }
+    .memory-card--video .memory-card-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .memory-card-play {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.6rem;
+      background: rgba(0,0,0,0.2);
+    }
     .memory-card--text {
       background: var(--color-green-muted);
       border-color: rgba(58, 125, 50, 0.15);
@@ -697,21 +720,30 @@
       </div>
 
       <div class="form-group">
-        <label>Photo <span class="optional">(optional)</span></label>
+        <label>Photo or Video <span class="optional">(optional)</span></label>
         <div id="file-drop-zone" class="file-drop-zone">
-          <p><strong>Click to upload</strong> or drag and drop<br />JPG, PNG, GIF, HEIC · Max 20MB</p>
+          <p><strong>Click to upload</strong> or drag and drop<br />JPG, PNG, GIF, HEIC (max 20MB) or MP4/MOV video (max 2GB)</p>
         </div>
         <div id="file-preview" class="file-preview">
           <img id="file-preview-img" src="" alt="" />
           <span id="file-preview-name" class="file-preview-name"></span>
           <button id="file-preview-remove" class="file-preview-remove" type="button">Remove</button>
         </div>
-        <input type="file" id="memory-photo-input" accept="image/jpeg,image/png,image/gif,image/heic,image/heif,image/webp" style="display:none;" />
+        <input type="file" id="memory-photo-input" accept="image/jpeg,image/png,image/gif,image/heic,image/heif,image/webp,video/mp4,video/quicktime" style="display:none;" />
       </div>
 
       <button id="memory-submit-btn" class="modal-submit-btn" type="submit">Share Memory</button>
       <p id="memory-form-msg" class="modal-msg"></p>
     </form>
+  </div>
+
+  <!-- Lightbox (video memories open here) -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Media viewer">
+    <button id="lightbox-close" aria-label="Close">✕</button>
+    <button id="lightbox-prev" aria-label="Previous photo">&#8592;</button>
+    <img id="lightboxImg" src="" alt="" />
+    <video id="lightboxVideo" controls playsinline></video>
+    <button id="lightbox-next" aria-label="Next photo">&#8594;</button>
   </div>
 
   <script src="js/main.js"></script>
@@ -799,6 +831,16 @@
             '<div class="memory-card-body">' + badge + caption + name + '</div>' +
             '</div>';
         }
+        if (m.hasVideo) {
+          var src = '/memory/' + esc(m.id) + '/video';
+          return '<div class="memory-card memory-card--video" data-era="' + esc(m.era) + '">' +
+            '<div class="memory-card-media" data-src="' + src + '">' +
+              '<video src="' + src + '" muted playsinline preload="metadata"></video>' +
+              '<div class="memory-card-play" aria-hidden="true">&#9654;</div>' +
+            '</div>' +
+            '<div class="memory-card-body">' + badge + caption + name + '</div>' +
+            '</div>';
+        }
         return '<div class="memory-card memory-card--text" data-era="' + esc(m.era) + '">' +
           '<div class="memory-card-body">' +
             '<div class="memory-quote-mark">&ldquo;</div>' +
@@ -823,6 +865,11 @@
           grid.innerHTML = filtered.map(renderCard).join('');
         }
       }
+
+      document.getElementById('memories-grid').addEventListener('click', function (e) {
+        var el = e.target.closest('.memory-card-media[data-src]');
+        if (el && window.openMediaLightbox) window.openMediaLightbox('video', el.dataset.src);
+      });
 
       // Era filter
       document.querySelectorAll('.era-btn').forEach(function (btn) {
@@ -929,38 +976,136 @@
           return;
         }
 
+        submitBtn.disabled = true;
+
+        function onSuccess() {
+          msgEl.textContent = 'Thank you! Your memory is under review and will appear here soon.';
+          msgEl.className = 'modal-msg success';
+          form.reset();
+          selectedFile = null;
+          filePreview.classList.remove('visible');
+          dropZone.style.display = '';
+        }
+        function onError(err) {
+          msgEl.textContent = (err && err.message) || 'Something went wrong. Please try again.';
+          msgEl.className = 'modal-msg error';
+        }
+        function reset() {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Share Memory';
+        }
+
+        if (selectedFile && selectedFile.type.startsWith('video/')) {
+          submitVideo(name, era, caption, selectedFile).then(onSuccess).catch(onError).finally(reset);
+          return;
+        }
+
         var fd = new FormData();
         fd.append('name',    name);
         fd.append('era',     era);
         fd.append('caption', caption);
         if (selectedFile) fd.append('photo', selectedFile);
 
-        submitBtn.disabled = true;
         submitBtn.textContent = 'Sending…';
-
         fetch('/memory', { method: 'POST', body: fd })
           .then(function (r) { return r.json(); })
           .then(function (data) {
-            if (data.success) {
-              msgEl.textContent = 'Thank you! Your memory is under review and will appear here soon.';
-              msgEl.className = 'modal-msg success';
-              form.reset();
-              selectedFile = null;
-              filePreview.classList.remove('visible');
-              dropZone.style.display = '';
-            } else {
-              throw new Error(data.error || 'Submission failed.');
-            }
+            if (!data.success) throw new Error(data.error || 'Submission failed.');
+            onSuccess();
           })
-          .catch(function (err) {
-            msgEl.textContent = err.message || 'Something went wrong. Please try again.';
-            msgEl.className = 'modal-msg error';
-          })
-          .finally(function () {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Share Memory';
-          });
+          .catch(onError)
+          .finally(reset);
       });
+
+      // ── Chunked video upload — a real phone video can be hundreds of MB to
+      //    a couple GB, well past Cloudflare's ~100MB single-request edge
+      //    limit, so this is sliced into chunks and reassembled via R2's
+      //    multipart upload API (same pattern used for Gazette/Magazines). ──
+
+      var VIDEO_CHUNK_SIZE = 8 * 1024 * 1024;
+
+      function xhrJson(method, url, body, headers) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open(method, url);
+          if (headers) Object.keys(headers).forEach(function (k) { xhr.setRequestHeader(k, headers[k]); });
+          xhr.onload = function () {
+            var data = null;
+            try { data = xhr.responseText ? JSON.parse(xhr.responseText) : null; } catch (e) {}
+            if (xhr.status >= 200 && xhr.status < 300 && data && data.success) {
+              resolve(data);
+            } else {
+              reject(new Error((data && data.error) || ('Upload failed (' + xhr.status + ')')));
+            }
+          };
+          xhr.onerror = function () { reject(new Error('Upload failed — check your connection and try again.')); };
+          xhr.send(body);
+        });
+      }
+
+      function xhrChunk(url, body, onProgress) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', url);
+          xhr.upload.addEventListener('progress', function (ev) {
+            if (ev.lengthComputable) onProgress(ev.loaded);
+          });
+          xhr.onload = function () {
+            var data = null;
+            try { data = xhr.responseText ? JSON.parse(xhr.responseText) : null; } catch (e) {}
+            if (xhr.status >= 200 && xhr.status < 300 && data && data.success) {
+              resolve(data);
+            } else {
+              reject(new Error((data && data.error) || ('Upload failed (' + xhr.status + ')')));
+            }
+          };
+          xhr.onerror = function () { reject(new Error('Upload failed — check your connection and try again.')); };
+          xhr.send(body);
+        });
+      }
+
+      function submitVideo(name, era, caption, file) {
+        var uploadId, id, parts = [], uploadedBytes = 0;
+        var totalParts = Math.ceil(file.size / VIDEO_CHUNK_SIZE);
+
+        function uploadPart(partNumber) {
+          if (partNumber > totalParts) return Promise.resolve();
+          var start = (partNumber - 1) * VIDEO_CHUNK_SIZE;
+          var chunk = file.slice(start, Math.min(start + VIDEO_CHUNK_SIZE, file.size));
+          var qs = '?id=' + encodeURIComponent(id) + '&uploadId=' + encodeURIComponent(uploadId) + '&partNumber=' + partNumber;
+          return xhrChunk('/memory/mpu/part' + qs, chunk, function (loaded) {
+            var pct = Math.round(((uploadedBytes + loaded) / file.size) * 100);
+            msgEl.className = 'modal-msg';
+            msgEl.textContent = 'Uploading video: ' + pct + '% (part ' + partNumber + '/' + totalParts + ')…';
+          }).then(function (res) {
+            uploadedBytes += chunk.size;
+            parts.push({ partNumber: res.partNumber, etag: res.etag });
+            return uploadPart(partNumber + 1);
+          });
+        }
+
+        msgEl.className = 'modal-msg';
+        msgEl.textContent = 'Starting upload…';
+        submitBtn.textContent = 'Uploading…';
+
+        return xhrJson('POST', '/memory/mpu/start', JSON.stringify({
+          filename: file.name, fileType: file.type, fileSize: file.size,
+        }), { 'Content-Type': 'application/json' }).then(function (res) {
+          uploadId = res.uploadId;
+          id = res.id;
+          return uploadPart(1);
+        }).then(function () {
+          msgEl.textContent = 'Finalizing…';
+          return xhrJson('POST', '/memory/mpu/complete', JSON.stringify({
+            id: id, uploadId: uploadId, parts: parts, name: name, era: era, caption: caption,
+          }), { 'Content-Type': 'application/json' });
+        }).catch(function (err) {
+          if (uploadId) {
+            xhrJson('POST', '/memory/mpu/abort', JSON.stringify({ id: id, uploadId: uploadId }), { 'Content-Type': 'application/json' }).catch(function () {});
+          }
+          throw err;
+        });
+      }
 
       // ── Video modal ───────────────────────────────────────────────────────
 
