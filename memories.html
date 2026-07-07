@@ -80,6 +80,7 @@
       aspect-ratio: 4 / 3;
       object-fit: cover;
       display: block;
+      cursor: zoom-in;
     }
     .memory-card--video .memory-card-media {
       position: relative;
@@ -826,8 +827,9 @@
         var name = '<p class="memory-name">— ' + esc(m.name) + '</p>';
 
         if (m.hasPhoto) {
+          var photoSrc = '/memory/' + esc(m.id) + '/photo';
           return '<div class="memory-card memory-card--photo" data-era="' + esc(m.era) + '">' +
-            '<img class="memory-card-img" src="/memory/' + esc(m.id) + '/photo" alt="" loading="lazy" />' +
+            '<img class="memory-card-img" data-src="' + photoSrc + '" src="' + photoSrc + '" alt="" loading="lazy" />' +
             '<div class="memory-card-body">' + badge + caption + name + '</div>' +
             '</div>';
         }
@@ -867,8 +869,13 @@
       }
 
       document.getElementById('memories-grid').addEventListener('click', function (e) {
-        var el = e.target.closest('.memory-card-media[data-src]');
-        if (el && window.openMediaLightbox) window.openMediaLightbox('video', el.dataset.src);
+        var videoEl = e.target.closest('.memory-card-media[data-src]');
+        if (videoEl && window.openMediaLightbox) {
+          window.openMediaLightbox('video', videoEl.dataset.src);
+          return;
+        }
+        var photoEl = e.target.closest('.memory-card-img[data-src]');
+        if (photoEl && window.openMediaLightbox) window.openMediaLightbox('photo', photoEl.dataset.src);
       });
 
       // Era filter
