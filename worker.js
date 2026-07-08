@@ -21,6 +21,15 @@ export default {
     if (url.pathname === '/gallery-data') {
       return handleGalleryData(env);
     }
+    if (url.pathname === '/residents/unlock') {
+      return handleResidentsUnlock(request, env);
+    }
+    if (url.pathname === '/residents-data') {
+      return handleResidentsData(request, env);
+    }
+    if (url.pathname === '/admin/residents') {
+      return handleAdminResidents(request, env, url);
+    }
     if (url.pathname === '/updates' || url.pathname.startsWith('/updates/')) {
       return handleUpdates(request, env, url);
     }
@@ -319,6 +328,55 @@ function handleAdminLogout() {
   });
 }
 
+// ── Resident Directory auth (shared passphrase, not per-user login) ────────
+// A separate, non-interchangeable session cookie from the real admin session:
+// distinct cookie name, a domain-separated HMAC key, and a 3-part token
+// format (vs admin's 2-part) so a copied cookie can never authenticate the
+// other surface, even by accident. `version` (bumped whenever the admin
+// saves a new passphrase) is embedded in the token, so rotating the
+// passphrase instantly re-locks everyone already unlocked.
+
+const RESIDENT_COOKIE = 'gta_resident_session';
+const RESIDENT_SESSION_TTL_SECONDS = 60 * 60 * 24 * 180; // 180 days
+
+async function residentHmacKey(secret) {
+  return hmacKey(secret + '::resident-gate-v1');
+}
+
+async function signResidentToken(exp, version, secret) {
+  const key = await residentHmacKey(secret);
+  const payload = exp + '.' + version;
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload));
+  return payload + '.' + b64urlEncode(new Uint8Array(sig));
+}
+
+async function verifyResidentToken(token, currentVersion, secret) {
+  if (!token || !secret) return false;
+  const parts = token.split('.');
+  if (parts.length !== 3) return false;
+  const [expStr, versionStr, sigB64] = parts;
+  const exp = parseInt(expStr, 10);
+  if (!exp || Math.floor(Date.now() / 1000) > exp) return false;
+  if (parseInt(versionStr, 10) !== currentVersion) return false;
+  let sig;
+  try { sig = b64urlDecode(sigB64); } catch { return false; }
+  const key = await residentHmacKey(secret);
+  return crypto.subtle.verify('HMAC', key, sig, new TextEncoder().encode(expStr + '.' + versionStr));
+}
+
+function residentCookieHeader(value, maxAgeSeconds) {
+  return RESIDENT_COOKIE + '=' + encodeURIComponent(value) + '; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=' + maxAgeSeconds;
+}
+
+async function isResidentAuthed(request, env) {
+  const token = getCookie(request, RESIDENT_COOKIE);
+  if (!token) return false;
+  const gateRaw = await env.ORDERS.get('resident_gate');
+  if (!gateRaw) return false;
+  const gate = JSON.parse(gateRaw);
+  return verifyResidentToken(token, gate.version || 1, env.SESSION_SECRET);
+}
+
 // ── Orders ─────────────────────────────────────────────────────────────────
 
 async function handleOrder(request, env, url) {
@@ -592,6 +650,150 @@ async function handleGalleryData(env) {
   return json({ memories: approved });
 }
 
+// ── Resident Directory data ─────────────────────────────────────────────────
+// Visitors unlock with a single shared passphrase (rotatable by the admin) —
+// no accounts, and nothing for the admin to send per-request. The directory
+// itself is whatever CSV the admin last uploaded, parsed into JSON. Rows are
+// stored as {header: value} objects (not arrays) so both this page and the
+// admin preview can render arbitrary/dynamic columns generically — the real
+// CSV's column names aren't hardcoded anywhere.
+
+// Minimal RFC 4180 subset: quoted fields, embedded commas/newlines inside
+// quotes, "" as an escaped quote. Not attempting exotic dialects.
+function parseCSVRecords(text) {
+  const records = [];
+  let row = [], field = '', inQuotes = false;
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // strip BOM
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else {
+        field += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ',') {
+      row.push(field); field = '';
+    } else if (c === '\r') {
+      // ignore; \n ends the record
+    } else if (c === '\n') {
+      row.push(field); field = '';
+      records.push(row); row = [];
+    } else {
+      field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); records.push(row); }
+  return records.filter(r => !(r.length === 1 && r[0] === ''));
+}
+
+function parseCSV(text) {
+  const records = parseCSVRecords(text);
+  if (!records.length) return { headers: [], rows: [] };
+  const rawHeaders = records[0].map(h => h.trim());
+  // De-dupe accidental repeat column names defensively — object-keyed rows
+  // would otherwise silently drop data for the 2nd+ occurrence.
+  const seen = Object.create(null);
+  const headers = rawHeaders.map(h => {
+    const base = h || 'column';
+    seen[base] = (seen[base] || 0) + 1;
+    return seen[base] > 1 ? base + ' (' + seen[base] + ')' : base;
+  });
+  const rows = records.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, idx) => { obj[h] = (r[idx] !== undefined ? r[idx] : '').trim(); });
+    return obj;
+  });
+  return { headers, rows };
+}
+
+async function handleResidentsUnlock(request, env) {
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const rlKey = 'residents_fail_' + ip;
+  const failCount = parseInt((await env.ORDERS.get(rlKey)) || '0', 10);
+  if (failCount >= 8) {
+    return json({ ok: false, error: 'Too many attempts — try again in a few minutes.' }, 429);
+  }
+
+  let body;
+  try { body = await request.json(); } catch { return json({ ok: false, error: 'Bad request' }, 400); }
+  const attempt = (body.passphrase || '').toString();
+
+  const gateRaw = await env.ORDERS.get('resident_gate');
+  const gate = gateRaw ? JSON.parse(gateRaw) : null;
+  if (!gate || !gate.passphrase) return json({ ok: false, error: 'Directory is not set up yet.' }, 503);
+
+  if (!attempt || attempt !== gate.passphrase) {
+    await env.ORDERS.put(rlKey, String(failCount + 1), { expirationTtl: 600 });
+    return json({ ok: false, error: 'Incorrect passphrase.' }, 401);
+  }
+
+  await env.ORDERS.delete(rlKey);
+  const exp = Math.floor(Date.now() / 1000) + RESIDENT_SESSION_TTL_SECONDS;
+  const token = await signResidentToken(exp, gate.version || 1, env.SESSION_SECRET);
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: { ...CORS, 'Content-Type': 'application/json', 'Set-Cookie': residentCookieHeader(token, RESIDENT_SESSION_TTL_SECONDS) },
+  });
+}
+
+async function handleResidentsData(request, env) {
+  if (!(await isResidentAuthed(request, env))) return json({ ok: false, error: 'locked' }, 401);
+  const raw = await env.ORDERS.get('resident_data');
+  if (!raw) return json({ headers: [], rows: [], rowCount: 0 });
+  return new Response(raw, { headers: { ...CORS, 'Content-Type': 'application/json' } });
+}
+
+async function handleAdminResidents(request, env, url) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const fd = await request.formData();
+  const action = fd.get('action');
+  let errMsg = '';
+
+  if (action === 'save-passphrase') {
+    const newPass = (fd.get('passphrase') || '').toString().trim();
+    if (!newPass) {
+      errMsg = 'Passphrase cannot be blank.';
+    } else {
+      const prevRaw = await env.ORDERS.get('resident_gate');
+      const prev = prevRaw ? JSON.parse(prevRaw) : { version: 0 };
+      const version = (prev.version || 0) + 1;
+      await env.ORDERS.put('resident_gate', JSON.stringify({ passphrase: newPass, version, updatedAt: new Date().toISOString() }));
+    }
+  } else if (action === 'upload-csv') {
+    const file = fd.get('csvFile');
+    const pasted = (fd.get('csvPaste') || '').toString();
+    const csvText = (file && typeof file.size === 'number' && file.size > 0) ? await file.text() : pasted;
+    if (!csvText.trim()) {
+      errMsg = 'Provide a CSV file or paste CSV text.';
+    } else {
+      const parsed = parseCSV(csvText);
+      if (!parsed.headers.length) {
+        errMsg = 'Could not detect any columns in that CSV.';
+      } else {
+        await env.ORDERS.put('resident_data', JSON.stringify({
+          headers: parsed.headers,
+          rows: parsed.rows,
+          rowCount: parsed.rows.length,
+          filename: (file && file.name) || 'pasted',
+          updatedAt: new Date().toISOString(),
+        }));
+      }
+    }
+  }
+
+  const loc = '/admin' + (errMsg ? '?residentserr=' + encodeURIComponent(errMsg) : '') + '#residents';
+  return new Response(null, { status: 302, headers: { Location: loc } });
+}
+
 // ── Admin ───────────────────────────────────────────────────────────────────
 
 async function handleAdmin(request, env, url) {
@@ -646,6 +848,12 @@ async function handleAdmin(request, env, url) {
 
   const contactViews = await listContactViews(env, 50);
   const contactSubmits = await listContactSubmits(env, 50);
+
+  const residentGateRaw = await env.ORDERS.get('resident_gate');
+  const residentGate = residentGateRaw ? JSON.parse(residentGateRaw) : null;
+  const residentDataRaw = await env.ORDERS.get('resident_data');
+  const residentData = residentDataRaw ? JSON.parse(residentDataRaw) : null;
+  const residentsErr = url.searchParams.get('residentserr') || '';
 
   const renderItem = (m) => {
     const thumb = m.hasPhoto
@@ -859,6 +1067,7 @@ async function handleAdmin(request, env, url) {
         <button data-tab="memories" role="tab">💭 Memories${pending.length ? ` <span class="pill">${pending.length}</span>` : ''}</button>
         <button data-tab="updates" role="tab">📣 Updates <span class="pill">${updates.length}</span></button>
         <button data-tab="analytics" role="tab">📊 Analytics</button>
+        <button data-tab="residents" role="tab">🏘️ Residents${residentData ? ` <span class="pill">${residentData.rowCount}</span>` : ''}</button>
       </nav>
     </div>
   </header>
@@ -1087,6 +1296,54 @@ async function handleAdmin(request, env, url) {
         </div>` : '<p class="empty">No contact form views logged yet.</p>'}
       </div>
     </section>
+
+    <!-- ── RESIDENTS ── -->
+    <section class="tab-panel" data-panel="residents" role="tabpanel">
+      ${residentsErr ? `<p style="color:#e53e3e;font-size:0.85rem;margin:-6px 0 16px;">${esc(residentsErr)}</p>` : ''}
+
+      <h2>Shared Passphrase</h2>
+      <div class="panel">
+        <p style="font-size:0.85rem;color:#6e6e73;margin:-6px 0 16px;">Anyone with this passphrase can view the resident directory at /residents — give it out however residents get it (welcome packet, sign at the office, etc.). No accounts, nothing for you to send per-request.</p>
+        <form method="POST" action="/admin/residents" onsubmit="return confirm('Saving a new passphrase immediately signs out everyone currently unlocked. Continue?')">
+          <input type="hidden" name="action" value="save-passphrase" />
+          <label>Passphrase</label>
+          <input name="passphrase" type="text" required maxlength="120" value="${esc(residentGate ? residentGate.passphrase : '')}" placeholder="e.g. greentree2026" />
+          <button type="submit">${residentGate ? 'Save New Passphrase' : 'Set Passphrase'}</button>
+          ${residentGate ? `<p style="margin-top:10px;font-size:0.75rem;color:#999;">Last updated ${new Date(residentGate.updatedAt).toLocaleString()}. Saving a new one logs out everyone currently unlocked.</p>` : ''}
+        </form>
+      </div>
+
+      <h2>Directory Data</h2>
+      <div class="panel">
+        <p style="font-size:0.85rem;color:#6e6e73;margin:-6px 0 16px;">Upload a CSV (first row = column headers) or paste CSV text — either replaces the current directory. Columns are shown exactly as given, so use whatever headers you want residents to see.</p>
+        <form method="POST" action="/admin/residents" enctype="multipart/form-data">
+          <input type="hidden" name="action" value="upload-csv" />
+          <label>CSV File</label>
+          <input name="csvFile" type="file" accept=".csv,text/csv" />
+          <label>...or paste CSV text</label>
+          <textarea name="csvPaste" placeholder="name,bungalow,phone&#10;Jane Doe,12,845-555-0100"></textarea>
+          <button type="submit">Upload Directory</button>
+        </form>
+      </div>
+
+      <h2>Current Data</h2>
+      <div class="panel">
+        ${residentData ? `<p class="count" style="margin-bottom:10px;">${residentData.rowCount} row${residentData.rowCount === 1 ? '' : 's'} · ${esc(residentData.filename)} · updated ${new Date(residentData.updatedAt).toLocaleString()}</p>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+            <thead>
+              <tr style="background:#f5f5f7;text-align:left;">
+                ${residentData.headers.map(h => `<th style="padding:8px;border-bottom:1px solid #d2d2d7;">${esc(h)}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${residentData.rows.slice(0, 5).map(r => `<tr>${residentData.headers.map(h => `<td style="padding:6px 8px;border-bottom:1px solid #eee;">${esc(r[h])}</td>`).join('')}</tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        ${residentData.rowCount > 5 ? `<p style="margin-top:8px;font-size:0.78rem;color:#999;">Showing first 5 of ${residentData.rowCount} rows.</p>` : ''}` : '<p class="empty">No directory data uploaded yet.</p>'}
+      </div>
+    </section>
   </main>
 
   <script>
@@ -1097,7 +1354,7 @@ async function handleAdmin(request, env, url) {
     }
 
     (function () {
-      var TABS = ['notifications', 'gazette', 'magazines', 'memories', 'updates', 'analytics'];
+      var TABS = ['notifications', 'gazette', 'magazines', 'memories', 'updates', 'analytics', 'residents'];
       var DEFAULT_TAB = 'notifications';
       var initial = (location.hash || '').replace('#', '').split('-')[0];
       if (TABS.indexOf(initial) === -1) initial = DEFAULT_TAB;

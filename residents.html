@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Residents — Greentree Acres</title>
+  <meta name="description" content="Resident directory for Greentree Acres — passphrase required." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Open Graph / social preview (WhatsApp, Facebook, iMessage, etc.) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Greentree Acres" />
+  <meta property="og:title" content="Residents — Greentree Acres" />
+  <meta property="og:description" content="Resident directory for Greentree Acres — passphrase required." />
+  <meta property="og:url" content="https://greentreebungalows.com/residents.html" />
+  <meta property="og:image" content="https://greentreebungalows.com/img/hero.jpg" />
+  <meta property="og:image:width" content="1920" />
+  <meta property="og:image:height" content="1440" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Residents — Greentree Acres" />
+  <meta name="twitter:description" content="Resident directory for Greentree Acres — passphrase required." />
+  <meta name="twitter:image" content="https://greentreebungalows.com/img/hero.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#3a7d32" />
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/img/icons/favicon-32.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Greentree" />
+
+  <style>
+    #res-gate {
+      max-width: 420px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    #res-gate form {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    #res-gate input[type="password"] {
+      padding: 14px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: var(--font);
+    }
+    #res-gate button {
+      padding: 14px;
+      background: var(--color-green);
+      color: white;
+      border: none;
+      border-radius: 100px;
+      font-family: var(--font);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    #res-gate button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #res-gate-err {
+      color: #e53e3e;
+      font-size: 0.85rem;
+      min-height: 20px;
+    }
+    #res-content { display: none; }
+    .res-search {
+      width: 100%;
+      max-width: 420px;
+      padding: 12px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 100px;
+      font-size: 0.95rem;
+      font-family: var(--font);
+      margin-bottom: 24px;
+      box-sizing: border-box;
+    }
+    .res-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+    }
+    #res-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    #res-table th {
+      text-align: left;
+      background: var(--color-surface);
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-secondary);
+      white-space: nowrap;
+    }
+    #res-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-dark);
+    }
+    #res-table tr:last-child td { border-bottom: none; }
+    #res-empty { color: var(--color-secondary); font-size: 0.9rem; padding: 24px 0; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       NAV
+  ══════════════════════════════════════ -->
+  <nav id="nav">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img src="img/logo.png" alt="Greentree Acres" class="nav-logo-img" />
+        <span class="nav-logo-text">Greentree Acres</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="entertainment.html">Entertainment</a></li>
+        <li><a href="memories.html">Memories</a></li>
+        <li><a href="ferndale.html">Ferndale History</a></li>
+        <li><a href="zmanim.html">Zmanim</a></li>
+        <li><a href="local.html">Local Info</a></li>
+        <li><a href="residents.html">Residents</a></li>
+        <li><a href="gazette.html">Gazette</a></li>
+        <li><a href="magazines.html">Magazines</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a class="nav-cta" href="index.html#contact">Get in Touch</a></li>
+      </ul>
+
+      <span id="nav-weather"></span>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PAGE HEADER
+  ══════════════════════════════════════ -->
+  <section class="page-header">
+    <div class="container page-header-content">
+      <p class="eyebrow">For Residents</p>
+      <h1>Resident Directory</h1>
+      <p>Enter the passphrase from your welcome packet to look up a fellow resident.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       DIRECTORY
+  ══════════════════════════════════════ -->
+  <section class="section" id="residents">
+    <div class="container">
+
+      <div id="res-gate">
+        <p class="eyebrow">Passphrase Required</p>
+        <h2>This directory is for residents only</h2>
+        <p>Don't have the passphrase? Ask at the office or check your welcome packet.</p>
+        <form id="res-gate-form">
+          <input id="res-pass" type="password" name="passphrase" placeholder="Passphrase" autocomplete="off" required autofocus />
+          <button id="res-gate-submit" type="submit">Unlock Directory</button>
+        </form>
+        <p id="res-gate-err"></p>
+      </div>
+
+      <div id="res-content">
+        <input id="res-search" class="res-search" type="search" placeholder="Search the directory…" aria-label="Search directory" />
+        <div class="res-table-wrap">
+          <table id="res-table">
+            <thead id="res-thead"></thead>
+            <tbody id="res-tbody"></tbody>
+          </table>
+        </div>
+        <p id="res-empty" style="display:none;">No matches.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="img/logo.png" alt="Greentree Acres" class="footer-logo" />
+        <p>&copy; 2026 Greentree Acres. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/weather.js" defer></script>
+  <script src="js/pool.js" defer></script>
+  <script>
+    (function () {
+      var gateEl    = document.getElementById('res-gate');
+      var contentEl = document.getElementById('res-content');
+      var gateForm  = document.getElementById('res-gate-form');
+      var gateErr   = document.getElementById('res-gate-err');
+      var gateBtn   = document.getElementById('res-gate-submit');
+      var searchEl  = document.getElementById('res-search');
+      var theadEl   = document.getElementById('res-thead');
+      var tbodyEl   = document.getElementById('res-tbody');
+      var emptyEl   = document.getElementById('res-empty');
+
+      var state = { headers: [], rows: [], q: '' };
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function renderTable() {
+        theadEl.innerHTML = '<tr>' + state.headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr>';
+
+        var q = state.q.trim().toLowerCase();
+        var rows = !q ? state.rows : state.rows.filter(function (r) {
+          return Object.values(r).some(function (v) { return String(v).toLowerCase().indexOf(q) !== -1; });
+        });
+
+        if (!rows.length) {
+          tbodyEl.innerHTML = '';
+          emptyEl.style.display = '';
+        } else {
+          emptyEl.style.display = 'none';
+          tbodyEl.innerHTML = rows.map(function (r) {
+            return '<tr>' + state.headers.map(function (h) { return '<td>' + esc(r[h]) + '</td>'; }).join('') + '</tr>';
+          }).join('');
+        }
+      }
+
+      function showUnlocked(data) {
+        state.headers = data.headers || [];
+        state.rows = data.rows || [];
+        gateEl.style.display = 'none';
+        contentEl.style.display = '';
+        renderTable();
+      }
+
+      function tryLoad() {
+        return fetch('/residents-data', { credentials: 'same-origin' }).then(function (r) {
+          if (r.status === 401) return null;
+          if (!r.ok) throw new Error('load failed');
+          return r.json();
+        });
+      }
+
+      tryLoad().then(function (data) { if (data) showUnlocked(data); }).catch(function () {
+        gateErr.textContent = 'Could not load the directory — please refresh.';
+      });
+
+      gateForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        gateErr.textContent = '';
+        gateBtn.disabled = true;
+        gateBtn.textContent = 'Checking…';
+
+        fetch('/residents/unlock', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passphrase: document.getElementById('res-pass').value }),
+        }).then(function (r) { return r.json().then(function (j) { return j; }); })
+          .then(function (j) {
+            if (!j.ok) { gateErr.textContent = j.error || 'Incorrect passphrase.'; return; }
+            return tryLoad().then(function (data) { if (data) showUnlocked(data); });
+          })
+          .catch(function () { gateErr.textContent = 'Something went wrong — please try again.'; })
+          .finally(function () {
+            gateBtn.disabled = false;
+            gateBtn.textContent = 'Unlock Directory';
+          });
+      });
+
+      searchEl.addEventListener('input', function (e) {
+        state.q = e.target.value;
+        renderTable();
+      });
+    })();
+  </script>
+</body>
+</html>
