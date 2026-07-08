@@ -30,6 +30,21 @@ export default {
     if (url.pathname === '/admin/residents') {
       return handleAdminResidents(request, env, url);
     }
+    if (url.pathname === '/residents/pdf') {
+      return handleResidentsPdf(request, env);
+    }
+    if (url.pathname === '/admin/residents/mpu/start') {
+      return handleResidentsPdfMpuStart(request, env);
+    }
+    if (url.pathname === '/admin/residents/mpu/part') {
+      return handleResidentsPdfMpuPart(request, env, url);
+    }
+    if (url.pathname === '/admin/residents/mpu/complete') {
+      return handleResidentsPdfMpuComplete(request, env);
+    }
+    if (url.pathname === '/admin/residents/mpu/abort') {
+      return handleResidentsPdfMpuAbort(request, env);
+    }
     if (url.pathname === '/updates' || url.pathname.startsWith('/updates/')) {
       return handleUpdates(request, env, url);
     }
@@ -746,8 +761,10 @@ async function handleResidentsUnlock(request, env) {
 async function handleResidentsData(request, env) {
   if (!(await isResidentAuthed(request, env))) return json({ ok: false, error: 'locked' }, 401);
   const raw = await env.ORDERS.get('resident_data');
-  if (!raw) return json({ headers: [], rows: [], rowCount: 0 });
-  return new Response(raw, { headers: { ...CORS, 'Content-Type': 'application/json' } });
+  const data = raw ? JSON.parse(raw) : { headers: [], rows: [], rowCount: 0 };
+  const pdfRaw = await env.ORDERS.get('resident_pdf');
+  const pdf = pdfRaw ? JSON.parse(pdfRaw) : null;
+  return json({ ...data, hasPdf: !!pdf, pdfFilename: pdf ? pdf.filename : null, pdfUpdatedAt: pdf ? pdf.uploadedAt : null });
 }
 
 async function handleAdminResidents(request, env, url) {
@@ -788,10 +805,120 @@ async function handleAdminResidents(request, env, url) {
         }));
       }
     }
+  } else if (action === 'delete-pdf') {
+    await env.MEMORIES.delete(RESIDENT_PDF_KEY);
+    await env.ORDERS.delete('resident_pdf');
   }
 
   const loc = '/admin' + (errMsg ? '?residentserr=' + encodeURIComponent(errMsg) : '') + '#residents';
   return new Response(null, { status: 302, headers: { Location: loc } });
+}
+
+// ── Resident Directory PDF (chunked R2 multipart — see the Gazette/Magazine
+// section for why: a scanned directory can easily exceed Cloudflare's
+// ~100MB edge request-size limit) ───────────────────────────────────────────
+
+const MAX_RESIDENT_PDF_BYTES = 500 * 1024 * 1024; // sanity ceiling only, R2 multipart supports far more
+const RESIDENT_PDF_KEY = 'resident/directory.pdf';
+
+async function handleResidentsPdf(request, env) {
+  // Either an unlocked resident OR a logged-in admin (so the admin can
+  // preview it from the admin panel without also unlocking the passphrase gate).
+  const ok = (await isResidentAuthed(request, env)) || (await isAuthed(request, env));
+  if (!ok) return new Response('Unauthorized', { status: 401 });
+  const obj = await env.MEMORIES.get(RESIDENT_PDF_KEY);
+  if (!obj) return new Response('Not found', { status: 404 });
+  return new Response(obj.body, {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Cache-Control': 'private, no-store',
+      'Content-Disposition': obj.httpMetadata?.contentDisposition || 'inline',
+    },
+  });
+}
+
+async function handleResidentsPdfMpuStart(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const filename = (body.filename || 'directory.pdf').toString();
+  const fileSize = Number(body.fileSize) || 0;
+
+  if (!filename.toLowerCase().endsWith('.pdf')) return new Response('Must be a PDF', { status: 400 });
+  if (fileSize <= 0) return new Response('Empty file', { status: 400 });
+  if (fileSize > MAX_RESIDENT_PDF_BYTES) return new Response('PDF must be under 500MB', { status: 400 });
+
+  const upload = await env.MEMORIES.createMultipartUpload(RESIDENT_PDF_KEY, {
+    httpMetadata: {
+      contentType: 'application/pdf',
+      contentDisposition: 'inline; filename="' + filename.replace(/[^a-zA-Z0-9._-]/g, '_') + '"',
+    },
+  });
+
+  return json({ uploadId: upload.uploadId });
+}
+
+async function handleResidentsPdfMpuPart(request, env, url) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  const uploadId = url.searchParams.get('uploadId') || '';
+  const partNumber = parseInt(url.searchParams.get('partNumber') || '0', 10);
+  if (!uploadId || !partNumber) return new Response('Bad request', { status: 400 });
+
+  const buf = await request.arrayBuffer();
+  if (!buf.byteLength) return new Response('Empty part', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(RESIDENT_PDF_KEY, uploadId);
+  try {
+    const part = await upload.uploadPart(partNumber, buf);
+    return json({ partNumber: part.partNumber, etag: part.etag });
+  } catch (err) {
+    return new Response('Part upload failed: ' + (err && err.message || err), { status: 500 });
+  }
+}
+
+async function handleResidentsPdfMpuComplete(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const uploadId = (body.uploadId || '').toString().trim();
+  const parts = Array.isArray(body.parts) ? body.parts : [];
+  const filename = (body.filename || 'directory.pdf').toString();
+  if (!uploadId || !parts.length) return new Response('Bad request', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(RESIDENT_PDF_KEY, uploadId);
+  try {
+    await upload.complete(parts.map(p => ({ partNumber: p.partNumber, etag: p.etag })));
+  } catch (err) {
+    return new Response('Could not finalize upload: ' + (err && err.message || err), { status: 500 });
+  }
+
+  await env.ORDERS.put('resident_pdf', JSON.stringify({
+    filename,
+    uploadedAt: new Date().toISOString(),
+  }));
+
+  return json({ success: true });
+}
+
+async function handleResidentsPdfMpuAbort(request, env) {
+  if (!(await isAuthed(request, env))) return new Response('Unauthorized', { status: 401 });
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
+  let body;
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const uploadId = (body.uploadId || '').toString().trim();
+  if (!uploadId) return new Response('Bad request', { status: 400 });
+
+  const upload = env.MEMORIES.resumeMultipartUpload(RESIDENT_PDF_KEY, uploadId);
+  try { await upload.abort(); } catch { /* best effort */ }
+
+  return json({ success: true });
 }
 
 // ── Admin ───────────────────────────────────────────────────────────────────
@@ -853,6 +980,8 @@ async function handleAdmin(request, env, url) {
   const residentGate = residentGateRaw ? JSON.parse(residentGateRaw) : null;
   const residentDataRaw = await env.ORDERS.get('resident_data');
   const residentData = residentDataRaw ? JSON.parse(residentDataRaw) : null;
+  const residentPdfRaw = await env.ORDERS.get('resident_pdf');
+  const residentPdf = residentPdfRaw ? JSON.parse(residentPdfRaw) : null;
   const residentsErr = url.searchParams.get('residentserr') || '';
 
   const renderItem = (m) => {
@@ -1313,9 +1442,25 @@ async function handleAdmin(request, env, url) {
         </form>
       </div>
 
-      <h2>Directory Data</h2>
+      <h2>Directory PDF</h2>
       <div class="panel">
-        <p style="font-size:0.85rem;color:#6e6e73;margin:-6px 0 16px;">Upload a CSV (first row = column headers) or paste CSV text — either replaces the current directory. Columns are shown exactly as given, so use whatever headers you want residents to see.</p>
+        <p style="font-size:0.85rem;color:#6e6e73;margin:-6px 0 16px;">Upload the directory as a PDF — this is what residents see when they unlock the page. Uploading replaces the current PDF.</p>
+        <form id="residentPdfForm">
+          <label>PDF File</label>
+          <input id="residentPdfInput" type="file" accept="application/pdf,.pdf" required />
+          <button type="submit" id="residentPdfSubmitBtn">${residentPdf ? 'Replace PDF' : 'Upload PDF'}</button>
+          <p id="residentPdfStatus" style="margin-top:8px;font-size:0.8rem;color:#999;"></p>
+        </form>
+        ${residentPdf ? `<p class="count" style="margin-top:14px;">${esc(residentPdf.filename)} · uploaded ${new Date(residentPdf.uploadedAt).toLocaleString()} · <a href="/residents/pdf" target="_blank" rel="noopener">View PDF</a></p>
+        <form method="POST" action="/admin/residents" style="margin-top:10px;" onsubmit="return confirm('Remove the current directory PDF?')">
+          <input type="hidden" name="action" value="delete-pdf" />
+          <button class="btn-mini btn-del" type="submit">Remove PDF</button>
+        </form>` : '<p class="empty">No PDF uploaded yet.</p>'}
+      </div>
+
+      <h2>Directory Table Data <span style="font-weight:400;color:#999;">(optional, alternative to the PDF)</span></h2>
+      <div class="panel">
+        <p style="font-size:0.85rem;color:#6e6e73;margin:-6px 0 16px;">Upload a CSV (first row = column headers) or paste CSV text if you'd rather residents get a searchable table instead of (or alongside) the PDF. Columns are shown exactly as given.</p>
         <form method="POST" action="/admin/residents" enctype="multipart/form-data">
           <input type="hidden" name="action" value="upload-csv" />
           <label>CSV File</label>
@@ -1324,11 +1469,7 @@ async function handleAdmin(request, env, url) {
           <textarea name="csvPaste" placeholder="name,bungalow,phone&#10;Jane Doe,12,845-555-0100"></textarea>
           <button type="submit">Upload Directory</button>
         </form>
-      </div>
-
-      <h2>Current Data</h2>
-      <div class="panel">
-        ${residentData ? `<p class="count" style="margin-bottom:10px;">${residentData.rowCount} row${residentData.rowCount === 1 ? '' : 's'} · ${esc(residentData.filename)} · updated ${new Date(residentData.updatedAt).toLocaleString()}</p>
+        ${residentData ? `<p class="count" style="margin-top:14px;margin-bottom:10px;">${residentData.rowCount} row${residentData.rowCount === 1 ? '' : 's'} · ${esc(residentData.filename)} · updated ${new Date(residentData.updatedAt).toLocaleString()}</p>
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
             <thead>
@@ -1341,7 +1482,7 @@ async function handleAdmin(request, env, url) {
             </tbody>
           </table>
         </div>
-        ${residentData.rowCount > 5 ? `<p style="margin-top:8px;font-size:0.78rem;color:#999;">Showing first 5 of ${residentData.rowCount} rows.</p>` : ''}` : '<p class="empty">No directory data uploaded yet.</p>'}
+        ${residentData.rowCount > 5 ? `<p style="margin-top:8px;font-size:0.78rem;color:#999;">Showing first 5 of ${residentData.rowCount} rows.</p>` : ''}` : ''}
       </div>
     </section>
   </main>
@@ -1605,6 +1746,93 @@ async function handleAdmin(request, env, url) {
               xhrRequest('POST', '/admin/magazines/mpu/abort', JSON.stringify({ slug: slug, uploadId: uploadId }), { 'Content-Type': 'application/json' }).catch(function () {});
             }
           });
+        });
+      });
+    })();
+  </script>
+
+  <!-- Resident Directory PDF: same chunked-upload pattern as the Magazine
+       forms above, but a single fixed file (no per-slug loop needed). -->
+  <script>
+    (function () {
+      var form = document.getElementById('residentPdfForm');
+      if (!form) return;
+      var input = document.getElementById('residentPdfInput');
+      var btn = document.getElementById('residentPdfSubmitBtn');
+      var statusEl = document.getElementById('residentPdfStatus');
+      var CHUNK_SIZE = 8 * 1024 * 1024;
+
+      function xhrRequest(method, url, body, headers, onProgress) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open(method, url);
+          if (headers) Object.keys(headers).forEach(function (k) { xhr.setRequestHeader(k, headers[k]); });
+          if (onProgress) xhr.upload.addEventListener('progress', onProgress);
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(xhr.responseText ? JSON.parse(xhr.responseText) : null);
+              return;
+            }
+            if (xhr.status === 413) {
+              reject(new Error('That chunk was rejected as too large — please try again.'));
+              return;
+            }
+            var isHtml = /^\s*<(!doctype|html)/i.test(xhr.responseText || '');
+            reject(new Error((!isHtml && xhr.responseText) || ('Request failed (' + xhr.status + ')')));
+          };
+          xhr.onerror = function () { reject(new Error('Upload failed — check your connection and try again.')); };
+          xhr.send(body);
+        });
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var file = input.files[0];
+        if (!file) return;
+        btn.disabled = true;
+        statusEl.textContent = 'Starting upload…';
+
+        var uploadId = null;
+        var parts = [];
+        var uploadedBytes = 0;
+        var totalParts = Math.ceil(file.size / CHUNK_SIZE);
+
+        function uploadPart(partNumber) {
+          if (partNumber > totalParts) return Promise.resolve();
+          var start = (partNumber - 1) * CHUNK_SIZE;
+          var chunk = file.slice(start, Math.min(start + CHUNK_SIZE, file.size));
+          var qs = '?uploadId=' + encodeURIComponent(uploadId) + '&partNumber=' + partNumber;
+          return xhrRequest('POST', '/admin/residents/mpu/part' + qs, chunk, null, function (ev) {
+            if (!ev.lengthComputable) return;
+            var pct = Math.round(((uploadedBytes + ev.loaded) / file.size) * 100);
+            statusEl.textContent = 'Uploading ' + pct + '% (part ' + partNumber + '/' + totalParts + ')…';
+          }).then(function (res) {
+            uploadedBytes += chunk.size;
+            parts.push({ partNumber: res.partNumber, etag: res.etag });
+            return uploadPart(partNumber + 1);
+          });
+        }
+
+        xhrRequest('POST', '/admin/residents/mpu/start', JSON.stringify({
+          filename: file.name, fileSize: file.size,
+        }), { 'Content-Type': 'application/json' }).then(function (res) {
+          uploadId = res.uploadId;
+          return uploadPart(1);
+        }).then(function () {
+          statusEl.textContent = 'Finalizing…';
+          return xhrRequest('POST', '/admin/residents/mpu/complete', JSON.stringify({
+            uploadId: uploadId, parts: parts, filename: file.name,
+          }), { 'Content-Type': 'application/json' });
+        }).then(function () {
+          statusEl.textContent = 'Uploaded — refreshing…';
+          window.location.hash = 'residents';
+          window.location.reload();
+        }).catch(function (err) {
+          statusEl.textContent = err.message || 'Upload failed — please try again.';
+          btn.disabled = false;
+          if (uploadId) {
+            xhrRequest('POST', '/admin/residents/mpu/abort', JSON.stringify({ uploadId: uploadId }), { 'Content-Type': 'application/json' }).catch(function () {});
+          }
         });
       });
     })();

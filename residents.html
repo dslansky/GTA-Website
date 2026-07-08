@@ -113,6 +113,29 @@
     }
     #res-table tr:last-child td { border-bottom: none; }
     #res-empty { color: var(--color-secondary); font-size: 0.9rem; padding: 24px 0; }
+    #res-pdf-wrap {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+    #res-pdf-wrap iframe {
+      display: block;
+      width: 100%;
+      height: min(90vh, 1000px);
+      border: 0;
+      background: #525659;
+    }
+    @media (max-width: 700px) {
+      #res-pdf-wrap iframe { height: 80vh; }
+    }
+    #res-pdf-fallback {
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--color-secondary);
+      background: var(--color-surface);
+    }
   </style>
 </head>
 <body>
@@ -178,14 +201,23 @@
       </div>
 
       <div id="res-content">
-        <input id="res-search" class="res-search" type="search" placeholder="Search the directory…" aria-label="Search directory" />
-        <div class="res-table-wrap">
-          <table id="res-table">
-            <thead id="res-thead"></thead>
-            <tbody id="res-tbody"></tbody>
-          </table>
+        <div id="res-pdf-wrap" style="display:none;">
+          <iframe id="res-pdf-embed" title="Resident Directory PDF" loading="lazy"></iframe>
         </div>
-        <p id="res-empty" style="display:none;">No matches.</p>
+        <p id="res-pdf-fallback" style="display:none;">PDF appears blank? <a id="res-pdf-open" href="#" target="_blank" rel="noopener noreferrer">Open in new tab</a>.</p>
+
+        <div id="res-table-section" style="display:none;">
+          <input id="res-search" class="res-search" type="search" placeholder="Search the directory…" aria-label="Search directory" />
+          <div class="res-table-wrap">
+            <table id="res-table">
+              <thead id="res-thead"></thead>
+              <tbody id="res-tbody"></tbody>
+            </table>
+          </div>
+          <p id="res-empty" style="display:none;">No matches.</p>
+        </div>
+
+        <p id="res-none" style="display:none;color:var(--color-secondary);">The directory hasn't been uploaded yet — check back soon.</p>
       </div>
 
     </div>
@@ -208,15 +240,21 @@
   <script src="js/pool.js" defer></script>
   <script>
     (function () {
-      var gateEl    = document.getElementById('res-gate');
-      var contentEl = document.getElementById('res-content');
-      var gateForm  = document.getElementById('res-gate-form');
-      var gateErr   = document.getElementById('res-gate-err');
-      var gateBtn   = document.getElementById('res-gate-submit');
-      var searchEl  = document.getElementById('res-search');
-      var theadEl   = document.getElementById('res-thead');
-      var tbodyEl   = document.getElementById('res-tbody');
-      var emptyEl   = document.getElementById('res-empty');
+      var gateEl     = document.getElementById('res-gate');
+      var contentEl  = document.getElementById('res-content');
+      var gateForm   = document.getElementById('res-gate-form');
+      var gateErr    = document.getElementById('res-gate-err');
+      var gateBtn    = document.getElementById('res-gate-submit');
+      var searchEl   = document.getElementById('res-search');
+      var theadEl    = document.getElementById('res-thead');
+      var tbodyEl    = document.getElementById('res-tbody');
+      var emptyEl    = document.getElementById('res-empty');
+      var tableSecEl = document.getElementById('res-table-section');
+      var pdfWrapEl  = document.getElementById('res-pdf-wrap');
+      var pdfEmbedEl = document.getElementById('res-pdf-embed');
+      var pdfFallbackEl = document.getElementById('res-pdf-fallback');
+      var pdfOpenEl  = document.getElementById('res-pdf-open');
+      var noneEl     = document.getElementById('res-none');
 
       var state = { headers: [], rows: [], q: '' };
 
@@ -248,7 +286,22 @@
         state.rows = data.rows || [];
         gateEl.style.display = 'none';
         contentEl.style.display = '';
-        renderTable();
+
+        var hasTable = state.headers.length > 0;
+
+        if (data.hasPdf) {
+          pdfEmbedEl.src = '/residents/pdf';
+          pdfOpenEl.href = '/residents/pdf';
+          pdfWrapEl.style.display = '';
+          pdfFallbackEl.style.display = '';
+        }
+        if (hasTable) {
+          tableSecEl.style.display = '';
+          renderTable();
+        }
+        if (!data.hasPdf && !hasTable) {
+          noneEl.style.display = '';
+        }
       }
 
       function tryLoad() {
