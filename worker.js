@@ -2996,7 +2996,7 @@ const ENTERTAINMENT_LINEUP = [
   { date: '2026-06-27', emoji: '🌟', title: 'Opening Weekend' },
   { date: '2026-07-04', emoji: '🧠', title: 'Mentalist David Levitan', time: '11:00 PM',
     link: 'https://davidlevitan.com/', linkLabel: 'Visit website' },
-  { date: '2026-07-11', emoji: '🕯️', title: '9 Days', noEntertainment: true, note: 'No entertainment this week' },
+  { date: '2026-07-11', title: 'No Entertainment This Week', noEntertainment: true },
   { date: '2026-07-18', emoji: '🎶', title: 'Melave Malka' },
   { date: '2026-07-25', emoji: '🎸', title: 'Nachamu with Eli Levin', time: '11:00 PM',
     link: 'https://www.instagram.com/elilevinmusic/', linkLabel: 'Follow on Instagram' },
