@@ -724,14 +724,15 @@
       <div class="form-group">
         <label>Photo or Video <span class="optional">(optional)</span></label>
         <div id="file-drop-zone" class="file-drop-zone">
-          <p><strong>Click to upload</strong> or drag and drop<br />JPG, PNG, GIF, HEIC (max 20MB) or MP4/MOV video (max 2GB)</p>
+          <p><strong>Click to upload</strong> or drag and drop — select multiple to share several at once<br />JPG, PNG, GIF, HEIC (max 20MB) or MP4/MOV video (max 2GB) each</p>
         </div>
+        <p class="optional" style="margin-top:6px;">Selecting several files shares each as its own memory using the same name, era, and text above.</p>
         <div id="file-preview" class="file-preview">
           <img id="file-preview-img" src="" alt="" />
           <span id="file-preview-name" class="file-preview-name"></span>
           <button id="file-preview-remove" class="file-preview-remove" type="button">Remove</button>
         </div>
-        <input type="file" id="memory-photo-input" accept="image/jpeg,image/png,image/gif,image/heic,image/heif,image/webp,video/mp4,video/quicktime" style="display:none;" />
+        <input type="file" id="memory-photo-input" accept="image/jpeg,image/png,image/gif,image/heic,image/heif,image/webp,video/mp4,video/quicktime" multiple style="display:none;" />
       </div>
 
       <button id="memory-submit-btn" class="modal-submit-btn" type="submit">Share Memory</button>
@@ -915,18 +916,18 @@
 
       // ── File upload ───────────────────────────────────────────────────────
 
-      var fileInput    = document.getElementById('memory-photo-input');
-      var dropZone     = document.getElementById('file-drop-zone');
-      var filePreview  = document.getElementById('file-preview');
-      var previewImg   = document.getElementById('file-preview-img');
-      var previewName  = document.getElementById('file-preview-name');
-      var removeBtn    = document.getElementById('file-preview-remove');
-      var selectedFile = null;
+      var fileInput     = document.getElementById('memory-photo-input');
+      var dropZone      = document.getElementById('file-drop-zone');
+      var filePreview   = document.getElementById('file-preview');
+      var previewImg    = document.getElementById('file-preview-img');
+      var previewName   = document.getElementById('file-preview-name');
+      var removeBtn     = document.getElementById('file-preview-remove');
+      var selectedFiles = [];
 
       dropZone.addEventListener('click', function () { fileInput.click(); });
 
       fileInput.addEventListener('change', function () {
-        if (fileInput.files[0]) setFile(fileInput.files[0]);
+        if (fileInput.files.length) setFiles(fileInput.files);
       });
 
       dropZone.addEventListener('dragover', function (e) {
@@ -939,25 +940,34 @@
       dropZone.addEventListener('drop', function (e) {
         e.preventDefault();
         dropZone.classList.remove('drag-over');
-        if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+        if (e.dataTransfer.files.length) setFiles(e.dataTransfer.files);
       });
 
-      function setFile(file) {
-        selectedFile = file;
-        previewName.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
-        if (file.type.startsWith('image/')) {
-          var reader = new FileReader();
-          reader.onload = function (e) { previewImg.src = e.target.result; previewImg.style.display = ''; };
-          reader.readAsDataURL(file);
+      function setFiles(fileList) {
+        selectedFiles = Array.prototype.slice.call(fileList);
+
+        if (selectedFiles.length === 1) {
+          var file = selectedFiles[0];
+          previewName.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
+          if (file.type.startsWith('image/')) {
+            var reader = new FileReader();
+            reader.onload = function (e) { previewImg.src = e.target.result; previewImg.style.display = ''; };
+            reader.readAsDataURL(file);
+          } else {
+            previewImg.style.display = 'none';
+          }
         } else {
           previewImg.style.display = 'none';
+          var totalMB = selectedFiles.reduce(function (sum, f) { return sum + f.size; }, 0) / 1024 / 1024;
+          previewName.textContent = selectedFiles.length + ' files selected (' + totalMB.toFixed(1) + ' MB total)';
         }
+
         filePreview.classList.add('visible');
         dropZone.style.display = 'none';
       }
 
       removeBtn.addEventListener('click', function () {
-        selectedFile = null;
+        selectedFiles = [];
         fileInput.value = '';
         filePreview.classList.remove('visible');
         dropZone.style.display = '';
@@ -986,43 +996,71 @@
 
         submitBtn.disabled = true;
 
-        function onSuccess() {
-          msgEl.textContent = 'Thank you! Your memory is under review and will appear here soon.';
-          msgEl.className = 'modal-msg success';
+        // Submitting several files shares each as its own memory record,
+        // reusing the same name/era/caption typed once above — sequentially,
+        // not in parallel, so per-file progress text stays readable and a
+        // photo/video mix doesn't race against the video's own chunk-upload
+        // status text.
+        function submitOne(file) {
+          if (file && file.type.startsWith('video/')) {
+            return submitVideo(name, era, caption, file);
+          }
+          var fd = new FormData();
+          fd.append('name',    name);
+          fd.append('era',     era);
+          fd.append('caption', caption);
+          if (file) fd.append('photo', file);
+          return fetch('/memory', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              if (!data.success) throw new Error(data.error || 'Submission failed.');
+            });
+        }
+
+        var files = selectedFiles.length ? selectedFiles : [null];
+        var total = files.length;
+        var failed = [];
+        var i = 0;
+
+        function finish() {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Share Memory';
+
+          if (failed.length === total) {
+            msgEl.textContent = 'Something went wrong. Please try again.';
+            msgEl.className = 'modal-msg error';
+            return;
+          }
+          if (failed.length) {
+            msgEl.textContent = (total - failed.length) + ' of ' + total + ' uploaded — failed: ' + failed.join(', ') + '.';
+            msgEl.className = 'modal-msg error';
+          } else {
+            msgEl.textContent = total > 1
+              ? 'Thank you! ' + total + ' memories are under review and will appear here soon.'
+              : 'Thank you! Your memory is under review and will appear here soon.';
+            msgEl.className = 'modal-msg success';
+          }
           form.reset();
-          selectedFile = null;
+          selectedFiles = [];
           filePreview.classList.remove('visible');
           dropZone.style.display = '';
         }
-        function onError(err) {
-          msgEl.textContent = (err && err.message) || 'Something went wrong. Please try again.';
-          msgEl.className = 'modal-msg error';
-        }
-        function reset() {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Share Memory';
+
+        function next() {
+          if (i >= total) { finish(); return; }
+          var file = files[i];
+          submitBtn.textContent = total > 1 ? 'Uploading ' + (i + 1) + ' of ' + total + '…' : 'Sending…';
+          submitOne(file).then(function () {
+            i++;
+            next();
+          }).catch(function () {
+            failed.push(file ? file.name : 'memory');
+            i++;
+            next();
+          });
         }
 
-        if (selectedFile && selectedFile.type.startsWith('video/')) {
-          submitVideo(name, era, caption, selectedFile).then(onSuccess).catch(onError).finally(reset);
-          return;
-        }
-
-        var fd = new FormData();
-        fd.append('name',    name);
-        fd.append('era',     era);
-        fd.append('caption', caption);
-        if (selectedFile) fd.append('photo', selectedFile);
-
-        submitBtn.textContent = 'Sending…';
-        fetch('/memory', { method: 'POST', body: fd })
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (!data.success) throw new Error(data.error || 'Submission failed.');
-            onSuccess();
-          })
-          .catch(onError)
-          .finally(reset);
+        next();
       });
 
       // ── Chunked video upload — a real phone video can be hundreds of MB to
