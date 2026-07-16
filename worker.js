@@ -1254,7 +1254,7 @@ async function handleAdmin(request, env, url) {
 
     <!-- ── MAGAZINES ── -->
     <section class="tab-panel" data-panel="magazines" role="tabpanel">
-      <h2>Country Vues &amp; Viderkol</h2>
+      <h2>Country Vues, Viderkol &amp; Nekuda Tovah</h2>
       <p style="font-size:0.85rem;color:#6e6e73;margin:-6px 0 16px;">Each upload replaces the current issue — no archive, matching how the old auto-updating embeds worked. Upload the new PDF here each week.</p>
       ${Object.keys(MAGAZINES).map(slug => {
         const m = magazines.find(x => x.slug === slug) || {};
@@ -2106,6 +2106,7 @@ async function listGazettes(env) {
 const MAGAZINES = {
   vues: { title: 'Country Vues' },
   viderkol: { title: 'Viderkol' },
+  nekudatovah: { title: 'Nekuda Tovah' },
 };
 
 const MAX_MAGAZINE_BYTES = 500 * 1024 * 1024;
