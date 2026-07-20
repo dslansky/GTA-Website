@@ -412,14 +412,36 @@ async function handleOrder(request, env, url) {
     }
 
     const id = Date.now().toString();
+    const timestamp = new Date().toISOString();
     await env.ORDERS.put(id, JSON.stringify({
       id,
-      timestamp: new Date().toISOString(),
+      timestamp,
       name: body.name,
       email: body.email,
       items: body.items,
       total: body.total,
     }));
+
+    if (env.SHEETS_WEBHOOK_URL) {
+      try {
+        await fetch(env.SHEETS_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            secret: env.SHEETS_WEBHOOK_SECRET,
+            id,
+            timestamp,
+            name: body.name,
+            email: body.email,
+            items: body.items,
+            total: body.total,
+          }),
+        });
+      } catch {
+        // Best-effort — the order is already saved in KV above, so a Sheets
+        // outage should never block or fail the order.
+      }
+    }
 
     return json({ success: true });
   }
@@ -446,7 +468,10 @@ async function handleOrder(request, env, url) {
       q(o.timestamp),
       q(o.name),
       q(o.email),
-      q(o.items.map((i) => i.qty + 'x ' + i.name + (i.size ? ' (' + i.size + ')' : '')).join('; ')),
+      q(o.items.map((i) => {
+        const details = [i.color, i.size].filter(Boolean).join(', ');
+        return i.qty + 'x ' + i.name + (details ? ' (' + details + ')' : '');
+      }).join('; ')),
       q('$' + o.total),
     ].join(','));
 

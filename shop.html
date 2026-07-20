@@ -91,12 +91,14 @@
     .shop-card-options {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 14px;
     }
 
-    .size-select {
+    .size-select, .color-select {
       flex: 1;
+      min-width: 90px;
       padding: 7px 10px;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
@@ -107,8 +109,8 @@
       cursor: pointer;
       transition: border-color 0.15s;
     }
-    .size-select:focus { outline: 2px solid var(--color-green); outline-offset: 2px; }
-    .size-select.error { border-color: #e53e3e; }
+    .size-select:focus, .color-select:focus { outline: 2px solid var(--color-green); outline-offset: 2px; }
+    .size-select.error, .color-select.error { border-color: #e53e3e; }
 
     .qty-stepper {
       display: flex;
@@ -413,6 +415,87 @@
     }
     .cart-msg.success { color: var(--color-green); }
     .cart-msg.error { color: #e53e3e; }
+
+    /* ── Order confirmation ── */
+    .cart-confirmation {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .cart-confirm-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--color-green);
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .cart-confirmation h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin: 0 0 6px;
+    }
+    .cart-confirm-total {
+      font-size: 0.95rem;
+      color: var(--color-secondary);
+      margin: 0 0 24px;
+    }
+    .cart-confirm-total strong {
+      color: var(--color-green);
+      font-size: 1.15rem;
+    }
+    .cart-confirm-pay {
+      width: 100%;
+      background: var(--color-green-muted);
+      border: 1px solid rgba(58, 125, 50, 0.15);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .cart-confirm-deadline {
+      margin: 0 0 14px;
+      font-size: 0.85rem;
+      color: var(--color-dark);
+      line-height: 1.5;
+    }
+    .cart-confirm-methods {
+      list-style: none;
+      margin: 0 0 14px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cart-confirm-methods li {
+      font-size: 0.85rem;
+      color: var(--color-dark);
+      line-height: 1.5;
+    }
+    .cart-confirm-methods strong { color: var(--color-green); }
+    .cart-confirm-contact {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--color-secondary);
+      line-height: 1.5;
+    }
+    .cart-confirm-contact strong { color: var(--color-dark); }
+    #cart-confirm-done {
+      width: 100%;
+      justify-content: center;
+      padding: 12px;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -467,10 +550,10 @@
     <div class="container">
 
       <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;background:#1d1d1f;border-radius:var(--radius);margin-bottom:32px;flex-wrap:wrap;">
-        <div style="width:10px;height:10px;border-radius:50%;background:#f59e0b;flex-shrink:0;box-shadow:0 0 0 3px rgba(245,158,11,0.25);"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:#3a7d32;flex-shrink:0;box-shadow:0 0 0 3px rgba(58,125,50,0.25);"></div>
         <div style="flex:1;min-width:0;">
-          <p style="margin:0;font-weight:700;color:#fff;font-size:0.95rem;">Shop Opening Soon</p>
-          <p style="margin:4px 0 0;color:#999;font-size:0.82rem;">Orders aren't open yet — check back soon. Items and pricing are final.</p>
+          <p style="margin:0;font-weight:700;color:#fff;font-size:0.95rem;">Orders Open — Deadline July 26</p>
+          <p style="margin:4px 0 0;color:#999;font-size:0.82rem;">Orders must be submitted AND paid by 7:00 PM, Sunday July 26. Payment instructions are shown after you place your order.</p>
         </div>
       </div>
 
@@ -481,41 +564,8 @@
 
       <div class="shop-grid">
 
-        <!-- Lobos Tee -->
-        <div class="shop-card reveal" data-name="GTA Lobos Tee" data-price="0">
-          <img class="shop-card-img" src="img/shop/tshirt.png" alt="GTA Lobos T-Shirt" />
-          <div class="shop-card-body">
-            <div class="shop-card-badge">
-              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
-              <span>GTA Lobos</span>
-            </div>
-            <p class="shop-card-name">GTA Lobos Tee</p>
-            <p class="shop-card-desc">Kelly green tee with the GTA Lobos logo on front and #26 on the back. Sizes S–3XL.</p>
-            <div class="shop-card-options">
-              <select class="size-select" aria-label="Size">
-                <option value="">Select Size</option>
-                <option>S</option>
-                <option>M</option>
-                <option>L</option>
-                <option>XL</option>
-                <option>2XL</option>
-                <option>3XL</option>
-              </select>
-              <div class="qty-stepper">
-                <button class="qty-btn" type="button" data-dir="-1">−</button>
-                <span class="qty-val">1</span>
-                <button class="qty-btn" type="button" data-dir="1">+</button>
-              </div>
-            </div>
-            <div class="shop-card-footer">
-              <span class="shop-card-price">Free</span>
-              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
-            </div>
-          </div>
-        </div>
-
         <!-- Quarter-Zip Pullover -->
-        <div class="shop-card reveal reveal-delay-1" data-name="GTA Lobos Quarter-Zip Pullover" data-price="28">
+        <div class="shop-card reveal reveal-delay-1" data-name="GTA Lobos Quarter-Zip Pullover" data-price="32">
           <img class="shop-card-img" src="img/shop/quarter-zip.png" alt="GTA Lobos Quarter-Zip Pullover" />
           <div class="shop-card-body">
             <div class="shop-card-badge">
@@ -543,7 +593,7 @@
               </div>
             </div>
             <div class="shop-card-footer">
-              <span class="shop-card-price">$28</span>
+              <span class="shop-card-price">$32</span>
               <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
             </div>
           </div>
@@ -584,6 +634,177 @@
             <p class="shop-card-name">GTA Lobos 5-Panel Rope Cap</p>
             <p class="shop-card-desc">Style #545 curved 5-panel cap in black with rope trim and the GTA Lobos patch. One size fits most.</p>
             <div class="shop-card-options">
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$30</span>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Runners Club Tee — Men's Long Sleeve -->
+        <div class="shop-card reveal" data-name="GTA Runners Club Tee — Men's Long Sleeve" data-price="20">
+          <img class="shop-card-img" src="img/shop/runners-tee-men-long.jpg" alt="GTA Runners Club Tee, Men's Long Sleeve" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Runners Club</span>
+            </div>
+            <p class="shop-card-name">GTA Runners Club Tee — Men's Long Sleeve</p>
+            <p class="shop-card-desc">Gray long-sleeve performance tee with the GTA Runners Club logo. Men's fit, sizes S–3XL.</p>
+            <div class="shop-card-options">
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+                <option>3XL</option>
+              </select>
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$20</span>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Runners Club Tee — Men's Short Sleeve -->
+        <div class="shop-card reveal reveal-delay-1" data-name="GTA Runners Club Tee — Men's Short Sleeve" data-price="20">
+          <img class="shop-card-img" src="img/shop/runners-tee-men-short.jpg" alt="GTA Runners Club Tee, Men's Short Sleeve" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Runners Club</span>
+            </div>
+            <p class="shop-card-name">GTA Runners Club Tee — Men's Short Sleeve</p>
+            <p class="shop-card-desc">Gray short-sleeve performance tee with the GTA Runners Club logo. Men's fit, sizes S–3XL.</p>
+            <div class="shop-card-options">
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+                <option>3XL</option>
+              </select>
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$20</span>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Runners Club Tee — Women's Long Sleeve -->
+        <div class="shop-card reveal reveal-delay-2" data-name="GTA Runners Club Tee — Women's Long Sleeve" data-price="20">
+          <img class="shop-card-img" src="img/shop/runners-tee-women-long.jpg" alt="GTA Runners Club Tee, Women's Long Sleeve" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Runners Club</span>
+            </div>
+            <p class="shop-card-name">GTA Runners Club Tee — Women's Long Sleeve</p>
+            <p class="shop-card-desc">Gray long-sleeve performance tee with the GTA Runners Club logo. Women's fit, sizes S–3XL.</p>
+            <div class="shop-card-options">
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+                <option>3XL</option>
+              </select>
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$20</span>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Runners Club Tee — Women's Short Sleeve -->
+        <div class="shop-card reveal" data-name="GTA Runners Club Tee — Women's Short Sleeve" data-price="20">
+          <img class="shop-card-img" src="img/shop/runners-tee-women-short.jpg" alt="GTA Runners Club Tee, Women's Short Sleeve" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Runners Club</span>
+            </div>
+            <p class="shop-card-name">GTA Runners Club Tee — Women's Short Sleeve</p>
+            <p class="shop-card-desc">Gray short-sleeve performance tee with the GTA Runners Club logo. Women's fit, sizes S–3XL.</p>
+            <div class="shop-card-options">
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+                <option>3XL</option>
+              </select>
+              <div class="qty-stepper">
+                <button class="qty-btn" type="button" data-dir="-1">−</button>
+                <span class="qty-val">1</span>
+                <button class="qty-btn" type="button" data-dir="1">+</button>
+              </div>
+            </div>
+            <div class="shop-card-footer">
+              <span class="shop-card-price">$20</span>
+              <button class="btn-order btn-add-cart" type="button">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Runners Club Sweatpants -->
+        <div class="shop-card reveal reveal-delay-1" data-name="GTA Runners Club Sweatpants" data-price="30"
+             data-color-images='{"Grey":"img/shop/runners-pants-grey.jpg","Navy":"img/shop/runners-pants-navy.jpg"}'>
+          <img class="shop-card-img" src="img/shop/runners-pants-grey.jpg" alt="GTA Runners Club Sweatpants" />
+          <div class="shop-card-body">
+            <div class="shop-card-badge">
+              <img src="img/shop/lobos-logo.png" alt="GTA Lobos" />
+              <span>GTA Runners Club</span>
+            </div>
+            <p class="shop-card-name">GTA Runners Club Sweatpants</p>
+            <p class="shop-card-desc">Fleece sweatpants with the GTA Runners Club logo. Sizes S–3XL, in grey or navy.</p>
+            <div class="shop-card-options">
+              <select class="color-select" aria-label="Color">
+                <option value="">Select Color</option>
+                <option>Grey</option>
+                <option>Navy</option>
+              </select>
+              <select class="size-select" aria-label="Size">
+                <option value="">Select Size</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>2XL</option>
+                <option>3XL</option>
+              </select>
               <div class="qty-stepper">
                 <button class="qty-btn" type="button" data-dir="-1">−</button>
                 <span class="qty-val">1</span>
@@ -642,7 +863,7 @@
       <p class="cart-empty">No items yet. Add something above!</p>
     </div>
 
-    <div class="cart-footer">
+    <div id="cart-footer" class="cart-footer">
       <div class="cart-total">Total: <strong id="cart-total-price">$0</strong></div>
 
       <div class="cart-form">
@@ -652,6 +873,24 @@
 
       <button id="cart-submit" class="btn-order" type="button">Place Order</button>
       <p id="cart-msg" class="cart-msg"></p>
+    </div>
+
+    <div id="cart-confirmation" class="cart-confirmation" style="display:none;">
+      <div class="cart-confirm-icon">&#x2713;</div>
+      <h3>Order Submitted!</h3>
+      <p class="cart-confirm-total">Total Due: <strong id="confirm-total-price">$0</strong></p>
+
+      <div class="cart-confirm-pay">
+        <p class="cart-confirm-deadline">Please submit payment by <strong>7:00 PM, Sunday July 26</strong>.</p>
+        <ul class="cart-confirm-methods">
+          <li><strong>Zelle:</strong> sh.albala@gmail.com</li>
+          <li><strong>Venmo:</strong> @shoshana-albala</li>
+          <li><strong>Cash/Check:</strong> Bring to Mikey Albala in Unit X</li>
+        </ul>
+        <p class="cart-confirm-contact">Questions? Contact <strong>Mikey Albala</strong>.</p>
+      </div>
+
+      <button id="cart-confirm-done" class="btn-order" type="button">Done</button>
     </div>
   </div>
 
@@ -686,10 +925,13 @@
         }
 
         el.innerHTML = cart.map(function (item, i) {
+          var details = [];
+          if (item.color) details.push('Color: ' + esc(item.color));
+          if (item.size) details.push('Size: ' + esc(item.size));
           return '<div class="cart-item-row">' +
             '<div class="cart-item-info">' +
               '<span class="cart-item-name">' + esc(item.name) + '</span>' +
-              (item.size ? '<span class="cart-item-size">Size: ' + esc(item.size) + '</span>' : '') +
+              (details.length ? '<span class="cart-item-size">' + details.join(' · ') + '</span>' : '') +
             '</div>' +
             '<div class="cart-item-right">' +
               '<span class="cart-item-qty">×' + item.qty + '</span>' +
@@ -714,13 +956,31 @@
         document.getElementById('cart-drawer').classList.remove('open');
         document.getElementById('cart-overlay').classList.remove('open');
         document.body.style.overflow = '';
+        hideConfirmation();
+      }
+
+      function showConfirmation(total) {
+        document.getElementById('confirm-total-price').textContent = '$' + total;
+        document.getElementById('cart-items').style.display = 'none';
+        document.getElementById('cart-footer').style.display = 'none';
+        document.getElementById('cart-confirmation').style.display = 'flex';
+      }
+
+      function hideConfirmation() {
+        document.getElementById('cart-confirmation').style.display = 'none';
+        document.getElementById('cart-items').style.display = '';
+        document.getElementById('cart-footer').style.display = '';
       }
 
       // Wire up each card
       document.querySelectorAll('.shop-card').forEach(function (card) {
-        var addBtn     = card.querySelector('.btn-add-cart');
-        var sizeSelect = card.querySelector('.size-select');
-        var qtyValEl   = card.querySelector('.qty-val');
+        var addBtn      = card.querySelector('.btn-add-cart');
+        var sizeSelect  = card.querySelector('.size-select');
+        var colorSelect = card.querySelector('.color-select');
+        var qtyValEl    = card.querySelector('.qty-val');
+        var imgEl       = card.querySelector('.shop-card-img');
+        var colorImagesRaw = card.getAttribute('data-color-images');
+        var colorImages = colorImagesRaw ? JSON.parse(colorImagesRaw) : null;
 
         // Qty steppers
         card.querySelectorAll('.qty-btn').forEach(function (btn) {
@@ -732,24 +992,40 @@
           });
         });
 
+        // Swap product photo when color changes
+        if (colorSelect && colorImages) {
+          colorSelect.addEventListener('change', function () {
+            if (colorImages[colorSelect.value]) {
+              imgEl.src = colorImages[colorSelect.value];
+            }
+          });
+        }
+
         addBtn.addEventListener('click', function () {
           var name  = card.getAttribute('data-name');
           var price = parseInt(card.getAttribute('data-price'), 10);
           var size  = sizeSelect ? sizeSelect.value : '';
+          var color = colorSelect ? colorSelect.value : '';
           var qty   = parseInt(qtyValEl.textContent, 10);
 
-          // Require size when selector exists
+          // Require size/color when those selectors exist
           if (sizeSelect && !size) {
             sizeSelect.classList.add('error');
             sizeSelect.focus();
             setTimeout(function () { sizeSelect.classList.remove('error'); }, 2000);
             return;
           }
+          if (colorSelect && !color) {
+            colorSelect.classList.add('error');
+            colorSelect.focus();
+            setTimeout(function () { colorSelect.classList.remove('error'); }, 2000);
+            return;
+          }
 
-          // Merge with existing cart entry if same name + size
+          // Merge with existing cart entry if same name + size + color
           var existing = null;
           for (var i = 0; i < cart.length; i++) {
-            if (cart[i].name === name && cart[i].size === size) {
+            if (cart[i].name === name && cart[i].size === size && cart[i].color === color) {
               existing = cart[i];
               break;
             }
@@ -757,7 +1033,7 @@
           if (existing) {
             existing.qty += qty;
           } else {
-            cart.push({ name: name, price: price, size: size, qty: qty });
+            cart.push({ name: name, price: price, size: size, color: color, qty: qty });
           }
 
           updateBadge();
@@ -774,6 +1050,7 @@
           // Reset controls
           qtyValEl.textContent = '1';
           if (sizeSelect) sizeSelect.value = '';
+          if (colorSelect) colorSelect.value = '';
         });
       });
 
@@ -829,7 +1106,7 @@
             name: name,
             email: email,
             items: cart.map(function (i) {
-              return { name: i.name, size: i.size, qty: i.qty, price: i.price };
+              return { name: i.name, size: i.size, color: i.color, qty: i.qty, price: i.price };
             }),
             total: total
           })
@@ -842,10 +1119,11 @@
             renderCart();
             document.getElementById('cart-name').value = '';
             document.getElementById('cart-email').value = '';
-            msgEl.textContent = 'Order sent! We\'ll be in touch soon.';
-            msgEl.classList.add('success');
+            msgEl.textContent = '';
+            msgEl.className = 'cart-msg';
             submitBtn.disabled = false;
             submitBtn.textContent = 'Place Order';
+            showConfirmation(total);
           } else {
             throw new Error('submit failed');
           }
@@ -857,12 +1135,8 @@
           submitBtn.textContent = 'Place Order';
         });
       });
-    // Shop not open yet — disable all add-to-cart buttons
-    document.querySelectorAll('.btn-add-cart').forEach(function (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Coming Soon';
-    });
 
+      document.getElementById('cart-confirm-done').addEventListener('click', closeCart);
     })();
   </script>
 </body>
