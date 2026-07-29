@@ -439,6 +439,7 @@
       justify-content: center;
       margin-bottom: 16px;
     }
+    .cart-confirm-icon.pending { background: #f59e0b; }
     .cart-confirmation h3 {
       font-size: 1.1rem;
       font-weight: 700;
@@ -483,6 +484,11 @@
       line-height: 1.5;
     }
     .cart-confirm-methods strong { color: var(--color-green); }
+    .cart-confirm-pending {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .cart-confirm-pending .cart-confirm-deadline strong { color: #b45309; }
     .cart-confirm-contact {
       margin: 0;
       font-size: 0.82rem;
@@ -552,8 +558,8 @@
       <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;background:#1d1d1f;border-radius:var(--radius);margin-bottom:32px;flex-wrap:wrap;">
         <div style="width:10px;height:10px;border-radius:50%;background:#3a7d32;flex-shrink:0;box-shadow:0 0 0 3px rgba(58,125,50,0.25);"></div>
         <div style="flex:1;min-width:0;">
-          <p style="margin:0;font-weight:700;color:#fff;font-size:0.95rem;">Orders Open — Deadline July 26</p>
-          <p style="margin:4px 0 0;color:#999;font-size:0.82rem;">Orders must be submitted AND paid by 7:00 PM, Sunday July 26. Payment instructions are shown after you place your order.</p>
+          <p style="margin:0;font-weight:700;color:#fff;font-size:0.95rem;">Orders Close Today at 5:00 PM</p>
+          <p style="margin:4px 0 0;color:#999;font-size:0.82rem;">Orders and payment are both due by 5:00 PM today. Payment instructions are shown after you place your order. Orders placed after 5:00 PM are not guaranteed — we'll reach out if yours can still be included.</p>
           <p style="margin:6px 0 0;color:#f59e0b;font-size:0.82rem;font-weight:600;">⚠ Items will only be produced if a minimum order quantity is reached. If an item doesn't meet the minimum, your order for it may be cancelled and refunded.</p>
         </div>
       </div>
@@ -816,17 +822,23 @@
     </div>
 
     <div id="cart-confirmation" class="cart-confirmation" style="display:none;">
-      <div class="cart-confirm-icon">&#x2713;</div>
-      <h3>Order Submitted!</h3>
+      <div class="cart-confirm-icon" id="cart-confirm-icon">&#x2713;</div>
+      <h3 id="cart-confirm-heading">Order Submitted!</h3>
       <p class="cart-confirm-total">Total Due: <strong id="confirm-total-price">$0</strong></p>
 
-      <div class="cart-confirm-pay">
-        <p class="cart-confirm-deadline">Please submit payment by <strong>7:00 PM, Sunday July 26</strong>.</p>
+      <div class="cart-confirm-pay" id="cart-confirm-pay">
+        <p class="cart-confirm-deadline">Please submit payment by <strong>5:00 PM today</strong>.</p>
         <ul class="cart-confirm-methods">
           <li><strong>Zelle:</strong> sh.albala@gmail.com</li>
           <li><strong>Venmo:</strong> @shoshana-albala</li>
           <li><strong>Cash/Check:</strong> Bring to Mikey Albala in Unit X</li>
         </ul>
+        <p class="cart-confirm-contact">Questions? Contact <strong>Mikey Albala</strong>.</p>
+      </div>
+
+      <div class="cart-confirm-pay cart-confirm-pending" id="cart-confirm-pending" style="display:none;">
+        <p class="cart-confirm-deadline">Ordering closed at <strong>5:00 PM today</strong>, so this order is <strong>not yet confirmed</strong> — we are not collecting payment right now.</p>
+        <p class="cart-confirm-deadline">If we're able to include it, we'll reach out with payment instructions.</p>
         <p class="cart-confirm-contact">Questions? Contact <strong>Mikey Albala</strong>.</p>
       </div>
 
@@ -838,6 +850,11 @@
   <script>
     (function () {
       var cart = [];
+
+      // Orders/payment cut off at 5:00 PM Eastern today. Orders placed after
+      // this still go through, but the confirmation screen tells the buyer
+      // it isn't confirmed yet instead of showing payment instructions.
+      var ORDER_CUTOFF = new Date('2026-07-29T17:00:00-04:00');
 
       function esc(s) {
         return String(s)
@@ -900,7 +917,15 @@
       }
 
       function showConfirmation(total) {
+        var isLate = new Date() > ORDER_CUTOFF;
+
         document.getElementById('confirm-total-price').textContent = '$' + total;
+        var iconEl = document.getElementById('cart-confirm-icon');
+        iconEl.textContent = isLate ? '!' : '✓';
+        iconEl.classList.toggle('pending', isLate);
+        document.getElementById('cart-confirm-heading').textContent = isLate ? 'Order Received' : 'Order Submitted!';
+        document.getElementById('cart-confirm-pay').style.display = isLate ? 'none' : 'block';
+        document.getElementById('cart-confirm-pending').style.display = isLate ? 'block' : 'none';
         document.getElementById('cart-items').style.display = 'none';
         document.getElementById('cart-footer').style.display = 'none';
         document.getElementById('cart-confirmation').style.display = 'flex';
