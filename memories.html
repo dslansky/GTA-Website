@@ -1162,7 +1162,7 @@
       document.querySelectorAll('.video-card').forEach(function (card) {
         card.addEventListener('click', function () {
           var id = card.getAttribute('data-video-id');
-          videoIframe.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1';
+          videoIframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1';
           videoModal.classList.add('active');
           document.body.style.overflow = 'hidden';
         });

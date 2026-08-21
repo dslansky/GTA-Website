@@ -57,7 +57,7 @@ const videoModal = document.getElementById('video-modal');
 const videoIframe = document.getElementById('video-modal-iframe');
 
 function openVideo(videoId) {
-  videoIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+  videoIframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
   videoModal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
