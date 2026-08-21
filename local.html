@@ -642,7 +642,9 @@
         categoryOrder: [],
         q: '',
         town: '',
-        filter: 'all'
+        // Off-season (after the colony season ends) the directory opens on the
+        // Year-Round tab — matches SEASON_END in js/pool.js.
+        filter: (new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date()) > '2026-08-23') ? 'year' : 'all'
       };
 
       function esc(s) {
@@ -809,6 +811,9 @@
       document.getElementById('dir-town').addEventListener('change', function (e) {
         state.town = e.target.value;
         render();
+      });
+      document.querySelectorAll('.dir-filter-tab').forEach(function (t) {
+        t.classList.toggle('active', t.getAttribute('data-filter') === state.filter);
       });
       document.getElementById('dir-filter-tabs').addEventListener('click', function (e) {
         var btn = e.target.closest('.dir-filter-tab');
