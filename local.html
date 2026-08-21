@@ -358,62 +358,27 @@
     }
     .shul-card-contacts a:hover { border-color: var(--color-green); color: var(--color-green); }
 
-    /* ── Directory: legend, toggle, category sections, verify badges ── */
-    .dir-legend {
+    /* ── Directory: filter tabs, category sections, verify badges ── */
+    .dir-filter-tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px 18px;
-      margin-top: 10px;
-      font-size: 0.78rem;
-      color: var(--color-secondary);
+      gap: 8px;
     }
-    .dir-legend-dot {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .dir-legend-dot::before {
-      content: '';
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .dir-legend-dot.confirmed::before { background: var(--color-green); }
-    .dir-legend-dot.verify::before { background: #d4a017; }
-
-    .verify-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      user-select: none;
-      font-size: 0.85rem;
-      color: var(--color-dark);
-      padding: 6px 0;
-    }
-    .verify-toggle input { position: absolute; opacity: 0; pointer-events: none; }
-    .verify-toggle-switch {
-      position: relative;
-      width: 38px;
-      height: 22px;
-      background: var(--color-border);
+    .dir-filter-tab {
+      padding: 8px 18px;
+      border: 1px solid var(--color-border);
       border-radius: 100px;
-      transition: background var(--transition);
-      flex-shrink: 0;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: var(--color-surface);
+      color: var(--color-secondary);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: border-color var(--transition), color var(--transition), background var(--transition);
     }
-    .verify-toggle-switch::after {
-      content: '';
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 18px; height: 18px;
-      background: white;
-      border-radius: 50%;
-      transition: transform var(--transition);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .verify-toggle input:checked + .verify-toggle-switch { background: var(--color-green); }
-    .verify-toggle input:checked + .verify-toggle-switch::after { transform: translateX(16px); }
-    .verify-toggle input:focus-visible + .verify-toggle-switch { outline: 2px solid var(--color-green); outline-offset: 2px; }
+    .dir-filter-tab:hover { border-color: var(--color-green); color: var(--color-green); }
+    .dir-filter-tab.active { background: var(--color-green); border-color: var(--color-green); color: white; }
+    .dir-filter-tab:focus-visible { outline: 2px solid var(--color-green); outline-offset: 2px; }
 
     .cat-jump {
       display: flex;
@@ -632,20 +597,11 @@
         <input type="search" id="dir-search" class="dir-search" placeholder="Search by name, town, or address…" aria-label="Search directory" />
         <div class="dir-selects">
           <select id="dir-town" aria-label="Filter by town"><option value="">All towns</option></select>
-          <label class="verify-toggle">
-            <input type="checkbox" id="dir-verified-only" />
-            <span class="verify-toggle-switch" aria-hidden="true"></span>
-            <span>Verified open only</span>
-          </label>
-          <label class="verify-toggle">
-            <input type="checkbox" id="dir-yearround-only" />
-            <span class="verify-toggle-switch" aria-hidden="true"></span>
-            <span>❄️ Year-round only</span>
-          </label>
         </div>
-        <div class="dir-legend">
-          <span class="dir-legend-dot confirmed"><span id="legend-confirmed">Verified open</span></span>
-          <span class="dir-legend-dot verify"><span id="legend-verify">Call to verify</span></span>
+        <div class="dir-filter-tabs" id="dir-filter-tabs" role="tablist" aria-label="Filter listings">
+          <button class="dir-filter-tab active" role="tab" data-filter="all">All</button>
+          <button class="dir-filter-tab" role="tab" data-filter="open">Open</button>
+          <button class="dir-filter-tab" role="tab" data-filter="year">❄️ Year-Round</button>
         </div>
         <div class="cat-jump" id="cat-jump" aria-label="Jump to category"></div>
         <p class="dir-meta" id="dir-meta"></p>
@@ -686,8 +642,7 @@
         categoryOrder: [],
         q: '',
         town: '',
-        verifiedOnly: false,
-        yearRoundOnly: false
+        filter: 'all'
       };
 
       function esc(s) {
@@ -723,7 +678,7 @@
         if (it.address) actions += '<a class="dir-web" href="' + mapsUrl(it.address) + '" target="_blank" rel="noopener noreferrer" aria-label="Directions to ' + esc(it.name) + '">' + PIN_SVG + 'Directions</a>';
 
         var badgeClass = it.verify_status === 'confirmed' ? 'confirmed' : 'verify';
-        var badgeLabel = it.verify_status === 'confirmed' ? 'Verified open' : 'Call to verify';
+        var badgeLabel = it.verify_status === 'confirmed' ? 'Open' : 'Call to verify';
         var yrBadge = it.year_round ? '<span class="verify-badge yearround">❄️ Year-round</span>' : '';
 
         return '<article class="dir-card" data-id="' + esc(it.id) + '">' +
@@ -742,8 +697,8 @@
         var q = state.q.trim().toLowerCase();
         return state.items.filter(function (it) {
           if (state.town && it.town !== state.town) return false;
-          if (state.verifiedOnly && it.verify_status !== 'confirmed') return false;
-          if (state.yearRoundOnly && !it.year_round) return false;
+          if (state.filter === 'open' && it.verify_status !== 'confirmed') return false;
+          if (state.filter === 'year' && !it.year_round) return false;
           if (q) {
             var hay = (it.name + ' ' + it.town + ' ' + it.address + ' ' + it.category + ' ' + (it.notes || '')).toLowerCase();
             if (hay.indexOf(q) === -1) return false;
@@ -824,12 +779,6 @@
         });
       }
 
-      function applyLegendText(legend) {
-        if (!legend) return;
-        if (legend.confirmed) document.getElementById('legend-confirmed').textContent = 'Verified open — ' + legend.confirmed.toLowerCase();
-        if (legend.verify) document.getElementById('legend-verify').textContent = 'Call to verify — ' + legend.verify.toLowerCase();
-      }
-
       function applyFooter(data) {
         var f = document.getElementById('dir-footer');
         var src = data.source ? '<div><strong>Source:</strong> ' + esc(data.source) + '</div>' : '';
@@ -844,7 +793,6 @@
           state.data = data;
           state.items = data.items || [];
           state.categoryOrder = data.category_order || [];
-          applyLegendText(data.verify_legend);
           applyFooter(data);
           buildJump();
           buildTownDropdown();
@@ -862,12 +810,12 @@
         state.town = e.target.value;
         render();
       });
-      document.getElementById('dir-yearround-only').addEventListener('change', function (e) {
-        state.yearRoundOnly = e.target.checked;
-        render();
-      });
-      document.getElementById('dir-verified-only').addEventListener('change', function (e) {
-        state.verifiedOnly = e.target.checked;
+      document.getElementById('dir-filter-tabs').addEventListener('click', function (e) {
+        var btn = e.target.closest('.dir-filter-tab');
+        if (!btn) return;
+        document.querySelectorAll('.dir-filter-tab').forEach(function (t) { t.classList.remove('active'); });
+        btn.classList.add('active');
+        state.filter = btn.getAttribute('data-filter');
         render();
       });
     })();
