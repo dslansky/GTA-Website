@@ -7,7 +7,11 @@ Community site for Greentree Acres (GTA) — a single Cloudflare Worker (`worker
 - **Hosting/runtime:** Cloudflare Workers, deployed via [Wrangler](https://developers.cloudflare.com/workers/wrangler/)
 - **Static assets:** served directly from the repo root via the `[assets]` binding in `wrangler.toml`
 - **Data:** one KV namespace (`ORDERS`, despite the name — it's the general-purpose store for orders, memories metadata, gazette/magazine metadata, push subscriptions, the residents gate, rate limits, etc., all separated by key prefix) and one R2 bucket (`MEMORIES` — photos/videos, gazette/magazine PDFs, same prefix-separation approach)
-- **Pages:** `index.html`, `shop.html`, `memories.html`, `residents.html`, `gazette.html`, `magazines.html`, `entertainment.html`, `ferndale.html`, `local.html`, `zmanim.html` — each self-contained (inline `<style>`/`<script>`), sharing `css/styles.css` and `js/main.js` for nav/reveal/video-modal behavior. Nav markup is duplicated across all pages (no templating) — a nav change means editing all of them.
+- **Pages:** `index.html`, `shop.html`, `memories.html`, `residents.html`, `gazette.html`, `magazines.html`, `entertainment.html`, `ferndale.html`, `local.html`, `zmanim.html`, `privacy.html` — each self-contained (inline `<style>`/`<script>`), sharing `css/styles.css` and `js/main.js` for nav/reveal/video-modal behavior. Nav markup is duplicated across all pages (no templating) — a nav change means editing all of them. Same goes for the footer, which links `privacy.html` from every page.
+
+## Privacy
+
+There's no cookie banner and none is needed: the site sets no analytics/tracking cookies (only the admin and resident login session cookies), and YouTube embeds use the privacy-enhanced `youtube-nocookie.com` domain. `privacy.html` documents the actual data flows — contact-form logging (IP/UA, 90-day view / 1-year submit retention in KV), shop orders, Memories publishing, push subscriptions, and the third-party services (Cloudflare, Web3Forms, Google Fonts/Sheets, YouTube, Hebcal, NWS). If a new data flow or third-party service is added, update `privacy.html` and its "Last updated" date to match.
 
 ## Local development
 
