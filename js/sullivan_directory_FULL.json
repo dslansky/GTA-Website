@@ -40,7 +40,9 @@
    "verify_status": "confirmed",
    "notes": "Salad bar, sushi, takeout",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-001"
+   "id": "sc-001",
+   "year_round": true,
+   "year_round_evidence": "Full weekly hours (Mon-Sun) on multiple listings, active Instagram, no seasonal label; anchor supermarket for Liberty's year-round community"
   },
   {
    "name": "Goldman's Grocery",
@@ -66,7 +68,9 @@
    "verify_status": "confirmed",
    "notes": "Prepared foods + pizza",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-003"
+   "id": "sc-003",
+   "seasonal": true,
+   "seasonal_evidence": "Store announcements say \"now open for Summer 2026\"; operates as summer-season location"
   },
   {
    "name": "Kosher Express on the 42",
@@ -79,7 +83,9 @@
    "verify_status": "confirmed",
    "notes": "Next to Cafe Express",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-004"
+   "id": "sc-004",
+   "year_round": true,
+   "year_round_evidence": "Kosher Travel Info listing says \"kosher grocery open all year\"; active delivery service with 231 Google reviews"
   },
   {
    "name": "Landau's Supermarket",
@@ -92,7 +98,9 @@
    "verify_status": "confirmed",
    "notes": "On-site Main St Pizza + Boosur section",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-005"
+   "id": "sc-005",
+   "year_round": true,
+   "year_round_evidence": "Regular weekly hours listed on Yelp/gokosher/landausupstate.com, no seasonal label; South Fallsburg year-round community supermarket"
   },
   {
    "name": "Lemonade Kosher Supermarket",
@@ -105,7 +113,9 @@
    "verify_status": "confirmed",
    "notes": "Former Liberty Market; Zaftig Take-Out inside; KB Kosher Food = same plaza",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-006"
+   "id": "sc-006",
+   "year_round": true,
+   "year_round_evidence": "open 7 days, reviewer notes \"very good opening hours even during the winter\""
   },
   {
    "name": "Mountain Food (Mountain Kosher Food)",
@@ -118,7 +128,9 @@
    "verify_status": "confirmed",
    "notes": "Also listed as Kosher Garden; nearby Mountain Fruit produce",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-007"
+   "id": "sc-007",
+   "year_round": true,
+   "year_round_evidence": "Full weekly hours (incl. late-night) on listings, active storefront serving year-round Monticello community; no seasonal label found"
   },
   {
    "name": "Tyberg's Grocery",
@@ -158,7 +170,9 @@
    "verify_status": "confirmed",
    "notes": "Formerly Woodbourne Grocery; delivery, late hours",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-010"
+   "id": "sc-010",
+   "seasonal": true,
+   "seasonal_evidence": "My Jewish Listings labels it \"Zest Supermarket (Summer Only)\""
   },
   {
    "name": "Aladdin Supermarket",
@@ -171,7 +185,9 @@
    "verify_status": "verify",
    "notes": "Colony market",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-011"
+   "id": "sc-011",
+   "seasonal": true,
+   "seasonal_evidence": "located inside Kiryas Beirach Moshe, a Satmar summer colony at the former Aladdin Hotel site; no year-round listing found"
   },
   {
    "name": "All Fresh Supermarket",
@@ -197,7 +213,9 @@
    "verify_status": "verify",
    "notes": "NYS registry",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-013"
+   "id": "sc-013",
+   "seasonal": true,
+   "seasonal_evidence": "store's own site says it is located within the Shopron Bungalow Colony on Rt 42; no winter evidence"
   },
   {
    "name": "Buy Rite Kosher Supermarket",
@@ -210,7 +228,9 @@
    "verify_status": "verify",
    "notes": "Large summer location; houses Ossie's Fish + sushi; alt 845-434-1718",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-014"
+   "id": "sc-014",
+   "year_round": true,
+   "year_round_evidence": "Listing states store operates year-round except holidays, with full off-season weekly hours (Sat closed)"
   },
   {
    "name": "Camp Morris Grocery (Morris Food)",
@@ -223,7 +243,9 @@
    "verify_status": "verify",
    "notes": "NYS registry; Rebbe's Choice retail",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-015"
+   "id": "sc-015",
+   "seasonal": true,
+   "seasonal_evidence": "grocery inside Camp Morris bungalow colony/camp, Brooklyn 718 phone; no off-season presence found"
   },
   {
    "name": "Catskill Kosher Center",
@@ -249,7 +271,9 @@
    "verify_status": "verify",
    "notes": "NYS registry",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-017"
+   "id": "sc-017",
+   "seasonal": true,
+   "seasonal_evidence": "address is Giti Gardens bungalow colony on Glen Wild Rd; supermarket serves colony, no year-round evidence"
   },
   {
    "name": "Greenfresh Supermarket",
@@ -262,7 +286,9 @@
    "verify_status": "verify",
    "notes": "NYS registry / SNAP listing",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-018"
+   "id": "sc-018",
+   "seasonal": true,
+   "seasonal_evidence": "My Jewish Listings labels it \"Greenfresh Supermarket (Summer Only)\""
   },
   {
    "name": "Honeydew Supermarket",
@@ -275,7 +301,9 @@
    "verify_status": "verify",
    "notes": "Groceries + housewares/toys",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-019"
+   "id": "sc-019",
+   "year_round": true,
+   "year_round_evidence": "new permanent supermarket (grand opening June 27), described as year-round grocery; Mevaser magazine pickup location"
   },
   {
    "name": "Kollel Grocery",
@@ -301,7 +329,9 @@
    "verify_status": "verify",
    "notes": "Dairy + meat takeout, pizza, ice cream",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-021"
+   "id": "sc-021",
+   "seasonal": true,
+   "seasonal_evidence": "Yelp description says open seasonally serving Orthodox community in summer months; old Motty's listing marked closed, now Corner 55 Market"
   },
   {
    "name": "Newday North",
@@ -353,7 +383,9 @@
    "verify_status": "verify",
    "notes": "Tarnopol Kashrus; also listed 321 E Broadway",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-025"
+   "id": "sc-025",
+   "year_round": true,
+   "year_round_evidence": "JewishTidbits grand-opening headline \"All-year-round grocery in Monticello\"; featured in Mountain Square year-round stores video"
   },
   {
    "name": "Woodbourne Supermarket",
@@ -379,7 +411,9 @@
    "verify_status": "verify",
    "notes": "Also listed 5215 Main St",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-027"
+   "id": "sc-027",
+   "year_round": true,
+   "year_round_evidence": "listing states \"open all year\" with full weekly hours; also noted open weekends through winter"
   },
   {
    "name": "Kosher Atlantic",
@@ -418,7 +452,9 @@
    "verify_status": "verify",
    "notes": "Fish counter at Buy Rite / Center One",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-030"
+   "id": "sc-030",
+   "seasonal": true,
+   "seasonal_evidence": "Ossie's Fish own site lists Woodridge location phone as \"summer only\"; main operations in Cedarhurst/Brooklyn"
   },
   {
    "name": "Satmar Meats (Woodbourne)",
@@ -444,7 +480,9 @@
    "verify_status": "verify",
    "notes": "Butcher, deli, catering, Shabbos boxes; also satmarkjmeat.com; alt 347-221-0371",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-032"
+   "id": "sc-032",
+   "year_round": true,
+   "year_round_evidence": "boosur.com states store is open all year with full menu and Shabbos/Yom Tov selection (separate Satmar Meats listing is summer-only)"
   },
   {
    "name": "Fallsburg Bagels & Bakery",
@@ -457,7 +495,9 @@
    "verify_status": "confirmed",
    "notes": "Bagels, pastries, omelets",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-033"
+   "id": "sc-033",
+   "year_round": true,
+   "year_round_evidence": "own website posts standard full-week hours with no seasonal notice; listings updated through winter months"
   },
   {
    "name": "Gombo's Heimishe Bakery",
@@ -484,7 +524,9 @@
    "verify_status": "confirmed",
    "notes": "Dairy cafe + bakery; alt 845-796-4796",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-035"
+   "id": "sc-035",
+   "year_round": true,
+   "year_round_evidence": "Full weekly hours listed on Yelp/Restaurantji, no seasonal label; Monticello year-round community bakery"
   },
   {
    "name": "Berry's Bake Shop",
@@ -497,7 +539,9 @@
    "verify_status": "verify",
    "notes": "Babka, challah, sandwiches",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-036"
+   "id": "sc-036",
+   "year_round": true,
+   "year_round_evidence": "posted Mon-Fri weekly hours, serves year-round Bloomingburg community; no seasonal label"
   },
   {
    "name": "Swan Lake Bakery",
@@ -510,7 +554,9 @@
    "verify_status": "verify",
    "notes": "Also listed Monticello",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-037"
+   "id": "sc-037",
+   "seasonal": true,
+   "seasonal_evidence": "Mekomos describes it as \"a unique summer bakery\""
   },
   {
    "name": "Taam Eden Bakery",
@@ -523,7 +569,9 @@
    "verify_status": "verify",
    "notes": "Daily fresh; also inside Gourmet Glatt Kiamesha",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-038"
+   "id": "sc-038",
+   "year_round": true,
+   "year_round_evidence": "Mountain Square store covered in \"Year-Round Stores in the Catskills\" feature; active Uber Eats delivery"
   },
   {
    "name": "Bass & Bourbon",
@@ -575,7 +623,9 @@
    "verify_status": "confirmed",
    "notes": "Meat fast-casual",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-042"
+   "id": "sc-042",
+   "seasonal": true,
+   "seasonal_evidence": "Great Kosher Restaurants lists \"Crunchies SUMMER ONLY\"; TotallyJewishTravel lists as \"Crunchies (Seasonal)\""
   },
   {
    "name": "Falafel Tanami",
@@ -601,7 +651,9 @@
    "verify_status": "confirmed",
    "notes": "Four Corners; Sprinkles + Fialkoff's co-located (also 5672 NY-42)",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-044"
+   "id": "sc-044",
+   "seasonal": true,
+   "seasonal_evidence": "GreatKosherRestaurants lists \"Fialkoff's Pizza: Four Corners SUMMER ONLY\"; described as seasonal summer operation"
   },
   {
    "name": "Flavors",
@@ -614,7 +666,9 @@
    "verify_status": "confirmed",
    "notes": "Cafe",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-045"
+   "id": "sc-045",
+   "seasonal": true,
+   "seasonal_evidence": "YWN article: \"Flavors opens for 2nd summer\"; summer ice cream shop on S. Fallsburg strip"
   },
   {
    "name": "Formaggio Mio",
@@ -666,7 +720,9 @@
    "verify_status": "confirmed",
    "notes": "Dairy cafe (a/k/a Aroma Monticello); sourdough pizza",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-049"
+   "id": "sc-049",
+   "year_round": true,
+   "year_round_evidence": "listing states \"Kosher Dairy restaurant that is open year round\" with full weekly hours"
   },
   {
    "name": "Riverside Cafe & Diner / Smash House Burger",
@@ -796,7 +852,9 @@
    "verify_status": "verify",
    "notes": "CRC; alt 845-376-4040",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-059"
+   "id": "sc-059",
+   "year_round": true,
+   "year_round_evidence": "website posts explicit winter hours (Sun-Wed 11-7 etc.); named among Mountain Square year-round stores"
   },
   {
    "name": "Chezky's Pizza",
@@ -848,7 +906,9 @@
    "verify_status": "verify",
    "notes": "Catskills classic",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-063"
+   "id": "sc-063",
+   "seasonal": true,
+   "seasonal_evidence": "Great Kosher Restaurants lists \"Fialkoff's Pizza: Monticello SUMMER ONLY\"; reviews note open only months around summer"
   },
   {
    "name": "Green Lips Juice & Acai Bar",
@@ -926,7 +986,9 @@
    "verify_status": "verify",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-069"
+   "id": "sc-069",
+   "year_round": true,
+   "year_round_evidence": "Listed in \"What's Open in winter in Fallsburg\" guide; operating inside Landau's with winter hours"
   },
   {
    "name": "Ming Moon",
@@ -939,7 +1001,9 @@
    "verify_status": "verify",
    "notes": "Chinese",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-070"
+   "id": "sc-070",
+   "year_round": true,
+   "year_round_evidence": "long-standing local (non-kosher) Chinese takeout, \"locals coming back for decades,\" active online ordering into winter"
   },
   {
    "name": "Mo's Grill",
@@ -978,7 +1042,9 @@
    "verify_status": "verify",
    "notes": "Sushi; with Nature's Delight/Aroma",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-073"
+   "id": "sc-073",
+   "seasonal": true,
+   "seasonal_evidence": "website blog says \"officially open for the season\"; shares 554 W Broadway address with summer-trade eateries"
   },
   {
    "name": "Pezzto",
@@ -1017,7 +1083,9 @@
    "verify_status": "confirmed",
    "notes": "Italian dairy (w/ Rock Bistro)",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-076"
+   "id": "sc-076",
+   "seasonal": true,
+   "seasonal_evidence": "restaurant inside Rock Resort kosher vacation resort; sister restaurant at same resort labeled \"SUMMER ONLY\" by Great Kosher Restaurants"
   },
   {
    "name": "StarGelt Cafe",
@@ -1069,7 +1137,9 @@
    "verify_status": "verify",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-080"
+   "id": "sc-080",
+   "seasonal": true,
+   "seasonal_evidence": "TotallyJewishTravel lists it as \"The Bucket (Seasonal)\"; described as summer-months operation"
   },
   {
    "name": "Tuscany Cafe & Pizzeria",
@@ -1082,7 +1152,9 @@
    "verify_status": "verify",
    "notes": "Pizza/sushi",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-081"
+   "id": "sc-081",
+   "seasonal": true,
+   "seasonal_evidence": "Great Kosher Restaurants and My Jewish Listings both label it \"SUMMER ONLY\""
   },
   {
    "name": "Upstate Subs",
@@ -1134,7 +1206,9 @@
    "verify_status": "confirmed",
    "notes": "NEW 2026; three-floor fleishig; by Rock Bistro owner",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-085"
+   "id": "sc-085",
+   "year_round": true,
+   "year_round_evidence": "thebelvedereny.com lists standard Sun-Thu 5:30-10:30pm hours with no seasonal mention; markets Shabbos suites/ballroom"
   },
   {
    "name": "Bison & Bourbon",
@@ -1160,7 +1234,9 @@
    "verify_status": "confirmed",
    "notes": "NEW 2026; grill bar + Chinese; seats 150/70",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-087"
+   "id": "sc-087",
+   "seasonal": true,
+   "seasonal_evidence": "COLlive article \"Prime Avenue Opens a Summer Branch Upstate\" — seasonal summer location of Brooklyn restaurant"
   },
   {
    "name": "The Flame",
@@ -1173,7 +1249,9 @@
    "verify_status": "confirmed",
    "notes": "Meat/Chinese/steakhouse",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-088"
+   "id": "sc-088",
+   "seasonal": true,
+   "seasonal_evidence": "TotallyJewishTravel lists \"The Flame Monticello (Seasonal)\"; mekomos says summer-season schedule"
   },
   {
    "name": "Dougie's BBQ & Grill",
@@ -1342,7 +1420,9 @@
    "verify_status": "verify",
    "notes": "Books events",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-101"
+   "id": "sc-101",
+   "seasonal": true,
+   "seasonal_evidence": "Cones kosher ice cream trucks; Liberty address is Catskills summer base, company trucks operate tri-state"
   },
   {
    "name": "Shlomie's Choklat",
@@ -1446,7 +1526,9 @@
    "verify_status": "confirmed",
    "notes": "Catskill Kids Fun Zone",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-109"
+   "id": "sc-109",
+   "year_round": true,
+   "year_round_evidence": "full weekly hours posted (Loc8NearMe); includes indoor kids playzone and Chazak discount-card participation suggesting off-season trade"
   },
   {
    "name": "Hakol B'Sefer Judaica",
@@ -1459,7 +1541,9 @@
    "verify_status": "confirmed",
    "notes": "Seforim, Judaica, toys",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-110"
+   "id": "sc-110",
+   "seasonal": true,
+   "seasonal_evidence": "Described as open \"24/6 during the summer season\"; Woodbourne strip businesses run until ~Labor Day"
   },
   {
    "name": "KB Seforim and Judaica",
@@ -1485,7 +1569,9 @@
    "verify_status": "verify",
    "notes": "Judaica & Seforim (1-888-68-KETER)",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-112"
+   "id": "sc-112",
+   "year_round": true,
+   "year_round_evidence": "Featured in \"Exploring Mountain Square: Year-Round Stores in the Catskills\" (Yiddish Videos); permanent Mountain Square location"
   },
   {
    "name": "Toys 4 U",
@@ -1498,7 +1584,9 @@
    "verify_status": "verify",
    "notes": "Toys & books",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-113"
+   "id": "sc-113",
+   "year_round": true,
+   "year_round_evidence": "named among year-round stores at Mountain Square (\"Keter Judaica, Toys 4 U, Hoopla and Casa Cava\")"
   },
   {
    "name": "Yufah Judaica",
@@ -1511,7 +1599,9 @@
    "verify_status": "verify",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-114"
+   "id": "sc-114",
+   "year_round": true,
+   "year_round_evidence": "Serves Bloomingburg's year-round Hasidic community; listing actively updated November 2025; no seasonal label"
   },
   {
    "name": "Kidichic",
@@ -1524,7 +1614,9 @@
    "verify_status": "confirmed",
    "notes": "Kids' apparel; next to Prime Avenue",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-115"
+   "id": "sc-115",
+   "seasonal": true,
+   "seasonal_evidence": "Google/Yelp business name is literally \"Kidichic - Seasonal Store\" at Mountain Square"
   },
   {
    "name": "Kosher Socks (Pack for Camp)",
@@ -1537,7 +1629,9 @@
    "verify_status": "confirmed",
    "notes": "Camp gear",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-116"
+   "id": "sc-116",
+   "seasonal": true,
+   "seasonal_evidence": "Murray the Sockman camp-outfitting store; Facebook/Jewish Link describe it as open for the summer camp season"
   },
   {
    "name": "Majek Furs",
@@ -1550,7 +1644,9 @@
    "verify_status": "confirmed",
    "notes": "Furs/outerwear; advertised this issue",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-117"
+   "id": "sc-117",
+   "year_round": true,
+   "year_round_evidence": "same address/phone operates as Majek Furniture with posted 7-day weekly hours; fur trade is winter-oriented"
   },
   {
    "name": "Mynal Kids Shoes",
@@ -1576,7 +1672,9 @@
    "verify_status": "confirmed",
    "notes": "Heimishe-owned; delivery; also 845-434-5877",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-119"
+   "id": "sc-119",
+   "year_round": true,
+   "year_round_evidence": "Malek Discount Furniture, family-owned since 2000, standard Mon-Sat hours posted; permanent local store"
   },
   {
    "name": "Home Square",
@@ -1589,7 +1687,9 @@
    "verify_status": "verify",
    "notes": "Hardware, housewares, appliances",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-120"
+   "id": "sc-120",
+   "year_round": true,
+   "year_round_evidence": "Weekly Sun-Fri hours listed; Mountain Square-area store pitched as alternative to \"shlepping from the city\", no seasonal label"
   },
   {
    "name": "ON Board",
@@ -1628,7 +1728,9 @@
    "verify_status": "confirmed",
    "notes": "Advertised this issue",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-123"
+   "id": "sc-123",
+   "seasonal": true,
+   "seasonal_evidence": "ODA/findhelp listing states Monticello location is open July & August only"
   },
   {
    "name": "ODA Primary Health Care (Woodridge)",
@@ -1641,7 +1743,9 @@
    "verify_status": "confirmed",
    "notes": "Advertised this issue",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-124"
+   "id": "sc-124",
+   "seasonal": true,
+   "seasonal_evidence": "odahealth.org states Woodridge site is one of two seasonal Catskills locations, open July & August only"
   },
   {
    "name": "Rock Hill Pharmacy",
@@ -1654,7 +1758,9 @@
    "verify_status": "confirmed",
    "notes": "Pharmacy w/ Hallmark dept; advertised this issue",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-125"
+   "id": "sc-125",
+   "year_round": true,
+   "year_round_evidence": "permanent pharmacy, posted Mon-Sat weekly hours, chamber of commerce member"
   },
   {
    "name": "SeeView Optical",
@@ -1667,7 +1773,9 @@
    "verify_status": "confirmed",
    "notes": "Optical; advertised this issue",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-126"
+   "id": "sc-126",
+   "seasonal": true,
+   "seasonal_evidence": "COLlive: store opened upstate for summer, \"after the summer\" equipment returns to Brooklyn location"
   },
   {
    "name": "Woodbourne Medical Center",
@@ -1706,7 +1814,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-129"
+   "id": "sc-129",
+   "year_round": true,
+   "year_round_evidence": "permanent facility opened June 2025 in former movie theater; \"closed Saturdays throughout the year\" implies all-year operation"
   },
   {
    "name": "Fortress Bikes",
@@ -1745,7 +1855,9 @@
    "verify_status": "verify",
    "notes": "Family entertainment",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-132"
+   "id": "sc-132",
+   "year_round": true,
+   "year_round_evidence": "included in \"Exploring Mountain Square: Year-Round Stores in the Catskills\" feature"
   },
   {
    "name": "Smart Style Hair Salon",
@@ -1823,7 +1935,9 @@
    "verify_status": "verify",
    "notes": "Kosher/Shabbat programming",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-138"
+   "id": "sc-138",
+   "year_round": true,
+   "year_round_evidence": "thekartrite.com: NY's largest year-round indoor waterpark; resort open all year (waterpark Thu-Sun off-peak)"
   },
   {
    "name": "The Raleigh Hotel",
@@ -1875,7 +1989,9 @@
    "verify_status": "verify",
    "notes": "Chabad",
    "source": "Prior list",
-   "id": "sc-142"
+   "id": "sc-142",
+   "year_round": true,
+   "year_round_evidence": "permanent Chabad center on chabad.org with resident Rabbi Chanowitz; Chabad centers operate year-round"
   },
   {
    "name": "Chabad of Rock Hill",
@@ -1888,7 +2004,9 @@
    "verify_status": "verify",
    "notes": "Chabad",
    "source": "Prior list",
-   "id": "sc-143"
+   "id": "sc-143",
+   "year_round": true,
+   "year_round_evidence": "Permanent Chabad center serving ~800 year-round Rock Hill families; year-round programming on jewishcatskills.org"
   },
   {
    "name": "Chabad of Swan Lake",
@@ -1927,7 +2045,9 @@
    "verify_status": "verify",
    "notes": "Synagogue",
    "source": "Prior list",
-   "id": "sc-146"
+   "id": "sc-146",
+   "seasonal": true,
+   "seasonal_evidence": "Godaven/TereKosher listing says Dushinsky Shteeble operates during summer season only"
   },
   {
    "name": "K'hal Yereim",
@@ -1940,7 +2060,9 @@
    "verify_status": "verify",
    "notes": "Synagogue",
    "source": "Prior list",
-   "id": "sc-147"
+   "id": "sc-147",
+   "year_round": true,
+   "year_round_evidence": "registered 501c3 congregation; listing notes year-round accessibility with multiple daily minyanim"
   },
   {
    "name": "Kollel of South Fallsburg",
@@ -1953,7 +2075,9 @@
    "verify_status": "verify",
    "notes": "Study center",
    "source": "Prior list",
-   "id": "sc-148"
+   "id": "sc-148",
+   "year_round": true,
+   "year_round_evidence": "Ami/YWN: South Fallsburg is oldest year-round Catskills frum community; kollel/yeshiva beis midrash open all year"
   },
   {
    "name": "Kollel Zichron Moshe",
@@ -1979,7 +2103,9 @@
    "verify_status": "verify",
    "notes": "Synagogue",
    "source": "Prior list",
-   "id": "sc-150"
+   "id": "sc-150",
+   "year_round": true,
+   "year_round_evidence": "Historic Woodridge Shul (Ohave Shalom, est. 1930), listed active with daily 6:45am-9pm hours year-round"
   },
   {
    "name": "Shaloh Center",
@@ -2005,7 +2131,9 @@
    "verify_status": "verify",
    "notes": "Communal org",
    "source": "Prior list",
-   "id": "sc-152"
+   "id": "sc-152",
+   "year_round": true,
+   "year_round_evidence": "historic 1902 synagogue; directories state daily services and holidays throughout the year"
   },
   {
    "name": "The Woodbourne Shul (Cong. Bnei Israel)",
@@ -2045,7 +2173,9 @@
    "verify_status": "verify",
    "notes": "Synagogue",
    "source": "Prior list",
-   "id": "sc-155"
+   "id": "sc-155",
+   "year_round": true,
+   "year_round_evidence": "100+ year-old congregation with resident rabbi (Chanowitz); active website posts weekly Shabbat services"
   },
   {
    "name": "Viznitz Gibbers Shul",
@@ -2084,7 +2214,9 @@
    "verify_status": "verify",
    "notes": "Yeshiva",
    "source": "Prior list",
-   "id": "sc-158"
+   "id": "sc-158",
+   "year_round": true,
+   "year_round_evidence": "Permanent rabbinical college (est. 1944, ~200 resident students, Rosh Yeshiva R' Elya Ber Wachtfogel); anchor of year-round South Fallsburg community"
   },
   {
    "name": "Yeshivas TTL Monticello",
@@ -2097,7 +2229,9 @@
    "verify_status": "verify",
    "notes": "Yeshiva",
    "source": "Prior list",
-   "id": "sc-159"
+   "id": "sc-159",
+   "year_round": true,
+   "year_round_evidence": "Yeshivas Tomchei Temimim Lubavitch Mesivta — full-time school-year institution housed at Landfield Ave Synagogue"
   },
   {
    "name": "Camp Sternberg Mikvah",
@@ -2110,7 +2244,9 @@
    "verify_status": "confirmed",
    "notes": "By appointment",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-160"
+   "id": "sc-160",
+   "seasonal": true,
+   "seasonal_evidence": "Mikvah located inside Camp Sternberg, a summer camp"
   },
   {
    "name": "Fallsburg Community Mikvah",
@@ -2123,7 +2259,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-161"
+   "id": "sc-161",
+   "year_round": true,
+   "year_round_evidence": "mikvah.org listing: reservation system for summer only, \"rest of the year\" call for appointment; Friday-night appointments all year"
   },
   {
    "name": "Mikva Tahara (Kiryas Beirach Moshe)",
@@ -2149,7 +2287,9 @@
    "verify_status": "confirmed",
    "notes": "All year",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-163"
+   "id": "sc-163",
+   "seasonal": true,
+   "seasonal_evidence": "mikvah.org locates it at the Satmar Kollel bungalow colony in Woodridge, a summer colony facility"
   },
   {
    "name": "Mikva Taharas of Woodridge",
@@ -2162,7 +2302,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-164"
+   "id": "sc-164",
+   "year_round": true,
+   "year_round_evidence": "phone matches Mikvah of Woodridge on mikvah.org, open year-round by appointment (24-48hr notice); a different Woodridge mikvah is marked summer-only"
   },
   {
    "name": "Mikvah Divrei Chaim",
@@ -2214,7 +2356,9 @@
    "verify_status": "confirmed",
    "notes": "By appointment",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-168"
+   "id": "sc-168",
+   "seasonal": true,
+   "seasonal_evidence": "mikvah.org: located at Skolya Bungalows, summer season, by appointment only"
   },
   {
    "name": "Mikvah Tahara of Swan Lake",
@@ -2253,7 +2397,9 @@
    "verify_status": "verify",
    "notes": "Mikvah",
    "source": "Prior list",
-   "id": "sc-171"
+   "id": "sc-171",
+   "year_round": true,
+   "year_round_evidence": "Listings state 16 North St mikvah is open year round, winter season by appointment (845-321-5103)"
   },
   {
    "name": "Bikur Cholim of Catskills",
@@ -2266,7 +2412,9 @@
    "verify_status": "confirmed",
    "notes": "Ellenville 845-339-4640",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-172"
+   "id": "sc-172",
+   "seasonal": true,
+   "seasonal_evidence": "directories describe Catskills Bikur Cholim as operating during summer months incl. summer trailer at Harris hospital"
   },
   {
    "name": "Matzil",
@@ -2279,7 +2427,9 @@
    "verify_status": "confirmed",
    "notes": "Emergency response; Monticello 845-794-4422; 833-MATZIL7",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-173"
+   "id": "sc-173",
+   "year_round": true,
+   "year_round_evidence": "matzil.org/directories: 24/7 365 emergency search-and-rescue response"
   },
   {
    "name": "Chai Lifeline",
@@ -2292,7 +2442,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-174"
+   "id": "sc-174",
+   "seasonal": true,
+   "seasonal_evidence": "Sullivan County presence is Camp Simcha summer campus/office (Glen Spey); parent org is NYC-based year-round"
   },
   {
    "name": "Hamaspik",
@@ -2305,7 +2457,9 @@
    "verify_status": "confirmed",
    "notes": "Ferndale 845-292-6600",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-175"
+   "id": "sc-175",
+   "year_round": true,
+   "year_round_evidence": "Hamaspik is a permanent health/human-services agency (MLTC plan, agency services) serving Sullivan County year-round"
   },
   {
    "name": "Misaskim of the Catskills",
@@ -2331,7 +2485,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-177"
+   "id": "sc-177",
+   "year_round": true,
+   "year_round_evidence": "Permanent village police department"
   },
   {
    "name": "Catskills Hatzalah",
@@ -2358,7 +2514,9 @@
    "website": "",
    "verify_status": "confirmed",
    "notes": "Coffee, smoothies, pastries, acai bowls, sandwiches, salads. Seating 80+, delivery, catering. Tartikov hashgacha (Rabbi Yechiel Babad)",
-   "source": "Confirmed 2026-06-30"
+   "source": "Confirmed 2026-06-30",
+   "year_round": true,
+   "year_round_evidence": "grand-opening announcement says \"will be open all year-round\"; some directories describe it as a summer outpost"
   },
   {
    "name": "Monticello Cantorial Dental Center",
