@@ -144,10 +144,20 @@
       var todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
 
       var upcoming = lineup.find(function (e) { return e.date >= todayStr; });
-      if (!upcoming) upcoming = lineup[lineup.length - 1];
 
       var highlightEl = document.getElementById('ent-highlight');
-      if (upcoming) {
+      if (!upcoming && lineup.length) {
+        highlightEl.className = 'ent-highlight ent-highlight-off';
+        highlightEl.innerHTML =
+          '<p class="ent-highlight-eyebrow">Season Wrap</p>' +
+          '<div class="ent-highlight-main">' +
+            '<span class="ent-highlight-emoji">🍂</span>' +
+            '<div>' +
+              '<h2>That&#39;s a wrap on Summer 2026!</h2>' +
+              '<p class="ent-highlight-detail">Thanks for an incredible season of Saturday nights. See you next summer!</p>' +
+            '</div>' +
+          '</div>';
+      } else if (upcoming) {
         highlightEl.className = 'ent-highlight' + (upcoming.noEntertainment ? ' ent-highlight-off' : '');
         highlightEl.innerHTML =
           '<p class="ent-highlight-eyebrow">' + (upcoming.date === todayStr ? 'Tonight' : 'Coming Up') + '</p>' +

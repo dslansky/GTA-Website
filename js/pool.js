@@ -1,5 +1,9 @@
 /* Greentree Acres — Pool Hours 2026 */
 (function () {
+  // Last swim day of the season (inclusive, NY date). Matches POOL_SEASON_END
+  // in worker.js, which stops the pool push notifications — keep in sync.
+  var SEASON_END = '2026-08-23';
+
   var SCHEDULE = {
     'mon-thu': [
       { start: [10, 0],  end: [12, 30], group: 'Ladies' },
@@ -59,7 +63,14 @@
     return m === 0 ? hh + ampm : hh + ':' + String(m).padStart(2, '0') + ampm;
   }
 
+  function nyDateStr() {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+  }
+
   function currentStatus() {
+    if (nyDateStr() > SEASON_END) {
+      return { open: false, label: 'Pool closed for the season', detail: 'See you next summer!', icon: '🍂', tone: 'closed' };
+    }
     var t = nyParts();
     var key = dayKey(t.day);
     if (key === 'sat') return { open: false, label: 'Closed', detail: 'Shabbos', icon: '🌅', tone: 'closed' };

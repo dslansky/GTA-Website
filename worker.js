@@ -2754,6 +2754,16 @@ async function seedDefaultsIfEmpty(env) {
   ));
 }
 
+// Last day of the pool season (ET, inclusive). After this date all pool push
+// schedules (changeover heads-ups + default open/close) are skipped and the
+// seeder stops re-inserting them. js/pool.js has a matching SEASON_END that
+// switches the site banner to "Closed for the season" — keep the two in sync.
+const POOL_SEASON_END = '2026-08-23';
+
+function poolSeasonOver(now) {
+  return now.iso.slice(0, 10) > POOL_SEASON_END;
+}
+
 // Pool changeover heads-up: ~15 min before each gender switch / close.
 // Cron is */15 so scheduled time at :15 or :45 fires that exact tick.
 const POOL_CHANGEOVERS = [
@@ -2775,6 +2785,7 @@ const POOL_CHANGEOVERS = [
 ];
 
 async function seedPoolChangeoversIfMissing(env) {
+  if (poolSeasonOver(nyNow())) return;
   await Promise.all(POOL_CHANGEOVERS.map(async ([slug, days, time, title, body]) => {
     const id = 'sched_pool_' + slug;
     const existing = await env.ORDERS.get(id);
@@ -2880,6 +2891,7 @@ async function runScheduledTick(env) {
 
   for (const sched of scheds) {
     if (!sched.enabled) continue;
+    if (poolSeasonOver(now) && (sched.id.startsWith('sched_pool_') || sched.id.startsWith('sched_default_pool_'))) continue;
     if (!scheduleMatches(sched, now)) continue;
     // Debounce: skip if fired in last 25 min
     if (sched.lastFired) {
