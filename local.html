@@ -475,6 +475,7 @@
     }
     .verify-badge.confirmed { background: var(--color-green-muted); color: var(--color-green); }
     .verify-badge.verify { background: #fdf3d5; color: #8a6210; }
+    .verify-badge.yearround { background: #e3f2fd; color: #1565c0; }
 
     .dir-town-tag {
       font-size: 0.78rem;
@@ -636,6 +637,11 @@
             <span class="verify-toggle-switch" aria-hidden="true"></span>
             <span>Verified open only</span>
           </label>
+          <label class="verify-toggle">
+            <input type="checkbox" id="dir-yearround-only" />
+            <span class="verify-toggle-switch" aria-hidden="true"></span>
+            <span>❄️ Year-round only</span>
+          </label>
         </div>
         <div class="dir-legend">
           <span class="dir-legend-dot confirmed"><span id="legend-confirmed">Verified open</span></span>
@@ -680,7 +686,8 @@
         categoryOrder: [],
         q: '',
         town: '',
-        verifiedOnly: false
+        verifiedOnly: false,
+        yearRoundOnly: false
       };
 
       function esc(s) {
@@ -717,11 +724,12 @@
 
         var badgeClass = it.verify_status === 'confirmed' ? 'confirmed' : 'verify';
         var badgeLabel = it.verify_status === 'confirmed' ? 'Verified open' : 'Call to verify';
+        var yrBadge = it.year_round ? '<span class="verify-badge yearround">❄️ Year-round</span>' : '';
 
         return '<article class="dir-card" data-id="' + esc(it.id) + '">' +
           '<div class="dir-card-header">' +
             '<h4>' + esc(it.name) + '</h4>' +
-            '<span class="verify-badge ' + badgeClass + '">' + badgeLabel + '</span>' +
+            '<span class="verify-badge ' + badgeClass + '">' + badgeLabel + '</span>' + yrBadge +
           '</div>' +
           (it.town ? '<p class="dir-town-tag">' + esc(it.town) + '</p>' : '') +
           (it.address ? '<p class="dir-address">' + esc(it.address) + '</p>' : '') +
@@ -735,6 +743,7 @@
         return state.items.filter(function (it) {
           if (state.town && it.town !== state.town) return false;
           if (state.verifiedOnly && it.verify_status !== 'confirmed') return false;
+          if (state.yearRoundOnly && !it.year_round) return false;
           if (q) {
             var hay = (it.name + ' ' + it.town + ' ' + it.address + ' ' + it.category + ' ' + (it.notes || '')).toLowerCase();
             if (hay.indexOf(q) === -1) return false;
@@ -851,6 +860,10 @@
       });
       document.getElementById('dir-town').addEventListener('change', function (e) {
         state.town = e.target.value;
+        render();
+      });
+      document.getElementById('dir-yearround-only').addEventListener('change', function (e) {
+        state.yearRoundOnly = e.target.checked;
         render();
       });
       document.getElementById('dir-verified-only').addEventListener('change', function (e) {
