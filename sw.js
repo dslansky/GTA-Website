@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v46-2026-07-29';
+const CACHE_VERSION = 'gta-v47-2026-08-21';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 
@@ -14,6 +14,7 @@ const SHELL_URLS = [
   '/magazines.html',
   '/gazette.html',
   '/entertainment.html',
+  '/privacy.html',
   '/css/styles.css',
   '/js/main.js',
   '/js/weather.js',
