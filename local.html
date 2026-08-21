@@ -509,25 +509,11 @@
   ══════════════════════════════════════ -->
   <div class="jump-nav" id="jump-nav">
     <div class="jump-nav-inner">
-      <a href="#weather" class="jump-link" data-target="weather">Weather</a>
       <a href="#emergency" class="jump-link" data-target="emergency">Emergency</a>
       <a href="#directory" class="jump-link" data-target="directory">Directory</a>
+      <a href="#weather" class="jump-link" data-target="weather">Weather</a>
     </div>
   </div>
-
-  <!-- ══════════════════════════════════════
-       WEATHER
-  ══════════════════════════════════════ -->
-  <section class="section" id="weather">
-    <div class="container">
-      <div class="reveal">
-        <p class="eyebrow">Ferndale, NY · 12734</p>
-        <h2>Weather</h2>
-        <p>Current conditions and 7-day forecast.</p>
-      </div>
-      <div id="weather-widget" class="reveal reveal-delay-1"></div>
-    </div>
-  </section>
 
   <!-- ══════════════════════════════════════
        EMERGENCY / VOLUNTEER
@@ -610,6 +596,20 @@
       <div id="dir-sections"></div>
 
       <div class="dir-footer" id="dir-footer"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       WEATHER
+  ══════════════════════════════════════ -->
+  <section class="section" id="weather" style="background: var(--color-surface); border-top: 1px solid var(--color-border);">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Ferndale, NY · 12734</p>
+        <h2>Weather</h2>
+        <p>Current conditions and 7-day forecast.</p>
+      </div>
+      <div id="weather-widget" class="reveal reveal-delay-1"></div>
     </div>
   </section>
 
@@ -826,7 +826,7 @@
     })();
 
     (function () {
-      var sections = ['weather', 'emergency', 'directory'];
+      var sections = ['emergency', 'directory', 'weather'];
       var links = {};
       document.querySelectorAll('.jump-link').forEach(function (a) {
         links[a.getAttribute('data-target')] = a;
