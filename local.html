@@ -299,6 +299,18 @@
       transition: border-color var(--transition), color var(--transition);
     }
     .dir-phone:hover, .dir-web:hover { border-color: var(--color-green); color: var(--color-green); }
+    .dir-delivery {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--color-border);
+      background: #fff;
+      transition: border-color var(--transition);
+    }
+    .dir-delivery img { display: block; height: 14px; width: auto; }
+    .dir-delivery.doordash img { height: 12px; }
+    .dir-delivery:hover { border-color: var(--color-green); }
     .dir-notes {
       font-size: 0.78rem;
       color: var(--color-secondary);
@@ -441,6 +453,7 @@
     .verify-badge.confirmed { background: var(--color-green-muted); color: var(--color-green); }
     .verify-badge.verify { background: #fdf3d5; color: #8a6210; }
     .verify-badge.yearround { background: #e3f2fd; color: #1565c0; }
+    .verify-badge.summer { background: #fff3e0; color: #b8590f; }
 
     .dir-town-tag {
       font-size: 0.78rem;
@@ -644,8 +657,10 @@
         town: '',
         // Off-season (after the colony season ends) the directory opens on the
         // Year-Round tab — matches SEASON_END in js/pool.js.
-        filter: (new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date()) > '2026-08-23') ? 'year' : 'all'
+        filter: 'all'
       };
+      var offSeason = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date()) > '2026-08-23';
+      if (offSeason) state.filter = 'year';
 
       function esc(s) {
         return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -678,15 +693,19 @@
         if (it.email) actions += '<a class="dir-web" href="mailto:' + esc(it.email) + '" aria-label="Email ' + esc(it.name) + '">' + EMAIL_SVG + 'Email</a>';
         if (it.website) actions += '<a class="dir-web" href="' + esc(webHref(it.website)) + '" target="_blank" rel="noopener noreferrer" aria-label="Website for ' + esc(it.name) + '">' + WEB_SVG + 'Website</a>';
         if (it.address) actions += '<a class="dir-web" href="' + mapsUrl(it.address) + '" target="_blank" rel="noopener noreferrer" aria-label="Directions to ' + esc(it.name) + '">' + PIN_SVG + 'Directions</a>';
+        if (it.ubereats) actions += '<a class="dir-delivery ubereats" href="' + esc(it.ubereats) + '" target="_blank" rel="noopener noreferrer" aria-label="Order ' + esc(it.name) + ' on Uber Eats"><img src="img/delivery/ubereats.svg" alt="Uber Eats"></a>';
+        if (it.doordash) actions += '<a class="dir-delivery doordash" href="' + esc(it.doordash) + '" target="_blank" rel="noopener noreferrer" aria-label="Order ' + esc(it.name) + ' on DoorDash"><img src="img/delivery/doordash.svg" alt="DoorDash"></a>';
 
-        var badgeClass = it.verify_status === 'confirmed' ? 'confirmed' : 'verify';
-        var badgeLabel = it.verify_status === 'confirmed' ? 'Open' : 'Call to verify';
-        var yrBadge = it.year_round ? '<span class="verify-badge yearround">❄️ Year-round</span>' : '';
+        // Season status (from the year-round list) replaces the Open / Call to verify badge.
+        var badge;
+        if (it.year_round) badge = '<span class="verify-badge yearround">❄️ Year-round</span>';
+        else if (it.seasonal) badge = '<span class="verify-badge summer">☀️ Summer only</span>';
+        else if (it.verify_status === 'confirmed') badge = '<span class="verify-badge confirmed">Open</span>';
+        else badge = '<span class="verify-badge verify">Call to verify</span>';
 
         return '<article class="dir-card" data-id="' + esc(it.id) + '">' +
           '<div class="dir-card-header">' +
-            '<h4>' + esc(it.name) + '</h4>' +
-            '<span class="verify-badge ' + badgeClass + '">' + badgeLabel + '</span>' + yrBadge +
+            '<h4>' + esc(it.name) + '</h4>' + badge +
           '</div>' +
           (it.town ? '<p class="dir-town-tag">' + esc(it.town) + '</p>' : '') +
           (it.address ? '<p class="dir-address">' + esc(it.address) + '</p>' : '') +
@@ -699,7 +718,7 @@
         var q = state.q.trim().toLowerCase();
         return state.items.filter(function (it) {
           if (state.town && it.town !== state.town) return false;
-          if (state.filter === 'open' && it.verify_status !== 'confirmed') return false;
+          if (state.filter === 'open' && (it.verify_status !== 'confirmed' || (offSeason && it.seasonal))) return false;
           if (state.filter === 'year' && !it.year_round) return false;
           if (q) {
             var hay = (it.name + ' ' + it.town + ' ' + it.address + ' ' + it.category + ' ' + (it.notes || '')).toLowerCase();

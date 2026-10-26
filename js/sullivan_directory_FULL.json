@@ -1,6 +1,6 @@
 {
  "title": "Sullivan County Kosher & Jewish Directory",
- "source": "Country Vues, June 25 - July 1, 2026; merged with prior curated directory | Updated from Country Vues Season Finale 8/20/26",
+ "source": "Country Vues, June 25 - July 1, 2026; merged with prior curated directory | Updated from Country Vues Season Finale 8/20/26 | Year-round status from Catskills WhatsApp groups list 10/26/26",
  "compiled": "2026-06-29",
  "category_order": [
   "Supermarkets & Groceries",
@@ -25,9 +25,11 @@
  ],
  "verify_legend": {
   "confirmed": "Advertised/listed in current issue - open now",
-  "verify": "Carried over - call to verify"
+  "verify": "Carried over - call to verify",
+  "year_round": "On the 10/26/26 year-round list",
+  "seasonal": "Not on the year-round list - summer only"
  },
- "count": 180,
+ "count": 188,
  "items": [
   {
    "name": "Appletree Kosher Supermarket",
@@ -41,8 +43,8 @@
    "notes": "Salad bar, sushi, takeout",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-001",
-   "year_round": true,
-   "year_round_evidence": "Full weekly hours (Mon-Sun) on multiple listings, active Instagram, no seasonal label; anchor supermarket for Liberty's year-round community"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Goldman's Grocery",
@@ -55,7 +57,9 @@
    "verify_status": "confirmed",
    "notes": "Alt 917-569-4790",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-002"
+   "id": "sc-002",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Gourmet Glatt Kiamesha Lake",
@@ -70,7 +74,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-003",
    "seasonal": true,
-   "seasonal_evidence": "Store announcements say \"now open for Summer 2026\"; operates as summer-season location"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kosher Express on the 42",
@@ -85,7 +89,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-004",
    "year_round": true,
-   "year_round_evidence": "Kosher Travel Info listing says \"kosher grocery open all year\"; active delivery service with 231 Google reviews"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Landau's Supermarket",
@@ -100,7 +104,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-005",
    "year_round": true,
-   "year_round_evidence": "Regular weekly hours listed on Yelp/gokosher/landausupstate.com, no seasonal label; South Fallsburg year-round community supermarket"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Lemonade Kosher Supermarket",
@@ -115,7 +119,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-006",
    "year_round": true,
-   "year_round_evidence": "open 7 days, reviewer notes \"very good opening hours even during the winter\""
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Mountain Food (Mountain Kosher Food)",
@@ -129,8 +133,8 @@
    "notes": "Also listed as Kosher Garden; nearby Mountain Fruit produce",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-007",
-   "year_round": true,
-   "year_round_evidence": "Full weekly hours (incl. late-night) on listings, active storefront serving year-round Monticello community; no seasonal label found"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Tyberg's Grocery",
@@ -143,7 +147,9 @@
    "verify_status": "confirmed",
    "notes": "New for 2026 (Vues)",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-008"
+   "id": "sc-008",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Yagdil Kosher Supermarket",
@@ -157,7 +163,8 @@
    "notes": "Full-service anchor (845-434-FOOD) — Open year-round",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-009",
-   "year_round": true
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Zest Supermarket",
@@ -172,7 +179,7 @@
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-010",
    "seasonal": true,
-   "seasonal_evidence": "My Jewish Listings labels it \"Zest Supermarket (Summer Only)\""
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Aladdin Supermarket",
@@ -182,12 +189,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Colony market",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-011",
    "seasonal": true,
-   "seasonal_evidence": "located inside Kiryas Beirach Moshe, a Satmar summer colony at the former Aladdin Hotel site; no year-round listing found"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "All Fresh Supermarket",
@@ -197,10 +204,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Separate 'All Fresh-Kosher Corner' at 706 Laurel Ave, Fallsburg (718-908-1987) - verify",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-012"
+   "id": "sc-012",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Barron's Grocery",
@@ -210,12 +219,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "NYS registry",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-013",
    "seasonal": true,
-   "seasonal_evidence": "store's own site says it is located within the Shopron Bungalow Colony on Rt 42; no winter evidence"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Buy Rite Kosher Supermarket",
@@ -225,12 +234,12 @@
    "phone": "845-434-7365",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Large summer location; houses Ossie's Fish + sushi; alt 845-434-1718",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-014",
    "year_round": true,
-   "year_round_evidence": "Listing states store operates year-round except holidays, with full off-season weekly hours (Sat closed)"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Camp Morris Grocery (Morris Food)",
@@ -240,12 +249,12 @@
    "phone": "718-633-0262",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "NYS registry; Rebbe's Choice retail",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-015",
    "seasonal": true,
-   "seasonal_evidence": "grocery inside Camp Morris bungalow colony/camp, Brooklyn 718 phone; no off-season presence found"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Catskill Kosher Center",
@@ -255,10 +264,12 @@
    "phone": "845-794-7623",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Convenience-size",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-016"
+   "id": "sc-016",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Giti Garden Supermarket (Tomer Devorah)",
@@ -268,12 +279,12 @@
    "phone": "845-436-1593",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "NYS registry",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-017",
    "seasonal": true,
-   "seasonal_evidence": "address is Giti Gardens bungalow colony on Glen Wild Rd; supermarket serves colony, no year-round evidence"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Greenfresh Supermarket",
@@ -283,12 +294,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "NYS registry / SNAP listing",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-018",
    "seasonal": true,
-   "seasonal_evidence": "My Jewish Listings labels it \"Greenfresh Supermarket (Summer Only)\""
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Honeydew Supermarket",
@@ -298,12 +309,12 @@
    "phone": "845-295-8100",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Groceries + housewares/toys",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-019",
-   "year_round": true,
-   "year_round_evidence": "new permanent supermarket (grand opening June 27), described as year-round grocery; Mevaser magazine pickup location"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kollel Grocery",
@@ -313,10 +324,12 @@
    "phone": "845-662-1116",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "NYS registry",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-020"
+   "id": "sc-020",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Motty's Corner 55",
@@ -326,12 +339,12 @@
    "phone": "845-583-4080",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Dairy + meat takeout, pizza, ice cream",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-021",
    "seasonal": true,
-   "seasonal_evidence": "Yelp description says open seasonally serving Orthodox community in summer months; old Motty's listing marked closed, now Corner 55 Market"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Newday North",
@@ -341,10 +354,12 @@
    "phone": "845-292-6851",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-022"
+   "id": "sc-022",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Schreiber's Market with Melt",
@@ -354,10 +369,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Fresh fruit, shakes, chocolates",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-023"
+   "id": "sc-023",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Skopps Supermarket",
@@ -367,10 +384,12 @@
    "phone": "845-436-8731",
    "email": "skopps.orders@gmail.com",
    "website": "skoppssupermarket.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "~10,000 sq ft; pizza/sushi",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-024"
+   "id": "sc-024",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Sunflower Kosher Market",
@@ -380,12 +399,12 @@
    "phone": "845-376-9000",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Tarnopol Kashrus; also listed 321 E Broadway",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-025",
    "year_round": true,
-   "year_round_evidence": "JewishTidbits grand-opening headline \"All-year-round grocery in Monticello\"; featured in Mountain Square year-round stores video"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Woodbourne Supermarket",
@@ -395,10 +414,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Possible older name / 2nd store vs Zest - verify",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-026"
+   "id": "sc-026",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Boosur Meat & Deli (South Fallsburg)",
@@ -408,12 +429,12 @@
    "phone": "845-434-3689",
    "email": "sales@boosur.com",
    "website": "boosur.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Also listed 5215 Main St",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-027",
    "year_round": true,
-   "year_round_evidence": "listing states \"open all year\" with full weekly hours; also noted open weekends through winter"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kosher Atlantic",
@@ -423,10 +444,12 @@
    "phone": "845-794-3474",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Fresh fish + gefilte",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-028"
+   "id": "sc-028",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Meal Mart",
@@ -436,10 +459,12 @@
    "phone": "845-434-3689",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Shares Boosur/Satmar phone - likely affiliated takeout",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-029"
+   "id": "sc-029",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Ossie's Fish (New Jords LLC)",
@@ -449,12 +474,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Fish counter at Buy Rite / Center One",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-030",
    "seasonal": true,
-   "seasonal_evidence": "Ossie's Fish own site lists Woodridge location phone as \"summer only\"; main operations in Cedarhurst/Brooklyn"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Satmar Meats (Woodbourne)",
@@ -464,10 +489,12 @@
    "phone": "",
    "email": "",
    "website": "satmarmeatsw.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Seasonal butcher + dry goods; shares plaza w/ Jerusalem II Pizza",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-031"
+   "id": "sc-031",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Satmar Meats / Boosur Meat & Deli",
@@ -477,12 +504,14 @@
    "phone": "845-434-3689",
    "email": "sales@boosur.com",
    "website": "boosur.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Butcher, deli, catering, Shabbos boxes; also satmarkjmeat.com; alt 347-221-0371",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-032",
    "year_round": true,
-   "year_round_evidence": "boosur.com states store is open all year with full menu and Shabbos/Yom Tov selection (separate Satmar Meats listing is summer-only)"
+   "season_source": "Catskills year-round list 10/26/26",
+   "ubereats": "https://www.ubereats.com/search?q=Boosur%20Meat%20%26%20Deli",
+   "doordash": "https://www.doordash.com/search/store/Boosur/"
   },
   {
    "name": "Fallsburg Bagels & Bakery",
@@ -496,8 +525,8 @@
    "notes": "Bagels, pastries, omelets",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-033",
-   "year_round": true,
-   "year_round_evidence": "own website posts standard full-week hours with no seasonal notice; listings updated through winter months"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Gombo's Heimishe Bakery",
@@ -511,7 +540,8 @@
    "notes": "Landmark; seasonal Woodbourne branch on Main St — Open year-round",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-034",
-   "year_round": true
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Rugelach Heimishe Bakery & Cafe",
@@ -525,8 +555,8 @@
    "notes": "Dairy cafe + bakery; alt 845-796-4796",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-035",
-   "year_round": true,
-   "year_round_evidence": "Full weekly hours listed on Yelp/Restaurantji, no seasonal label; Monticello year-round community bakery"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Berry's Bake Shop",
@@ -536,12 +566,12 @@
    "phone": "845-316-2220",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Babka, challah, sandwiches",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-036",
-   "year_round": true,
-   "year_round_evidence": "posted Mon-Fri weekly hours, serves year-round Bloomingburg community; no seasonal label"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Swan Lake Bakery",
@@ -551,12 +581,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Also listed Monticello",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-037",
    "seasonal": true,
-   "seasonal_evidence": "Mekomos describes it as \"a unique summer bakery\""
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Taam Eden Bakery",
@@ -566,12 +596,12 @@
    "phone": "718-484-8565",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Daily fresh; also inside Gourmet Glatt Kiamesha",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-038",
-   "year_round": true,
-   "year_round_evidence": "Mountain Square store covered in \"Year-Round Stores in the Catskills\" feature; active Uber Eats delivery"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Bass & Bourbon",
@@ -584,7 +614,9 @@
    "verify_status": "confirmed",
    "notes": "Dairy sister of Bison & Bourbon; lakeside",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-039"
+   "id": "sc-039",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Boat Cafe",
@@ -597,7 +629,9 @@
    "verify_status": "confirmed",
    "notes": "Dairy",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-040"
+   "id": "sc-040",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Citrus Cafe",
@@ -610,7 +644,9 @@
    "verify_status": "confirmed",
    "notes": "Dairy",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-041"
+   "id": "sc-041",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Crunchies (Schnitzel Bar)",
@@ -625,7 +661,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-042",
    "seasonal": true,
-   "seasonal_evidence": "Great Kosher Restaurants lists \"Crunchies SUMMER ONLY\"; TotallyJewishTravel lists as \"Crunchies (Seasonal)\""
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Falafel Tanami",
@@ -638,7 +674,9 @@
    "verify_status": "confirmed",
    "notes": "NEW 2026 falafel truck; from Avenue M, Brooklyn",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-043"
+   "id": "sc-043",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Fialkoff's Pizza / Sprinkles (Four Corners)",
@@ -653,7 +691,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-044",
    "seasonal": true,
-   "seasonal_evidence": "GreatKosherRestaurants lists \"Fialkoff's Pizza: Four Corners SUMMER ONLY\"; described as seasonal summer operation"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Flavors",
@@ -668,7 +706,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-045",
    "seasonal": true,
-   "seasonal_evidence": "YWN article: \"Flavors opens for 2nd summer\"; summer ice cream shop on S. Fallsburg strip"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Formaggio Mio",
@@ -681,7 +719,9 @@
    "verify_status": "confirmed",
    "notes": "Dairy/Mediterranean",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-046"
+   "id": "sc-046",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Liberty Kosher Pizza (Liberty)",
@@ -694,7 +734,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-047"
+   "id": "sc-047",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Liberty Kosher Pizza (Monticello)",
@@ -707,7 +749,9 @@
    "verify_status": "confirmed",
    "notes": "Pizza + arcade",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-048"
+   "id": "sc-048",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Nature's Delight by Aroma",
@@ -721,8 +765,8 @@
    "notes": "Dairy cafe (a/k/a Aroma Monticello); sourdough pizza",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-049",
-   "year_round": true,
-   "year_round_evidence": "listing states \"Kosher Dairy restaurant that is open year round\" with full weekly hours"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Riverside Cafe & Diner / Smash House Burger",
@@ -735,7 +779,9 @@
    "verify_status": "confirmed",
    "notes": "Diner year-round; Smash House burgers summer; alt 845-351-1010",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-050"
+   "id": "sc-050",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Sushi Tokyo (Catskills)",
@@ -748,7 +794,9 @@
    "verify_status": "confirmed",
    "notes": "Shares 1188 NY-52 w/ Boat Cafe + Green Lips",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-051"
+   "id": "sc-051",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "T-Spoons",
@@ -761,7 +809,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-052"
+   "id": "sc-052",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Bonnie's Place",
@@ -771,10 +821,12 @@
    "phone": "845-434-2511",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Chinese/American; also Vacation Village location",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-053"
+   "id": "sc-053",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Bravo Pizza + Sushi Meshuga",
@@ -784,10 +836,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-054"
+   "id": "sc-054",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Brooklyn Brick Oven",
@@ -797,10 +851,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-055"
+   "id": "sc-055",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Cafe Au' Main",
@@ -810,10 +866,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-056"
+   "id": "sc-056",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Cafe Chocolat",
@@ -823,10 +881,12 @@
    "phone": "845-434-7641",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Dairy, ice cream, desserts; alt 845-548-8230",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-057"
+   "id": "sc-057",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Cafe Express",
@@ -836,10 +896,12 @@
    "phone": "845-794-3663",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Dairy/brunch",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-058"
+   "id": "sc-058",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Casa Cava Pizza & Cafe",
@@ -849,12 +911,13 @@
    "phone": "845-655-5888",
    "email": "",
    "website": "casacavapizzacafe.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "CRC; alt 845-376-4040",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-059",
    "year_round": true,
-   "year_round_evidence": "website posts explicit winter hours (Sun-Wed 11-7 etc.); named among Mountain Square year-round stores"
+   "season_source": "Catskills year-round list 10/26/26",
+   "ubereats": "https://www.ubereats.com/search?q=Casa%20Cava"
   },
   {
    "name": "Chezky's Pizza",
@@ -864,10 +927,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-060"
+   "id": "sc-060",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Coby's Corner",
@@ -877,10 +942,12 @@
    "phone": "845-434-1088",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Fleishig; changed hands over years",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-061"
+   "id": "sc-061",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Fialkoff's Pizza (Fun Spot)",
@@ -890,10 +957,12 @@
    "phone": "845-794-3420",
    "email": "",
    "website": "fialkoffskosherpizza.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Inside Fun Spot",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-062"
+   "id": "sc-062",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Fialkoff's Pizza (Pizza Palace)",
@@ -903,12 +972,12 @@
    "phone": "845-794-3420",
    "email": "",
    "website": "fialkoffskosherpizza.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Catskills classic",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-063",
    "seasonal": true,
-   "seasonal_evidence": "Great Kosher Restaurants lists \"Fialkoff's Pizza: Monticello SUMMER ONLY\"; reviews note open only months around summer"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Green Lips Juice & Acai Bar",
@@ -918,10 +987,12 @@
    "phone": "845-807-8006",
    "email": "",
    "website": "greenlips.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-064"
+   "id": "sc-064",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "i-Swirl",
@@ -931,10 +1002,12 @@
    "phone": "845-434-0334",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Frozen yogurt",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-065"
+   "id": "sc-065",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Jerusalem II Pizza",
@@ -944,10 +1017,12 @@
    "phone": "845-434-7499",
    "email": "",
    "website": "j2pizza.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Pizza, falafel, sushi",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-066"
+   "id": "sc-066",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kosher Inn",
@@ -957,10 +1032,12 @@
    "phone": "845-434-7000",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Verify phone (shared w/ Raleigh listing)",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-067"
+   "id": "sc-067",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kosher Pizza Plus",
@@ -970,10 +1047,12 @@
    "phone": "845-794-7499",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-068"
+   "id": "sc-068",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Main Street Pizza",
@@ -983,12 +1062,12 @@
    "phone": "845-434-5845",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-069",
    "year_round": true,
-   "year_round_evidence": "Listed in \"What's Open in winter in Fallsburg\" guide; operating inside Landau's with winter hours"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Ming Moon",
@@ -998,12 +1077,12 @@
    "phone": "845-434-2189",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Chinese",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-070",
-   "year_round": true,
-   "year_round_evidence": "long-standing local (non-kosher) Chinese takeout, \"locals coming back for decades,\" active online ordering into winter"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Mo's Grill",
@@ -1013,10 +1092,12 @@
    "phone": "845-693-4063",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-071"
+   "id": "sc-071",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Mr. Schnitzel",
@@ -1026,10 +1107,12 @@
    "phone": "845-434-0555",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-072"
+   "id": "sc-072",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Noble Nori",
@@ -1039,12 +1122,12 @@
    "phone": "845-504-9554",
    "email": "",
    "website": "noblenori.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Sushi; with Nature's Delight/Aroma",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-073",
    "seasonal": true,
-   "seasonal_evidence": "website blog says \"officially open for the season\"; shares 554 W Broadway address with summer-trade eateries"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Pezzto",
@@ -1054,10 +1137,12 @@
    "phone": "802-473-9986",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-074"
+   "id": "sc-074",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Pizza D' Pie",
@@ -1067,10 +1152,12 @@
    "phone": "845-791-8140",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-075"
+   "id": "sc-075",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Sasso",
@@ -1085,7 +1172,7 @@
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-076",
    "seasonal": true,
-   "seasonal_evidence": "restaurant inside Rock Resort kosher vacation resort; sister restaurant at same resort labeled \"SUMMER ONLY\" by Great Kosher Restaurants"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "StarGelt Cafe",
@@ -1095,10 +1182,12 @@
    "phone": "845-436-6774",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Dairy",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-077"
+   "id": "sc-077",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Starlight Cafe",
@@ -1108,10 +1197,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Possibly same as Starlight Bistro (23 Marina Rd) - verify",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-078"
+   "id": "sc-078",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Swan Lake Pizza & Dairy (Tybergs)",
@@ -1121,10 +1212,12 @@
    "phone": "845-292-8814",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "a/k/a Tybergs Kosher Pizzeria",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-079"
+   "id": "sc-079",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "The Bucket",
@@ -1134,12 +1227,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-080",
    "seasonal": true,
-   "seasonal_evidence": "TotallyJewishTravel lists it as \"The Bucket (Seasonal)\"; described as summer-months operation"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Tuscany Cafe & Pizzeria",
@@ -1149,12 +1242,12 @@
    "phone": "845-666-9500",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Pizza/sushi",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-081",
    "seasonal": true,
-   "seasonal_evidence": "Great Kosher Restaurants and My Jewish Listings both label it \"SUMMER ONLY\""
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Upstate Subs",
@@ -1164,10 +1257,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-082"
+   "id": "sc-082",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Woodbourne Pizza",
@@ -1177,10 +1272,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-083"
+   "id": "sc-083",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Woodridge Kosher Pizza (Feller's)",
@@ -1190,10 +1287,12 @@
    "phone": "845-436-7499",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "a/k/a Fellers",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-084"
+   "id": "sc-084",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Belvedere Steakhouse",
@@ -1207,8 +1306,8 @@
    "notes": "NEW 2026; three-floor fleishig; by Rock Bistro owner",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-085",
-   "year_round": true,
-   "year_round_evidence": "thebelvedereny.com lists standard Sun-Thu 5:30-10:30pm hours with no seasonal mention; markets Shabbos suites/ballroom"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Bison & Bourbon",
@@ -1221,7 +1320,9 @@
    "verify_status": "confirmed",
    "notes": "Meat + dairy sections; lakeside",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-086"
+   "id": "sc-086",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Prime Avenue",
@@ -1236,7 +1337,7 @@
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-087",
    "seasonal": true,
-   "seasonal_evidence": "COLlive article \"Prime Avenue Opens a Summer Branch Upstate\" — seasonal summer location of Brooklyn restaurant"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "The Flame",
@@ -1251,7 +1352,7 @@
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-088",
    "seasonal": true,
-   "seasonal_evidence": "TotallyJewishTravel lists \"The Flame Monticello (Seasonal)\"; mekomos says summer-season schedule"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Dougie's BBQ & Grill",
@@ -1261,10 +1362,12 @@
    "phone": "845-436-4441",
    "email": "info@dougiesbbq.com",
    "website": "dougiesw.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "BBQ/grill/sushi; OU",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-089"
+   "id": "sc-089",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Grill on Broadway",
@@ -1274,10 +1377,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Meat takeout + catering",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-090"
+   "id": "sc-090",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "King of Delancey",
@@ -1290,7 +1395,9 @@
    "verify_status": "confirmed",
    "notes": "Meat + catering/events",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-091"
+   "id": "sc-091",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Levy's",
@@ -1300,10 +1407,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-092"
+   "id": "sc-092",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Meat N' Boat",
@@ -1313,10 +1422,12 @@
    "phone": "929-539-8696",
    "email": "",
    "website": "meatnboat.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Lakeside meat",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-093"
+   "id": "sc-093",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Mountain Top Steakhouse",
@@ -1326,10 +1437,12 @@
    "phone": "845-434-5124",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Hotel steakhouse",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-094"
+   "id": "sc-094",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Primecut Steakhouse",
@@ -1339,10 +1452,12 @@
    "phone": "845-434-7000",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Hotel steakhouse",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-095"
+   "id": "sc-095",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Starlight Bistro",
@@ -1352,10 +1467,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Lakeside; Italian/pizza; see Starlight Cafe",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-096"
+   "id": "sc-096",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Zaftig",
@@ -1365,10 +1482,12 @@
    "phone": "845-513-0088",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Meat takeout + catering; counter inside Lemonade (Liberty)",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-097"
+   "id": "sc-097",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Cones Ice Cream",
@@ -1381,7 +1500,9 @@
    "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-098"
+   "id": "sc-098",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Country Cool Desserts",
@@ -1391,10 +1512,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "NYS registry",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-099"
+   "id": "sc-099",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Garage Ice Cream",
@@ -1404,10 +1527,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-100"
+   "id": "sc-100",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kosher Ice Cream Truck",
@@ -1417,12 +1542,12 @@
    "phone": "347-977-9756",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Books events",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-101",
    "seasonal": true,
-   "seasonal_evidence": "Cones kosher ice cream trucks; Liberty address is Catskills summer base, company trucks operate tri-state"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Shlomie's Choklat",
@@ -1432,10 +1557,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "NYS registry",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-102"
+   "id": "sc-102",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Simply Sweets Ice Cream",
@@ -1445,10 +1572,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-103"
+   "id": "sc-103",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Sprinkles Ice Cream",
@@ -1458,10 +1587,12 @@
    "phone": "845-434-7203",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-104"
+   "id": "sc-104",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "BalaBatish Catering",
@@ -1471,10 +1602,12 @@
    "phone": "732-719-4040",
    "email": "balabatishnj@gmail.com",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Direct delivery to colonies/villas",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-105"
+   "id": "sc-105",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Mountain Chef (Matamim Catering)",
@@ -1484,10 +1617,12 @@
    "phone": "845-500-5553",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-106"
+   "id": "sc-106",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Taam Catering",
@@ -1497,10 +1632,12 @@
    "phone": "845-218-8226",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-107"
+   "id": "sc-107",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Center One Judaica",
@@ -1513,7 +1650,9 @@
    "verify_status": "confirmed",
    "notes": "Seforim, toys, Judaica",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-108"
+   "id": "sc-108",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "ABC Toys & Gifts",
@@ -1527,8 +1666,8 @@
    "notes": "Catskill Kids Fun Zone",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-109",
-   "year_round": true,
-   "year_round_evidence": "full weekly hours posted (Loc8NearMe); includes indoor kids playzone and Chazak discount-card participation suggesting off-season trade"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Hakol B'Sefer Judaica",
@@ -1543,7 +1682,7 @@
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-110",
    "seasonal": true,
-   "seasonal_evidence": "Described as open \"24/6 during the summer season\"; Woodbourne strip businesses run until ~Labor Day"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "KB Seforim and Judaica",
@@ -1553,10 +1692,12 @@
    "phone": "347-578-4449",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-111"
+   "id": "sc-111",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Keter Judaica",
@@ -1566,12 +1707,12 @@
    "phone": "1-888-685-3837",
    "email": "",
    "website": "keterjudaica.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Judaica & Seforim (1-888-68-KETER)",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-112",
-   "year_round": true,
-   "year_round_evidence": "Featured in \"Exploring Mountain Square: Year-Round Stores in the Catskills\" (Yiddish Videos); permanent Mountain Square location"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Toys 4 U",
@@ -1581,12 +1722,12 @@
    "phone": "845-241-7080",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Toys & books",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-113",
-   "year_round": true,
-   "year_round_evidence": "named among year-round stores at Mountain Square (\"Keter Judaica, Toys 4 U, Hoopla and Casa Cava\")"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Yufah Judaica",
@@ -1596,12 +1737,12 @@
    "phone": "845-733-8308",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-114",
-   "year_round": true,
-   "year_round_evidence": "Serves Bloomingburg's year-round Hasidic community; listing actively updated November 2025; no seasonal label"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kidichic",
@@ -1616,7 +1757,7 @@
    "source": "Curated + Vues 6/25/26",
    "id": "sc-115",
    "seasonal": true,
-   "seasonal_evidence": "Google/Yelp business name is literally \"Kidichic - Seasonal Store\" at Mountain Square"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Kosher Socks (Pack for Camp)",
@@ -1631,7 +1772,7 @@
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-116",
    "seasonal": true,
-   "seasonal_evidence": "Murray the Sockman camp-outfitting store; Facebook/Jewish Link describe it as open for the summer camp season"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Majek Furs",
@@ -1645,8 +1786,8 @@
    "notes": "Furs/outerwear; advertised this issue",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-117",
-   "year_round": true,
-   "year_round_evidence": "same address/phone operates as Majek Furniture with posted 7-day weekly hours; fur trade is winter-oriented"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Mynal Kids Shoes",
@@ -1656,10 +1797,12 @@
    "phone": "845-888-7463",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Footwear",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-118"
+   "id": "sc-118",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Discount Furniture & Mattress",
@@ -1673,8 +1816,8 @@
    "notes": "Heimishe-owned; delivery; also 845-434-5877",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-119",
-   "year_round": true,
-   "year_round_evidence": "Malek Discount Furniture, family-owned since 2000, standard Mon-Sat hours posted; permanent local store"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Home Square",
@@ -1684,12 +1827,12 @@
    "phone": "845-685-6000",
    "email": "sales@yourhomesquare.com",
    "website": "shophomesquare.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Hardware, housewares, appliances",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-120",
    "year_round": true,
-   "year_round_evidence": "Weekly Sun-Fri hours listed; Mountain Square-area store pitched as alternative to \"shlepping from the city\", no seasonal label"
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "ON Board",
@@ -1699,10 +1842,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Presentation boards",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-121"
+   "id": "sc-121",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Catskills Urgent Care",
@@ -1801,7 +1946,9 @@
    "verify_status": "confirmed",
    "notes": "Party supplies; advertised this issue",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-128"
+   "id": "sc-128",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Bowling on Broadway",
@@ -1815,8 +1962,8 @@
    "notes": "",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-129",
-   "year_round": true,
-   "year_round_evidence": "permanent facility opened June 2025 in former movie theater; \"closed Saturdays throughout the year\" implies all-year operation"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Fortress Bikes",
@@ -1829,7 +1976,9 @@
    "verify_status": "confirmed",
    "notes": "Bike rentals; reservations suggested",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
-   "id": "sc-130"
+   "id": "sc-130",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Dome 2030 & Arcade",
@@ -1839,10 +1988,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-131"
+   "id": "sc-131",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Hoopla Arcade & Skyride",
@@ -1852,12 +2003,12 @@
    "phone": "718-480-0444",
    "email": "info@hooplavip.com",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Family entertainment",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-132",
-   "year_round": true,
-   "year_round_evidence": "included in \"Exploring Mountain Square: Year-Round Stores in the Catskills\" feature"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Smart Style Hair Salon",
@@ -1870,7 +2021,9 @@
    "verify_status": "confirmed",
    "notes": "Advertised this issue",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-133"
+   "id": "sc-133",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Sruli's Cleaners",
@@ -1883,7 +2036,9 @@
    "verify_status": "confirmed",
    "notes": "NEW 2026 dry cleaner",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-134"
+   "id": "sc-134",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Levi Local Heimish Handyman",
@@ -1893,10 +2048,12 @@
    "phone": "845-777-7288",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Handyman",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-135"
+   "id": "sc-135",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "The Catskill Pages",
@@ -1906,10 +2063,12 @@
    "phone": "718-435-1409",
    "email": "info@catskillpages.com",
    "website": "catskillpages.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Community directory; alt 845-292-5559",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-136"
+   "id": "sc-136",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "The Chalet Hotel",
@@ -1919,10 +2078,12 @@
    "phone": "845-434-5124",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Hosts Mountain Top Steakhouse",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-137"
+   "id": "sc-137",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "The Kartrite Resort",
@@ -1932,12 +2093,12 @@
    "phone": "844-527-8748",
    "email": "",
    "website": "thekartrite.com",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Kosher/Shabbat programming",
    "source": "Curated + Vues 6/25/26",
    "id": "sc-138",
-   "year_round": true,
-   "year_round_evidence": "thekartrite.com: NY's largest year-round indoor waterpark; resort open all year (waterpark Thu-Sun off-peak)"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "The Raleigh Hotel",
@@ -1947,10 +2108,12 @@
    "phone": "845-434-7000",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Glatt kosher hotel (Primecut Steakhouse)",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-139"
+   "id": "sc-139",
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Bethel Creamery",
@@ -1960,10 +2123,12 @@
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
+   "verify_status": "confirmed",
    "notes": "Organic kosher yogurt/milk",
    "source": "Curated + Vues 6/25/26",
-   "id": "sc-140"
+   "id": "sc-140",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Bais Medresh of Monticello",
@@ -2515,8 +2680,8 @@
    "verify_status": "confirmed",
    "notes": "Coffee, smoothies, pastries, acai bowls, sandwiches, salads. Seating 80+, delivery, catering. Tartikov hashgacha (Rabbi Yechiel Babad)",
    "source": "Confirmed 2026-06-30",
-   "year_round": true,
-   "year_round_evidence": "grand-opening announcement says \"will be open all year-round\"; some directories describe it as a summer outpost"
+   "seasonal": true,
+   "season_source": "Catskills year-round list 10/26/26"
   },
   {
    "name": "Monticello Cantorial Dental Center",
@@ -2531,6 +2696,127 @@
    "notes": "Ilan Tzur, DDS — general, cosmetic, implants. Open all year",
    "source": "Vues 8/20/26",
    "id": "sc-180"
+  },
+  {
+   "name": "Main Street Pizza at Lemonade",
+   "category": "Pizza, Dairy, Cafes & Fast-Casual",
+   "town": "Liberty",
+   "address": "Inside Lemonade, 261 N Main St, Liberty, NY 12754",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-181",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
+  },
+  {
+   "name": "Zaftig Take-Out at Lemonade",
+   "category": "Meat Restaurants & Steakhouses",
+   "town": "Liberty",
+   "address": "Inside Lemonade, 261 N Main St, Liberty, NY 12754",
+   "phone": "347-971-2421",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-182",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
+  },
+  {
+   "name": "Liberty Kosher Pizza (at Bowling on Broadway)",
+   "category": "Pizza, Dairy, Cafes & Fast-Casual",
+   "town": "Monticello",
+   "address": "498 Broadway, Monticello, NY 12701",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-183",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26",
+   "doordash": "https://www.doordash.com/search/store/Liberty%20Kosher%20Pizza/"
+  },
+  {
+   "name": "Star Food",
+   "category": "Supermarkets & Groceries",
+   "town": "Bloomingburg",
+   "address": "Bloomingburg, NY 12721",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-184",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
+  },
+  {
+   "name": "Beis Medresh Heichal Hakodesh Breslev",
+   "category": "Synagogues & Batei Medrash",
+   "town": "Hurleyville",
+   "address": "181 Huschke Rd, Hurleyville, NY 12747",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-185",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
+  },
+  {
+   "name": "Refuah Urgent Care",
+   "category": "Health & Medical",
+   "town": "Fallsburg",
+   "address": "Fallsburg, NY",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-186",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
+  },
+  {
+   "name": "Shmeil Dovid Rausenbum (Car Service)",
+   "category": "Professional & Other Services",
+   "town": "Monticello",
+   "address": "",
+   "phone": "845-608-2408",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-187",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
+  },
+  {
+   "name": "Hudson Valley Resort",
+   "category": "Hotels (Kosher Programs)",
+   "town": "Kerhonkson",
+   "address": "Kerhonkson, NY",
+   "phone": "845-794-6000",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Catskills year-round list 10/26/26",
+   "id": "sc-188",
+   "year_round": true,
+   "season_source": "Catskills year-round list 10/26/26"
   }
  ]
 }
