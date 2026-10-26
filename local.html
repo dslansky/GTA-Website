@@ -660,7 +660,9 @@
         filter: 'all'
       };
       var offSeason = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date()) > '2026-08-23';
-      if (offSeason) state.filter = 'year';
+      // Shareable link: local.html#year-round opens the directory on the Year-Round tab.
+      var sharedYearRound = location.hash === '#year-round';
+      if (offSeason || sharedYearRound) state.filter = 'year';
 
       function esc(s) {
         return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -818,6 +820,7 @@
           buildJump();
           buildTownDropdown();
           render();
+          if (sharedYearRound) document.getElementById('directory').scrollIntoView();
         })
         .catch(function () {
           document.getElementById('dir-sections').innerHTML = '<div class="dir-empty">Could not load directory. Please refresh.</div>';
