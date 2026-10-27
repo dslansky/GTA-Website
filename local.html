@@ -73,8 +73,54 @@
     }
 
     /* offset sticky anchor scroll so headings clear nav + jump-nav */
-    #weather, #emergency, #directory {
+    #weather, #emergency, #directory, #numbers {
       scroll-margin-top: calc(var(--nav-height) + 60px);
+    }
+
+    /* ── Useful numbers ── */
+    .num-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+      align-items: start;
+    }
+    @media (max-width: 700px) {
+      .num-grid { grid-template-columns: 1fr; }
+    }
+    .num-card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .num-card h3 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-green);
+      margin: 0 0 8px;
+    }
+    .num-list { list-style: none; margin: 0; padding: 0; }
+    .num-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 8px 0;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.9rem;
+    }
+    .num-list li:first-child { border-top: none; }
+    .num-name { color: var(--color-dark); }
+    .num-sub { display: block; font-size: 0.78rem; color: var(--color-secondary); margin-top: 2px; }
+    .num-list a {
+      flex-shrink: 0;
+      font-weight: 600;
+      color: var(--color-green);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
 
     /* ── Emergency section ── */
@@ -513,7 +559,7 @@
     <div class="container page-header-content">
       <p class="eyebrow">Sullivan County · Catskills</p>
       <h1>Local Info</h1>
-      <p>Emergency services, kosher businesses, and shuls in the neighborhood.</p>
+      <p>Emergency services, kosher businesses, shuls, and useful numbers in the neighborhood.</p>
     </div>
   </section>
 
@@ -524,6 +570,7 @@
     <div class="jump-nav-inner">
       <a href="#emergency" class="jump-link" data-target="emergency">Emergency</a>
       <a href="#directory" class="jump-link" data-target="directory">Directory</a>
+      <a href="#numbers" class="jump-link" data-target="numbers">Numbers</a>
       <a href="#weather" class="jump-link" data-target="weather">Weather</a>
     </div>
   </div>
@@ -613,9 +660,124 @@
   </section>
 
   <!-- ══════════════════════════════════════
+       USEFUL NUMBERS (shareable as /numbers)
+  ══════════════════════════════════════ -->
+  <section class="section" id="numbers" style="background: var(--color-surface); border-top: 1px solid var(--color-border);">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Sullivan County · Year-Round</p>
+        <h2>Useful Numbers</h2>
+        <p>Hospitals, police, fire, county offices, utilities, and transfer station hours. Tap a number to call. Updated October 2026.</p>
+      </div>
+
+      <div class="num-grid reveal reveal-delay-1">
+        <div class="num-card">
+          <h3>Emergency</h3>
+          <ul class="num-list">
+            <li><span class="num-name">Emergency</span><a href="tel:911">911</a></li>
+            <li><span class="num-name">Catskills Hatzalah</span><a href="tel:+17183871750">718-387-1750</a></li>
+            <li><span class="num-name">Chavivim</span><a href="tel:+18454442200">845-444-2200</a></li>
+            <li><span class="num-name">Chaveirim</span><a href="tel:+17184318181">718-431-8181</a></li>
+            <li><span class="num-name">Shmira</span><a href="tel:+17188714444">718-871-4444</a></li>
+            <li><span class="num-name">Chesed Shel Emes</span><a href="tel:+18552732121">855-273-2121</a></li>
+            <li><span class="num-name">Misaskim (24 hr)</span><a href="tel:+18772437336">877-243-7336</a></li>
+            <li><span class="num-name">Chai Lifeline crisis line</span><a href="tel:+18553277477">855-327-7477</a></li>
+            <li><span class="num-name">Poison Control</span><a href="tel:+18002221222">1-800-222-1222</a></li>
+          </ul>
+        </div>
+        <div class="num-card">
+          <h3>Hospitals &amp; Medical</h3>
+          <ul class="num-list">
+            <li><span class="num-name">Garnet Health Medical Center</span><a href="tel:+18457943300">845-794-3300</a></li>
+            <li><span class="num-name">Orange Regional Hospital</span><a href="tel:+18452944837">845-294-4837</a></li>
+            <li><span class="num-name">Ellenville Regional Hospital</span><a href="tel:+18456476400">845-647-6400</a></li>
+            <li><span class="num-name">Pine Bush Dental</span><a href="tel:+18457445422">845-744-5422</a></li>
+          </ul>
+        </div>
+        <div class="num-card">
+          <h3>Police</h3>
+          <ul class="num-list">
+            <li><span class="num-name">Sullivan County Sheriff</span><a href="tel:+18457947100">845-794-7100</a></li>
+            <li><span class="num-name">Fallsburg / South Fallsburg / Woodbourne</span><a href="tel:+18454344422">845-434-4422</a></li>
+            <li><span class="num-name">Woodridge</span><a href="tel:+18454346644">845-434-6644</a></li>
+            <li><span class="num-name">Monticello</span><a href="tel:+18457944422">845-794-4422</a></li>
+            <li><span class="num-name">Liberty</span><a href="tel:+18452924422">845-292-4422</a></li>
+            <li><span class="num-name">Wurtsboro / Mamakating</span><a href="tel:+18458882681">845-888-2681</a></li>
+            <li><span class="num-name">Ellenville</span><a href="tel:+18456474422">845-647-4422</a></li>
+            <li><span class="num-name">State Police — Liberty</span><a href="tel:+18452926600">845-292-6600</a></li>
+            <li><span class="num-name">State Police — Ellenville</span><a href="tel:+18456262800">845-626-2800</a></li>
+          </ul>
+        </div>
+        <div class="num-card">
+          <h3>Fire Departments</h3>
+          <ul class="num-list">
+            <li><span class="num-name">South Fallsburg / Fallsburg</span><a href="tel:+18454342008">845-434-2008</a></li>
+            <li><span class="num-name">Woodbourne</span><a href="tel:+18454346763">845-434-6763</a></li>
+            <li><span class="num-name">Woodridge</span><a href="tel:+18454346893">845-434-6893</a></li>
+            <li><span class="num-name">Monticello</span><a href="tel:+18457946330">845-794-6330</a></li>
+            <li><span class="num-name">Liberty</span><a href="tel:+18452924422">845-292-4422</a></li>
+            <li><span class="num-name">Wurtsboro</span><a href="tel:+18458884611">845-888-4611</a></li>
+            <li><span class="num-name">Ellenville</span><a href="tel:+18456478899">845-647-8899</a></li>
+          </ul>
+        </div>
+        <div class="num-card">
+          <h3>County Offices</h3>
+          <ul class="num-list">
+            <li><span class="num-name">Sullivan County main line</span><a href="tel:+18457943000">845-794-3000</a></li>
+            <li><span class="num-name">County directory</span><a href="tel:+18455837180">845-583-7180</a></li>
+            <li><span class="num-name">County Clerk</span><a href="tel:+18458070411">845-807-0411</a></li>
+            <li><span class="num-name">Passport Office</span><a href="tel:+18458070411">845-807-0411</a></li>
+            <li><span class="num-name">DMV / Motor Vehicle Bureau</span><a href="tel:+18458070700">845-807-0700</a></li>
+            <li><span class="num-name">District Attorney</span><a href="tel:+18457943344">845-794-3344</a></li>
+          </ul>
+        </div>
+        <div class="num-card">
+          <h3>Towns &amp; Villages</h3>
+          <ul class="num-list">
+            <li><span class="num-name">Town of Fallsburg</span><a href="tel:+18454348810">845-434-8810</a></li>
+            <li><span class="num-name">Town of Thompson</span><a href="tel:+18457942500">845-794-2500</a></li>
+            <li><span class="num-name">Town of Liberty</span><a href="tel:+18452925110">845-292-5110</a></li>
+            <li><span class="num-name">Town of Mamakating</span><a href="tel:+18458883000">845-888-3000</a></li>
+            <li><span class="num-name">Village of Monticello</span><a href="tel:+18457946130">845-794-6130</a></li>
+            <li><span class="num-name">Village of Woodridge</span><a href="tel:+18454347447">845-434-7447</a></li>
+            <li><span class="num-name">Village of Liberty</span><a href="tel:+18452922250">845-292-2250</a></li>
+            <li><span class="num-name">Village of Bloomingburg</span><a href="tel:+18457331400">845-733-1400</a></li>
+            <li><span class="num-name">Village of Ateres</span><a href="tel:+18457942727">845-794-2727</a></li>
+          </ul>
+        </div>
+        <div class="num-card">
+          <h3>Electric, Propane &amp; Trash</h3>
+          <ul class="num-list">
+            <li><span class="num-name">NYSEG — start or stop service</span><a href="tel:+18005721111">1-800-572-1111</a></li>
+            <li><span class="num-name">NYSEG — pay bill</span><a href="tel:+18006002275">1-800-600-2275</a></li>
+            <li><span class="num-name">NYSEG — power outage</span><a href="tel:+18005721131">1-800-572-1131</a></li>
+            <li><span class="num-name">NYSEG — gas emergency</span><a href="tel:+18005721121">1-800-572-1121</a></li>
+            <li><span class="num-name">Petro Propane</span><a href="tel:+18773502113">877-350-2113</a></li>
+            <li><span class="num-name">AmeriGas</span><a href="tel:+18667809084">866-780-9084</a></li>
+            <li><span class="num-name">Combined Energy Services</span><a href="tel:+18457941210">845-794-1210</a></li>
+            <li><span class="num-name">Paraco Gas</span><a href="tel:+18006474427">800-647-4427</a></li>
+            <li><span class="num-name">Rieber Rubbish Removal</span><a href="tel:+18457968431">845-796-8431</a></li>
+          </ul>
+        </div>
+        <div class="num-card">
+          <h3>County Transfer Stations</h3>
+          <ul class="num-list">
+            <li><span class="num-name">Monticello<span class="num-sub">Mon–Fri 7:00–3:30 · Sat 7:00–1:00</span></span><a href="tel:+18458070290">845-807-0290</a></li>
+            <li><span class="num-name">Ferndale<span class="num-sub">Tue, Thu & Sun 7:45–2:45</span></span><a href="tel:+18452923670">845-292-3670</a></li>
+            <li><span class="num-name">Mamakating / Wurtsboro<span class="num-sub">Wed & Sun 7:45–2:45</span></span><a href="tel:+18458070669">845-807-0669</a></li>
+            <li><span class="num-name">Highland<span class="num-sub">Tue, Thu & Sat 7:45–2:45</span></span><a href="tel:+18455576983">845-557-6983</a></li>
+            <li><span class="num-name">Rockland<span class="num-sub">Tue, Thu & Sat 7:45–2:45</span></span><a href="tel:+18454393654">845-439-3654</a></li>
+            <li><span class="num-name">Western<span class="num-sub">Wed & Sat 7:45–2:45</span></span><a href="tel:+18458070667">845-807-0667</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
        WEATHER
   ══════════════════════════════════════ -->
-  <section class="section" id="weather" style="background: var(--color-surface); border-top: 1px solid var(--color-border);">
+  <section class="section" id="weather">
     <div class="container">
       <div class="reveal">
         <p class="eyebrow">Ferndale, NY · 12734</p>
@@ -821,6 +983,7 @@
           buildTownDropdown();
           render();
           if (sharedYearRound) document.getElementById('directory').scrollIntoView();
+          else if (location.hash === '#numbers') document.getElementById('numbers').scrollIntoView();
         })
         .catch(function () {
           document.getElementById('dir-sections').innerHTML = '<div class="dir-empty">Could not load directory. Please refresh.</div>';
@@ -848,7 +1011,7 @@
     })();
 
     (function () {
-      var sections = ['emergency', 'directory', 'weather'];
+      var sections = ['emergency', 'directory', 'numbers', 'weather'];
       var links = {};
       document.querySelectorAll('.jump-link').forEach(function (a) {
         links[a.getAttribute('data-target')] = a;

@@ -1,5 +1,5 @@
 /* Greentree Acres — Service Worker */
-const CACHE_VERSION = 'gta-v51-2026-10-26';
+const CACHE_VERSION = 'gta-v52-2026-10-27';
 const SHELL_CACHE = 'gta-shell-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'gta-runtime-' + CACHE_VERSION;
 

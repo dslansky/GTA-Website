@@ -4,20 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Zmanim — Greentree Acres</title>
-  <meta name="description" content="Daily halachic times for Greentree Acres in Ferndale, NY (zip 12734) and local shul davening times." />
+  <meta name="description" content="Daily halachic times for Greentree Acres in Ferndale, NY (zip 12734) and year-round minyan times at local shuls." />
 
   <!-- Open Graph / social preview (WhatsApp, Facebook, iMessage, etc.) -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Greentree Acres" />
   <meta property="og:title" content="Zmanim — Greentree Acres" />
-  <meta property="og:description" content="Daily halachic times for Greentree Acres in Ferndale, NY (zip 12734) and local shul davening times." />
+  <meta property="og:description" content="Daily halachic times for Greentree Acres in Ferndale, NY (zip 12734) and year-round minyan times at local shuls." />
   <meta property="og:url" content="https://greentreebungalows.com/zmanim.html" />
   <meta property="og:image" content="https://greentreebungalows.com/img/hero.jpg" />
   <meta property="og:image:width" content="1920" />
   <meta property="og:image:height" content="1440" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Zmanim — Greentree Acres" />
-  <meta name="twitter:description" content="Daily halachic times for Greentree Acres in Ferndale, NY (zip 12734) and local shul davening times." />
+  <meta name="twitter:description" content="Daily halachic times for Greentree Acres in Ferndale, NY (zip 12734) and year-round minyan times at local shuls." />
   <meta name="twitter:image" content="https://greentreebungalows.com/img/hero.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -254,6 +254,37 @@
       color: var(--color-green);
       line-height: 1.5;
     }
+    .shul-addr {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--color-secondary);
+      margin-top: 2px;
+    }
+    .shul-table td:first-child { min-width: 140px; font-weight: 600; color: var(--color-dark); }
+    .shul-table td.shul-times { min-width: 120px; }
+    @media (max-width: 600px) {
+      #local-shuls .shul-table-wrap { overflow: visible; }
+      #local-shuls .shul-table thead { display: none; }
+      #local-shuls .shul-table,
+      #local-shuls .shul-table tbody,
+      #local-shuls .shul-table tr,
+      #local-shuls .shul-table td { display: block; width: 100%; }
+      #local-shuls .shul-table tr { padding: 12px 14px; border-bottom: 1px solid var(--color-border); }
+      #local-shuls .shul-table tbody tr:last-child { border-bottom: none; }
+      #local-shuls .shul-table td { border: none; padding: 3px 0; min-width: 0; }
+      #local-shuls .shul-table td:first-child { padding-bottom: 6px; }
+      #local-shuls .shul-table td[data-label] { display: flex; gap: 8px; }
+      #local-shuls .shul-table td[data-label]::before {
+        content: attr(data-label);
+        flex: 0 0 76px;
+        padding-top: 2px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--color-secondary);
+      }
+    }
     .shul-table td.shul-notes {
       color: var(--color-secondary);
       font-size: 0.82rem;
@@ -301,7 +332,7 @@
     <div class="container page-header-content">
       <p class="eyebrow">Ferndale, NY · 12734</p>
       <h1>Zmanim</h1>
-      <p>Daily halachic times for Greentree Acres, plus local shul davening times.</p>
+      <p>Daily halachic times for Greentree Acres, plus year-round minyanim at local shuls.</p>
     </div>
   </section>
 
@@ -334,79 +365,117 @@
     <div class="container">
       <div class="reveal">
         <p class="eyebrow">Neighborhood Shuls</p>
-        <h2>Local Shul Zmanim</h2>
-        <p>Davening times at nearby shuls in the area. Select a shul to view its schedule.</p>
+        <h2>Year-Round Minyanim</h2>
+        <p>Weekday davening times at shuls open all year, by town. Updated October 2026 &mdash; times shift with the seasons, so check with the shul if you're unsure.</p>
       </div>
 
       <div class="shul-tabs reveal reveal-delay-1" role="tablist">
-        <button class="shul-tab active" role="tab" data-shul="swan-lake">Swan Lake Synagogue</button>
-        <button class="shul-tab" role="tab" data-shul="heichal-breslev">Heichal HaKodesh Breslev</button>
+        <button class="shul-tab active" role="tab" data-shul="liberty">Liberty</button>
+        <button class="shul-tab" role="tab" data-shul="woodridge">Woodridge</button>
+        <button class="shul-tab" role="tab" data-shul="south-fallsburg">South Fallsburg</button>
+        <button class="shul-tab" role="tab" data-shul="monticello">Monticello</button>
+        <button class="shul-tab" role="tab" data-shul="kiamesha">Kiamesha</button>
       </div>
 
-      <div class="shul-panel active" id="shul-swan-lake" role="tabpanel">
-        <div class="shul-info">
-          <span>22 Stanton Corner Rd, Swan Lake, NY 12783</span>
-          <a href="tel:+18457678338">(845) 767-8338</a>
-          <a href="http://www.swanlakesynagogue.org" target="_blank" rel="noopener noreferrer">swanlakesynagogue.org</a>
-        </div>
-
+      <div class="shul-panel active" id="shul-liberty" role="tabpanel">
         <div class="shul-table-wrap">
           <table class="shul-table">
             <thead>
               <tr>
-                <th>Location</th>
-                <th>Brachos</th>
-                <th>Hodu</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Beis Medrash</td><td class="shul-time">6:00</td><td class="shul-time">6:05</td><td class="shul-notes"></td></tr>
-              <tr><td>Beis Medrash</td><td class="shul-time">6:50</td><td class="shul-time">7:00</td><td class="shul-notes"></td></tr>
-              <tr><td>Room A — downstairs</td><td class="shul-time">7:20</td><td class="shul-time">7:30</td><td class="shul-notes"></td></tr>
-              <tr><td>Room B — upstairs</td><td class="shul-time">7:40</td><td class="shul-time">7:50</td><td class="shul-notes">Only Sundays and legal holidays</td></tr>
-              <tr><td>Beis Medrash</td><td class="shul-time">7:50</td><td class="shul-time">8:00</td><td class="shul-notes"></td></tr>
-              <tr><td>Room A — downstairs</td><td class="shul-time">8:20</td><td class="shul-time">8:30</td><td class="shul-notes"></td></tr>
-              <tr><td>Room B — upstairs</td><td class="shul-time">8:40</td><td class="shul-time">8:50</td><td class="shul-notes">Only Sundays and legal holidays</td></tr>
-              <tr><td>Beis Medrash</td><td class="shul-time">8:50</td><td class="shul-time">9:00</td><td class="shul-notes"></td></tr>
-              <tr><td>Room A — downstairs</td><td class="shul-time">9:20</td><td class="shul-time">9:30</td><td class="shul-notes"></td></tr>
-              <tr><td>Room B — upstairs</td><td class="shul-time">9:40</td><td class="shul-time">9:50</td><td class="shul-notes">Only Sundays and legal holidays</td></tr>
-              <tr><td>Beis Medrash</td><td class="shul-time">9:50</td><td class="shul-time">10:00</td><td class="shul-notes"></td></tr>
-              <tr><td>Room A — downstairs</td><td class="shul-time">10:20</td><td class="shul-time">10:30</td><td class="shul-notes"></td></tr>
-              <tr><td>Room B — upstairs</td><td class="shul-time">10:40</td><td class="shul-time">10:50</td><td class="shul-notes">Only Sundays and legal holidays</td></tr>
-              <tr><td>Beis Medrash</td><td class="shul-time">10:50</td><td class="shul-time">11:00</td><td class="shul-notes"></td></tr>
-              <tr><td>Room B — upstairs</td><td class="shul-time">11:40</td><td class="shul-time">11:50</td><td class="shul-notes">Only Sundays and legal holidays</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="shul-panel" id="shul-heichal-breslev" role="tabpanel">
-        <div class="shul-info">
-          <span>181 Huschke Rd, Hurleyville, NY 12747</span>
-        </div>
-
-        <div class="shul-table-wrap">
-          <table class="shul-table">
-            <thead>
-              <tr>
-                <th>Day</th>
+                <th>Shul</th>
                 <th>Shacharis</th>
                 <th>Mincha</th>
                 <th>Maariv</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Sunday</td><td class="shul-times">5:24, 8:00, 8:30, 9:00, 9:30, 10:00, 10:30, 11:00, 12:00</td><td class="shul-times">1:45, 9:32</td><td class="shul-time">9:49</td></tr>
-              <tr><td>Monday</td><td class="shul-times">5:24, 7:00, 7:30, 8:00, 8:30, 8:30, 9:00, 9:30, 10:00, 10:30, 11:00, 12:00</td><td class="shul-times">1:45, 9:32</td><td class="shul-time">9:49</td></tr>
-              <tr><td>Tuesday</td><td class="shul-times">5:24, 7:00, 7:30, 8:00, 8:30, 8:30, 9:00, 9:30, 10:00, 10:30, 11:00, 12:00</td><td class="shul-times">1:45, 9:32</td><td class="shul-time">9:49</td></tr>
-              <tr><td>Wednesday</td><td class="shul-times">5:25, 7:00, 7:30, 8:00, 8:30, 8:30, 9:00, 9:30, 10:00, 10:30, 11:00, 12:00</td><td class="shul-times">1:45, 9:32</td><td class="shul-time">9:49</td></tr>
-              <tr><td>Thursday</td><td class="shul-times">5:25, 7:00, 7:30, 8:00, 8:30, 8:30, 9:00, 9:30, 10:00, 10:30, 11:00, 12:00</td><td class="shul-times">1:45, 9:32</td><td class="shul-time">9:49</td></tr>
-              <tr><td>Friday</td><td class="shul-times">5:25, 7:00, 7:30, 8:00, 8:30, 8:30, 9:00, 9:30, 10:00, 10:30, 11:00, 12:00</td><td class="shul-time">—</td><td class="shul-time">—</td></tr>
+              <tr><td>Breslev Shul<span class="shul-addr">181 Huschke Rd</span></td><td class="shul-times" data-label="Shacharis">Vasikin, 7:00, 7:30, 8:00, 8:30, 9:00, 9:30, 10:00</td><td class="shul-times" data-label="Mincha">1:45, 3:00; Mincha &amp; Maariv 15 min before Rabbeinu Tam</td><td class="shul-times" data-label="Maariv">10:00</td></tr>
+              <tr><td>Breslev Shul<span class="shul-addr">1 Jerusalem Ct</span></td><td class="shul-times" data-label="Shacharis">—</td><td class="shul-times" data-label="Mincha">Mincha &amp; Maariv 15 min before Rabbeinu Tam</td><td class="shul-times" data-label="Maariv">—</td></tr>
+              <tr><td>Fast Build<span class="shul-addr">35 Lake St</span></td><td class="shul-times" data-label="Shacharis">—</td><td class="shul-times" data-label="Mincha">2:00 (working days)</td><td class="shul-times" data-label="Maariv">—</td></tr>
+              <tr><td>Breslev Shul<span class="shul-addr">39 Chestnut St</span></td><td class="shul-times" data-label="Shacharis">—</td><td class="shul-times" data-label="Mincha">Mincha &amp; Maariv 15 min before Rabbeinu Tam</td><td class="shul-times" data-label="Maariv">—</td></tr>
             </tbody>
           </table>
         </div>
       </div>
+
+      <div class="shul-panel" id="shul-woodridge" role="tabpanel">
+        <div class="shul-table-wrap">
+          <table class="shul-table">
+            <thead>
+              <tr>
+                <th>Shul</th>
+                <th>Shacharis</th>
+                <th>Mincha</th>
+                <th>Maariv</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>K'hal Yereim<span class="shul-addr">25 Highland Ave</span></td><td class="shul-times" data-label="Shacharis">8:00</td><td class="shul-times" data-label="Mincha">Mincha-Maariv 45 min after shkia</td><td class="shul-times" data-label="Maariv">—</td></tr>
+              <tr><td>Woodridge Shul<span class="shul-addr">14 Maurice Rose St</span></td><td class="shul-times" data-label="Shacharis">6:45</td><td class="shul-times" data-label="Mincha">10 min before shkia</td><td class="shul-times" data-label="Maariv">After Mincha</td></tr>
+              <tr><td>Woodridge Yeshiva<span class="shul-addr">29 Broadway</span></td><td class="shul-times" data-label="Shacharis">8:00</td><td class="shul-times" data-label="Mincha">3:30</td><td class="shul-times" data-label="Maariv">10:00</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="shul-panel" id="shul-south-fallsburg" role="tabpanel">
+        <div class="shul-table-wrap">
+          <table class="shul-table">
+            <thead>
+              <tr>
+                <th>Shul</th>
+                <th>Shacharis</th>
+                <th>Mincha</th>
+                <th>Maariv</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Yeshiva Zichron Moshe<span class="shul-addr">84 Laurel Park Rd</span></td><td class="shul-times" data-label="Shacharis">7:30 · Cheder 7:40</td><td class="shul-times" data-label="Mincha">3:10 · Cheder 1:40</td><td class="shul-times" data-label="Maariv">10:30 · Cheder 9:00</td></tr>
+              <tr><td>Kollel Toras Chesed<span class="shul-addr">176 Laurel Ave</span></td><td class="shul-times" data-label="Shacharis">7:15</td><td class="shul-times" data-label="Mincha">6:50</td><td class="shul-times" data-label="Maariv">10:15</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="shul-panel" id="shul-monticello" role="tabpanel">
+        <div class="shul-table-wrap">
+          <table class="shul-table">
+            <thead>
+              <tr>
+                <th>Shul</th>
+                <th>Shacharis</th>
+                <th>Mincha</th>
+                <th>Maariv</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Tiferes Moshe<span class="shul-addr">55 St John St</span></td><td class="shul-times" data-label="Shacharis">7:00 (not Sunday), 8:00, 9:00, 10:00, after 11:00</td><td class="shul-times" data-label="Mincha">2:00, 4:30, 6:00, 55 min after shkia</td><td class="shul-times" data-label="Maariv">60 min after shkia, 72 min after shkia, 8:30, 10:00</td></tr>
+              <tr><td>Heichal HaTorah<span class="shul-addr">8 Garden Dr</span></td><td class="shul-times" data-label="Shacharis">—</td><td class="shul-times" data-label="Mincha">5:15 (free supper to take home)</td><td class="shul-times" data-label="Maariv">9:45</td></tr>
+              <tr><td>Kollel Zichron Moshe<span class="shul-addr">159 E Broadway</span></td><td class="shul-times" data-label="Shacharis">—</td><td class="shul-times" data-label="Mincha">6:15</td><td class="shul-times" data-label="Maariv">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="shul-panel" id="shul-kiamesha" role="tabpanel">
+        <div class="shul-table-wrap">
+          <table class="shul-table">
+            <thead>
+              <tr>
+                <th>Shul</th>
+                <th>Shacharis</th>
+                <th>Mincha</th>
+                <th>Maariv</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Kosher Express<span class="shul-addr">4670 Route 42</span></td><td class="shul-times" data-label="Shacharis">—</td><td class="shul-times" data-label="Mincha">3:00, 40 min after shkia</td><td class="shul-times" data-label="Maariv">60 min after shkia</td></tr>
+              <tr><td>Viznitz Kiamesha<span class="shul-addr">169 Barnes Blvd</span></td><td class="shul-times" data-label="Shacharis">6:30, 7:30, 7:45, 8:15, 8:45, 9:15, 9:45, 10:15, 20 min before sof zman tefila</td><td class="shul-times" data-label="Mincha">2:05, 3:40, 5:00 (Rebbe), 6:45, 15 min before shkia</td><td class="shul-times" data-label="Maariv">40 min after shkia, 9:15, 9:35, 10:00, 10:30</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </section>
 

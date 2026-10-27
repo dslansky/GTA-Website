@@ -29,7 +29,7 @@
   "year_round": "On the 10/26/26 year-round list",
   "seasonal": "Not on the year-round list - summer only"
  },
- "count": 201,
+ "count": 203,
  "items": [
   {
    "name": "Appletree Kosher Supermarket",
@@ -2910,7 +2910,7 @@
    "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
   },
   {
-   "name": "Minyan at 1 Jerusalem Ct",
+   "name": "Breslev Shul (1 Jerusalem Ct)",
    "category": "Synagogues & Batei Medrash",
    "town": "Liberty",
    "address": "1 Jerusalem Ct",
@@ -2940,7 +2940,7 @@
    "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
   },
   {
-   "name": "Minyan at 39 Chestnut St",
+   "name": "Breslev Shul (39 Chestnut St)",
    "category": "Synagogues & Batei Medrash",
    "town": "Liberty",
    "address": "39 Chestnut St",
@@ -3011,6 +3011,36 @@
    "notes": "Free hot suppers delivered to patients & new mothers at Orange Regional Hospital; call by 2 PM",
    "source": "Viderkol issue 38, 10/21/26",
    "id": "sc-201",
+   "year_round": true,
+   "season_source": "Viderkol issue 38, 10/21/26"
+  },
+  {
+   "name": "The Home Depot (Monticello)",
+   "category": "Home, Hardware & Furniture",
+   "town": "Monticello",
+   "address": "68 Thompson Square, Monticello, NY 12701",
+   "phone": "845-794-2498",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "Hardware, building supplies, garden",
+   "source": "Viderkol issue 38, 10/21/26",
+   "id": "sc-202",
+   "year_round": true,
+   "season_source": "Viderkol issue 38, 10/21/26"
+  },
+  {
+   "name": "Walmart Supercenter (Monticello)",
+   "category": "Home, Hardware & Furniture",
+   "town": "Monticello",
+   "address": "41 Anawana Lake Rd, Monticello, NY 12701",
+   "phone": "845-796-7202",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "General merchandise, pharmacy",
+   "source": "Viderkol issue 38, 10/21/26",
+   "id": "sc-203",
    "year_round": true,
    "season_source": "Viderkol issue 38, 10/21/26"
   }
