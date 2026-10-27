@@ -25,6 +25,8 @@ npx wrangler dev --persist-to <some-dir-outside-the-repo>
 
 ## Deploying
 
+Pushing to `main` deploys automatically (Cloudflare picks up the push within about a minute). To deploy without pushing:
+
 ```bash
 npx wrangler deploy
 ```
