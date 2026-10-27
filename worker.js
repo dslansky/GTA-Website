@@ -116,18 +116,18 @@ export default {
       return handleAdminPushVerify(request, env, url);
     }
     if (url.pathname === '/gazette-data') {
-      return handleGazetteData(env);
+      return handleGazetteData(request, env);
     }
     if (url.pathname === '/entertainment-data') {
       return json({ lineup: ENTERTAINMENT_LINEUP });
     }
     const gazPdfMatch = url.pathname.match(/^\/gazette\/([^/]+)\/pdf$/);
     if (gazPdfMatch) {
-      return handleGazettePdf(env, gazPdfMatch[1]);
+      return handleGazettePdf(request, env, gazPdfMatch[1]);
     }
     const gazThumbMatch = url.pathname.match(/^\/gazette\/([^/]+)\/thumb$/);
     if (gazThumbMatch) {
-      return handleGazetteThumb(env, gazThumbMatch[1]);
+      return handleGazetteThumb(request, env, gazThumbMatch[1]);
     }
     if (url.pathname === '/youtube-videos') {
       return handleYoutubeVideos(env);
@@ -394,12 +394,16 @@ async function isResidentAuthed(request, env) {
 
 // ── Orders ─────────────────────────────────────────────────────────────────
 
+// Shop closed for the season — new orders are rejected. Keep in sync with SHOP_OPEN in shop.html.
+const SHOP_OPEN = false;
+
 async function handleOrder(request, env, url) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: CORS });
   }
 
   if (request.method === 'POST') {
+    if (!SHOP_OPEN) return json({ success: false, error: 'The shop is closed.' }, 403);
     let body;
     try {
       body = await request.json();
@@ -2073,30 +2077,39 @@ async function handleGazetteThumbnailUpload(request, env, url) {
   return json({ success: true });
 }
 
-async function handleGazettePdf(env, id) {
+// Gazette is members-only: same passphrase gate as the Resident Directory,
+// or a logged-in admin (so the admin panel can still preview issues).
+async function canViewGazette(request, env) {
+  return (await isResidentAuthed(request, env)) || (await isAuthed(request, env));
+}
+
+async function handleGazettePdf(request, env, id) {
+  if (!(await canViewGazette(request, env))) return new Response('Unauthorized', { status: 401 });
   const obj = await env.MEMORIES.get(gazetteKey(id));
   if (!obj) return new Response('Not found', { status: 404 });
   return new Response(obj.body, {
     headers: {
       'Content-Type': 'application/pdf',
-      'Cache-Control': 'public, max-age=86400',
+      'Cache-Control': 'private, max-age=86400',
       'Content-Disposition': obj.httpMetadata?.contentDisposition || 'inline',
     },
   });
 }
 
-async function handleGazetteThumb(env, id) {
+async function handleGazetteThumb(request, env, id) {
+  if (!(await canViewGazette(request, env))) return new Response('Unauthorized', { status: 401 });
   const obj = await env.MEMORIES.get('gazette/' + id + '.jpg');
   if (!obj) return new Response('Not found', { status: 404 });
   return new Response(obj.body, {
     headers: {
       'Content-Type': 'image/jpeg',
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cache-Control': 'private, max-age=31536000, immutable',
     },
   });
 }
 
-async function handleGazetteData(env) {
+async function handleGazetteData(request, env) {
+  if (!(await canViewGazette(request, env))) return json({ ok: false, error: 'locked' }, 401);
   const list = await env.ORDERS.list({ prefix: 'gazette_' });
   if (!list.keys.length) return json({ issues: [] });
   const all = await Promise.all(

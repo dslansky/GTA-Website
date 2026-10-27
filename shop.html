@@ -556,11 +556,10 @@
     <div class="container">
 
       <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;background:#1d1d1f;border-radius:var(--radius);margin-bottom:32px;flex-wrap:wrap;">
-        <div style="width:10px;height:10px;border-radius:50%;background:#3a7d32;flex-shrink:0;box-shadow:0 0 0 3px rgba(58,125,50,0.25);"></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:#86868b;flex-shrink:0;box-shadow:0 0 0 3px rgba(134,134,139,0.25);"></div>
         <div style="flex:1;min-width:0;">
-          <p style="margin:0;font-weight:700;color:#fff;font-size:0.95rem;">Orders Close Today at 5:00 PM</p>
-          <p style="margin:4px 0 0;color:#999;font-size:0.82rem;">Orders and payment are both due by 5:00 PM today. Payment instructions are shown after you place your order. Orders placed after 5:00 PM are not guaranteed — we'll reach out if yours can still be included.</p>
-          <p style="margin:6px 0 0;color:#f59e0b;font-size:0.82rem;font-weight:600;">⚠ Items will only be produced if a minimum order quantity is reached. If an item doesn't meet the minimum, your order for it may be cancelled and refunded.</p>
+          <p style="margin:0;font-weight:700;color:#fff;font-size:0.95rem;">The Shop Is Closed</p>
+          <p style="margin:4px 0 0;color:#999;font-size:0.82rem;">Ordering is closed for the season. Check back next summer for the next round of GTA Lobos gear.</p>
         </div>
       </div>
 
@@ -937,6 +936,14 @@
         document.getElementById('cart-footer').style.display = '';
       }
 
+      // Shop is closed: no adding to cart. Flip to true (and SHOP_OPEN in worker.js) to reopen.
+      var SHOP_OPEN = false;
+      if (!SHOP_OPEN) {
+        document.querySelectorAll('.btn-add-cart').forEach(function (b) { b.disabled = true; b.textContent = 'Shop Closed'; });
+        document.querySelectorAll('.shop-card select, .shop-card .qty-btn').forEach(function (el) { el.disabled = true; });
+        document.getElementById('cart-float-btn').style.display = 'none';
+      }
+
       // Wire up each card
       document.querySelectorAll('.shop-card').forEach(function (card) {
         var addBtn      = card.querySelector('.btn-add-cart');
@@ -967,6 +974,7 @@
         }
 
         addBtn.addEventListener('click', function () {
+          if (!SHOP_OPEN) return;
           var name  = card.getAttribute('data-name');
           var price = parseInt(card.getAttribute('data-price'), 10);
           var size  = sizeSelect ? sizeSelect.value : '';

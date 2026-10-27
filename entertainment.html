@@ -104,20 +104,6 @@
   </section>
 
   <!-- ══════════════════════════════════════
-       LATEST VIDEO TEASER
-  ══════════════════════════════════════ -->
-  <section class="section--sm" id="ent-video">
-    <div class="container">
-      <div class="ent-video-header reveal">
-        <p class="eyebrow">From Past Weeks</p>
-        <h2>Latest from Our Channel</h2>
-      </div>
-      <div id="ent-video-card" class="ent-video-card" style="display:none;"></div>
-      <p class="ent-video-more"><a href="memories.html">See more on our Memories page →</a></p>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
        FOOTER
   ══════════════════════════════════════ -->
   <footer>
@@ -187,18 +173,6 @@
     }).catch(function () {
       document.getElementById('ent-highlight').innerHTML = '<p class="ent-highlight-status">Check back soon for this week’s lineup.</p>';
     });
-
-    fetch('/youtube-videos').then(function (r) { return r.json(); }).then(function (d) {
-      var latest = (d.videos || [])[0];
-      if (!latest) return;
-      var el = document.getElementById('ent-video-card');
-      el.innerHTML =
-        '<a class="ent-video-link-card" href="https://www.youtube.com/watch?v=' + encodeURIComponent(latest.id) + '" target="_blank" rel="noopener noreferrer">' +
-          '<img src="' + latest.thumbnail + '" alt="" class="ent-video-thumb" />' +
-          '<span class="ent-video-title">' + escEnt(latest.title || 'Watch now') + '</span>' +
-        '</a>';
-      el.style.display = '';
-    }).catch(function () {});
   </script>
   <script src="js/main.js"></script>
   <script src="js/weather.js" defer></script>

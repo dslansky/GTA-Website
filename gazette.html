@@ -4,20 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>GTA Gazette — Greentree Acres</title>
-  <meta name="description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Browse every issue from the archive." />
+  <meta name="description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Members only — residents passphrase required." />
 
   <!-- Open Graph / social preview (WhatsApp, Facebook, iMessage, etc.) -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Greentree Acres" />
   <meta property="og:title" content="GTA Gazette — Greentree Acres" />
-  <meta property="og:description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Browse every issue from the archive." />
+  <meta property="og:description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Members only — residents passphrase required." />
   <meta property="og:url" content="https://greentreebungalows.com/gazette.html" />
   <meta property="og:image" content="https://greentreebungalows.com/img/hero.jpg" />
   <meta property="og:image:width" content="1920" />
   <meta property="og:image:height" content="1440" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="GTA Gazette — Greentree Acres" />
-  <meta name="twitter:description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Browse every issue from the archive." />
+  <meta name="twitter:description" content="The GTA Gazette — Greentree Acres' weekly community newsletter. Members only — residents passphrase required." />
   <meta name="twitter:image" content="https://greentreebungalows.com/img/hero.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -246,6 +246,44 @@
       color: var(--color-secondary);
       font-size: 0.9rem;
     }
+    /* Members-only gate (same passphrase as the Resident Directory) */
+    .gz-gate-section { display: none; }
+    #gz-gate {
+      max-width: 420px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    #gz-gate form {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    #gz-gate input[type="password"] {
+      padding: 14px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: var(--font);
+    }
+    #gz-gate button {
+      padding: 14px;
+      background: var(--color-green);
+      color: white;
+      border: none;
+      border-radius: 100px;
+      font-family: var(--font);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    #gz-gate button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #gz-gate-err {
+      color: #e53e3e;
+      font-size: 0.85rem;
+      min-height: 20px;
+    }
   </style>
 </head>
 <body>
@@ -294,6 +332,24 @@
   </section>
 
   <!-- ══════════════════════════════════════
+       MEMBERS GATE
+  ══════════════════════════════════════ -->
+  <section class="section gz-gate-section" id="gz-gate-section">
+    <div class="container">
+      <div id="gz-gate">
+        <p class="eyebrow">Members Only</p>
+        <h2>The Gazette is for residents only</h2>
+        <p>Enter the residents passphrase from your welcome packet. Don't have it? Ask the Board for access.</p>
+        <form id="gz-gate-form">
+          <input id="gz-pass" type="password" name="passphrase" placeholder="Passphrase" autocomplete="off" required />
+          <button id="gz-gate-submit" type="submit">Unlock Gazette</button>
+        </form>
+        <p id="gz-gate-err"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
        VIEWER
   ══════════════════════════════════════ -->
   <section class="gz-viewer" id="viewer">
@@ -327,7 +383,7 @@
   <!-- ══════════════════════════════════════
        ARCHIVE
   ══════════════════════════════════════ -->
-  <section class="gz-archive-section">
+  <section class="gz-archive-section" id="gz-archive-section">
     <div class="container">
       <div class="gz-archive-header">
         <h2>All Issues</h2>
@@ -438,22 +494,66 @@
         });
       }
 
-      fetch('/gazette-data')
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          state.issues = data.issues || [];
-          if (!state.issues.length) {
-            document.getElementById('gz-empty').style.display = 'block';
-            document.getElementById('gz-embed-wrap').style.display = 'none';
-            document.getElementById('gz-current-title').textContent = 'No issues yet';
-            return;
-          }
-          renderArchive();
-          selectIssue(state.issues[0].id, false);
-        })
+      var gateSection = document.getElementById('gz-gate-section');
+      var lockedSections = [document.getElementById('viewer'), document.getElementById('gz-archive-section')];
+      function setLocked(locked) {
+        gateSection.style.display = locked ? 'block' : 'none';
+        lockedSections.forEach(function (el) { el.style.display = locked ? 'none' : ''; });
+      }
+
+      // Returns null while locked (401), otherwise the issues payload.
+      function tryLoad() {
+        return fetch('/gazette-data', { credentials: 'same-origin' }).then(function (r) {
+          if (r.status === 401) return null;
+          if (!r.ok) throw new Error('load failed');
+          return r.json();
+        });
+      }
+
+      function showIssues(data) {
+        setLocked(false);
+        state.issues = data.issues || [];
+        if (!state.issues.length) {
+          document.getElementById('gz-empty').style.display = 'block';
+          document.getElementById('gz-embed-wrap').style.display = 'none';
+          document.getElementById('gz-current-title').textContent = 'No issues yet';
+          return;
+        }
+        renderArchive();
+        selectIssue(state.issues[0].id, false);
+      }
+
+      tryLoad()
+        .then(function (data) { if (data) showIssues(data); else setLocked(true); })
         .catch(function () {
           document.getElementById('gz-current-title').textContent = 'Could not load issues';
         });
+
+      var gateForm = document.getElementById('gz-gate-form');
+      var gateErr = document.getElementById('gz-gate-err');
+      var gateBtn = document.getElementById('gz-gate-submit');
+      gateForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        gateErr.textContent = '';
+        gateBtn.disabled = true;
+        gateBtn.textContent = 'Checking…';
+
+        fetch('/residents/unlock', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passphrase: document.getElementById('gz-pass').value }),
+        }).then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (!j.ok) { gateErr.textContent = j.error || 'Incorrect passphrase.'; return; }
+            return tryLoad().then(function (data) { if (data) showIssues(data); });
+          })
+          .catch(function () { gateErr.textContent = 'Something went wrong — please try again.'; })
+          .finally(function () {
+            gateBtn.disabled = false;
+            gateBtn.textContent = 'Unlock Gazette';
+          });
+      });
     })();
   </script>
 </body>
