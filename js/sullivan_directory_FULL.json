@@ -29,7 +29,7 @@
   "year_round": "On the 10/26/26 year-round list",
   "seasonal": "Not on the year-round list - summer only"
  },
- "count": 197,
+ "count": 199,
  "items": [
   {
    "name": "Appletree Kosher Supermarket",
@@ -2953,6 +2953,36 @@
    "id": "sc-197",
    "year_round": true,
    "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
+  },
+  {
+   "name": "Ahava Medical (Liberty)",
+   "category": "Health & Medical",
+   "town": "Liberty",
+   "address": "25 Carrier St, Liberty, NY 12754",
+   "phone": "718-502-9900",
+   "email": "",
+   "website": "ahavamedical.com",
+   "verify_status": "confirmed",
+   "notes": "Medical clinic; flu shots",
+   "source": "Viderkol issue 38, 10/21/26",
+   "id": "sc-198",
+   "year_round": true,
+   "season_source": "Viderkol issue 38, 10/21/26"
+  },
+  {
+   "name": "The Home Shop",
+   "category": "Home, Hardware & Furniture",
+   "town": "South Fallsburg",
+   "address": "5201 NY-42, South Fallsburg, NY 12779",
+   "phone": "516-650-0801",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "Housewares; Sun–Thu 11–6, Fri 11–2",
+   "source": "Viderkol issue 38, 10/21/26",
+   "id": "sc-199",
+   "year_round": true,
+   "season_source": "Viderkol issue 38, 10/21/26"
   }
  ]
 }
