@@ -29,7 +29,7 @@
   "year_round": "On the 10/26/26 year-round list",
   "seasonal": "Not on the year-round list - summer only"
  },
- "count": 199,
+ "count": 201,
  "items": [
   {
    "name": "Appletree Kosher Supermarket",
@@ -2981,6 +2981,36 @@
    "notes": "Housewares; Sun–Thu 11–6, Fri 11–2",
    "source": "Viderkol issue 38, 10/21/26",
    "id": "sc-199",
+   "year_round": true,
+   "season_source": "Viderkol issue 38, 10/21/26"
+  },
+  {
+   "name": "Catskill Mountain Transportation",
+   "category": "Professional & Other Services",
+   "town": "",
+   "address": "",
+   "phone": "845-434-8400",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "Car service; local & long distance, minivans",
+   "source": "Viderkol issue 38, 10/21/26",
+   "id": "sc-200",
+   "year_round": true,
+   "season_source": "Viderkol issue 38, 10/21/26"
+  },
+  {
+   "name": "Bikur Cholim Kiryas Yetev Lev (Bloomingburg)",
+   "category": "Emergency & Community Services",
+   "town": "Bloomingburg",
+   "address": "Bloomingburg, NY 12721",
+   "phone": "929-250-5125",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "Free hot suppers delivered to patients & new mothers at Orange Regional Hospital; call by 2 PM",
+   "source": "Viderkol issue 38, 10/21/26",
+   "id": "sc-201",
    "year_round": true,
    "season_source": "Viderkol issue 38, 10/21/26"
   }
