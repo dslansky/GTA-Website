@@ -29,7 +29,7 @@
   "year_round": "On the 10/26/26 year-round list",
   "seasonal": "Not on the year-round list - summer only"
  },
- "count": 188,
+ "count": 191,
  "items": [
   {
    "name": "Appletree Kosher Supermarket",
@@ -2818,6 +2818,51 @@
    "id": "sc-188",
    "year_round": true,
    "season_source": "Catskills year-round list 10/26/26"
+  },
+  {
+   "name": "ADM Interiors",
+   "category": "Home, Hardware & Furniture",
+   "town": "Monticello",
+   "address": "88 Forestburgh Rd, Monticello, NY 12701",
+   "phone": "845-794-7900",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "Window treatments, reupholstery, fabric showroom, custom tablecloths",
+   "source": "Viderkol issue 37, 9/2/26",
+   "id": "sc-189",
+   "year_round": true,
+   "season_source": "Viderkol issue 37, 9/2/26"
+  },
+  {
+   "name": "Lachman Jewelry",
+   "category": "Apparel & Footwear",
+   "town": "Fallsburg",
+   "address": "C-74, Fallsburg, NY 12733",
+   "phone": "845-428-9937",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "14K gold & diamonds, watches, kallah gifts; by appointment",
+   "source": "Viderkol issue 37, 9/2/26",
+   "id": "sc-190",
+   "year_round": true,
+   "season_source": "Viderkol issue 37, 9/2/26"
+  },
+  {
+   "name": "Delicate Rose Fine Lingerie",
+   "category": "Apparel & Footwear",
+   "town": "Liberty",
+   "address": "Liberty, NY 12754",
+   "phone": "347-693-7915",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "Sunday & evening appointments",
+   "source": "Viderkol issue 37, 9/2/26",
+   "id": "sc-191",
+   "year_round": true,
+   "season_source": "Viderkol issue 37, 9/2/26"
   }
  ]
 }
