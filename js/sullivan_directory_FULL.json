@@ -29,7 +29,7 @@
   "year_round": "On the 10/26/26 year-round list",
   "seasonal": "Not on the year-round list - summer only"
  },
- "count": 191,
+ "count": 197,
  "items": [
   {
    "name": "Appletree Kosher Supermarket",
@@ -2863,6 +2863,96 @@
    "id": "sc-191",
    "year_round": true,
    "season_source": "Viderkol issue 37, 9/2/26"
+  },
+  {
+   "name": "Kollel Toras Chesed",
+   "category": "Synagogues & Batei Medrash",
+   "town": "South Fallsburg",
+   "address": "176 Laurel Ave",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Viderkol issue 38 year-round minyan list, 10/21/26",
+   "id": "sc-192",
+   "year_round": true,
+   "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
+  },
+  {
+   "name": "Heichal HaTorah",
+   "category": "Synagogues & Batei Medrash",
+   "town": "Monticello",
+   "address": "8 Garden Dr",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "Mincha 5:15 with free supper to take home",
+   "source": "Viderkol issue 38 year-round minyan list, 10/21/26",
+   "id": "sc-193",
+   "year_round": true,
+   "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
+  },
+  {
+   "name": "Woodridge Yeshiva",
+   "category": "Synagogues & Batei Medrash",
+   "town": "Woodridge",
+   "address": "29 Broadway",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Viderkol issue 38 year-round minyan list, 10/21/26",
+   "id": "sc-194",
+   "year_round": true,
+   "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
+  },
+  {
+   "name": "Minyan at 1 Jerusalem Ct",
+   "category": "Synagogues & Batei Medrash",
+   "town": "Liberty",
+   "address": "1 Jerusalem Ct",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Viderkol issue 38 year-round minyan list, 10/21/26",
+   "id": "sc-195",
+   "year_round": true,
+   "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
+  },
+  {
+   "name": "Fast Build Minyan",
+   "category": "Synagogues & Batei Medrash",
+   "town": "Liberty",
+   "address": "35 Lake St",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Viderkol issue 38 year-round minyan list, 10/21/26",
+   "id": "sc-196",
+   "year_round": true,
+   "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
+  },
+  {
+   "name": "Minyan at 39 Chestnut St",
+   "category": "Synagogues & Batei Medrash",
+   "town": "Liberty",
+   "address": "39 Chestnut St",
+   "phone": "",
+   "email": "",
+   "website": "",
+   "verify_status": "confirmed",
+   "notes": "",
+   "source": "Viderkol issue 38 year-round minyan list, 10/21/26",
+   "id": "sc-197",
+   "year_round": true,
+   "season_source": "Viderkol issue 38 year-round minyan list, 10/21/26"
   }
  ]
 }
