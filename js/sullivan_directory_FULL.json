@@ -537,11 +537,12 @@
    "email": "",
    "website": "",
    "verify_status": "confirmed",
-   "notes": "Landmark; seasonal Woodbourne branch on Main St — Open year-round",
+   "notes": "Landmark; breakfast & lunch; seasonal Woodbourne branch on Main St — Open year-round",
    "source": "Curated + Vues 6/25/26 + Vues 8/20/26",
    "id": "sc-034",
    "year_round": true,
-   "season_source": "Catskills year-round list 10/26/26"
+   "season_source": "Catskills year-round list 10/26/26",
+   "doordash": "https://www.doordash.com/search/store/Gombo%27s/"
   },
   {
    "name": "Rugelach Heimishe Bakery & Cafe",
@@ -2230,15 +2231,15 @@
    "year_round_evidence": "registered 501c3 congregation; listing notes year-round accessibility with multiple daily minyanim"
   },
   {
-   "name": "Kollel of South Fallsburg",
+   "name": "Lake Street Shul",
    "category": "Synagogues & Batei Medrash",
    "town": "South Fallsburg",
    "address": "187 Lake St",
    "phone": "",
    "email": "",
    "website": "",
-   "verify_status": "verify",
-   "notes": "Study center",
+   "verify_status": "confirmed",
+   "notes": "Formerly Kollel of South Fallsburg",
    "source": "Prior list",
    "id": "sc-148",
    "year_round": true,
